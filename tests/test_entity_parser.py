@@ -132,23 +132,23 @@ PRODUCT_JSON_SCHEMA: str = '''
       "properties": {
         "productId": {
           "type": "string",
-          "description": "Unique identifier for the brand",
+          "description": "Unique identifier for the product",
           "primaryKey": true,
           "maxLength": 30
         },
         "name": {
           "type": "string",
-          "description": "Name of the brand",
+          "description": "Name of the product",
           "maxLength": 50
         },
         "description": {
           "type": "string",
-          "description": "Description of the brand",
+          "description": "Description of the product",
           "maxLength": "max"
         },
         "category": {
           "$ref": "#/definitions/Category",
-          "description": "Parent category associated with the category"
+          "description": "The product category"
         }
       },
       "required": ["productId", "name"],
