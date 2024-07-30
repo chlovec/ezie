@@ -231,6 +231,36 @@ PRODUCT_BRAND_ENTITY = Entity(
     ]
 )
 
+PRODUCT_CATEGORY_NON_REF_FIELDS = [
+    EntityField(
+        name='name',
+        field_type='string',
+        max_length=50,
+        is_required=True,
+        is_primary_key=False,
+        type_ref=None
+    ),
+    EntityField(
+        name='description',
+        field_type='string',
+        max_length='max',
+        is_required=False,
+        is_primary_key=False,
+        type_ref=None
+    )
+]
+
+PRODUCT_CATEGORY_PK_FIELDS = [
+    EntityField(
+        name='id',
+        field_type='string',
+        max_length=30,
+        is_required=True,
+        is_primary_key=False,
+        type_ref=None
+    )
+]
+
 
 class TestJsonSchemaParser(unittest.TestCase):
     def setUp(self):
@@ -276,9 +306,16 @@ class TestJsonSchemaParser(unittest.TestCase):
         self.assertEqual(len(actual_entities), THREE)
         actual_entities.sort(key=lambda x: x.name)
 
-        actual_brand_entity = actual_entities[ZERO]
-        print(actual_brand_entity)
-        self.assertEqual(PRODUCT_BRAND_ENTITY, actual_brand_entity)
+        self.assertEqual(PRODUCT_BRAND_ENTITY, actual_entities[ZERO])
+
+        product_category = actual_entities[ONE]
+        self.assertEqual("Category", product_category.name)
+        self.assertEqual(
+            PRODUCT_CATEGORY_NON_REF_FIELDS, product_category.non_ref_fields
+        )
+        self.assertEqual(
+            PRODUCT_CATEGORY_PK_FIELDS, product_category.pk_fields
+        )
 
 
 if __name__ == '__main__':
