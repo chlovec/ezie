@@ -133,7 +133,6 @@ PRODUCT_JSON_SCHEMA: str = '''
         "productId": {
           "type": "string",
           "description": "Unique identifier for the product",
-          "primaryKey": true,
           "maxLength": 30
         },
         "name": {

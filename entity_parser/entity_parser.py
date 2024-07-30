@@ -29,7 +29,7 @@ class EntityParser(ABC):
 
         for field in non_ref_field:
             if field.name.lower() in [pk_field_name_1, pk_field_name_2]:
-                return field
+                return [field]
 
         raise ValueError(
             f"No primary key field found for entity '{class_name}'"
