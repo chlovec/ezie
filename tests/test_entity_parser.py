@@ -298,6 +298,21 @@ class TestJsonSchemaParser(unittest.TestCase):
         self.assertTrue(
             actual_entities[0].ref_fields
         )
+        self.assertEqual(
+            ONE, len(actual_entities[0].ref_fields)
+        )
+
+        # Verify parent category
+        parent_category = actual_entities[0].ref_fields[0]
+        self.assertEqual("parent_category", parent_category.name)
+        self.assertEqual("Category", parent_category.ref_entity.name)
+        self.assertEqual(
+            ENTITY_NON_REF_FIELDS,
+            parent_category.ref_entity.non_ref_fields
+        )
+        self.assertEqual(
+            ENTITY_ID_PK_FIELD, parent_category.ref_entity.pk_fields
+        )
 
     def test_product_json_schema(self):
         actual_entities: List[Entity] = self.parser.parse(
