@@ -5,6 +5,7 @@ from entity_parser.entity import Entity, EntityField
 from entity_parser.entity_parser import JsonSchemaParser
 
 ONE: int = 1
+THREE: int = 3
 
 BRAND_JSON_SCHEMA: str = '''
 {
@@ -46,6 +47,91 @@ CATEGORY_JSON_SCHEMA: str = '''
       "properties": {
         "id": {
           "type": "string",
+          "description": "Unique identifier for the category",
+          "primaryKey": true,
+          "maxLength": 30
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the category",
+          "maxLength": 50
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the category",
+          "maxLength": "max"
+        },
+        "parent_category": {
+          "$ref": "#/definitions/Category",
+          "description": "Parent category associated with the category"
+        }
+      },
+      "required": ["id", "name"],
+      "additionalProperties": false
+    }
+  }
+}
+'''
+
+PRODUCT_JSON_SCHEMA: str = '''
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "Category": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the category",
+          "primaryKey": true,
+          "maxLength": 30
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the category",
+          "maxLength": 50
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the category",
+          "maxLength": "max"
+        },
+        "parent_category": {
+          "$ref": "#/definitions/Category",
+          "description": "Parent category associated with the category"
+        }
+      },
+      "required": ["id", "name"],
+      "additionalProperties": false
+    },
+    "Brand": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the brand",
+          "primaryKey": true,
+          "maxLength": 30
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the brand",
+          "maxLength": 50
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the brand",
+          "maxLength": "max"
+        }
+      },
+      "required": ["id", "name"],
+      "additionalProperties": false
+    },
+    "Product": {
+      "type": "object",
+      "properties": {
+        "productId": {
+          "type": "string",
           "description": "Unique identifier for the brand",
           "primaryKey": true,
           "maxLength": 30
@@ -60,12 +146,12 @@ CATEGORY_JSON_SCHEMA: str = '''
           "description": "Description of the brand",
           "maxLength": "max"
         },
-        "parent_category": {
+        "category": {
           "$ref": "#/definitions/Category",
           "description": "Parent category associated with the category"
         }
       },
-      "required": ["id", "name"],
+      "required": ["productId", "name"],
       "additionalProperties": false
     }
   }
@@ -136,6 +222,12 @@ class TestJsonSchemaParser(unittest.TestCase):
         self.assertTrue(
             actual_entities[0].ref_fields
         )
+
+    def test_product_json_schema(self):
+        actual_entities: List[Entity] = self.parser.parse(
+            file_content=PRODUCT_JSON_SCHEMA
+        )
+        self.assertEqual(len(actual_entities), THREE)
 
 
 if __name__ == '__main__':
