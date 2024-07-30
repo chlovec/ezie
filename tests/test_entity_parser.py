@@ -271,13 +271,13 @@ class TestJsonSchemaParser(unittest.TestCase):
         actual_entities: List[Entity] = self.parser.parse(
             file_content=BRAND_JSON_SCHEMA
         )
-        self.assertEqual(len(actual_entities), ONE)
-        self.assertEqual(actual_entities[0].name, "Brand")
+        self.assertEqual(ONE, len(actual_entities))
+        self.assertEqual("Brand", actual_entities[0].name)
         self.assertEqual(
-            actual_entities[0].non_ref_fields, ENTITY_NON_REF_FIELDS
+            ENTITY_NON_REF_FIELDS, actual_entities[0].non_ref_fields
         )
         self.assertEqual(
-            actual_entities[0].pk_fields, ENTITY_ID_PK_FIELD
+            ENTITY_ID_PK_FIELD, actual_entities[0].pk_fields
         )
         self.assertFalse(
             actual_entities[0].ref_fields
@@ -287,13 +287,13 @@ class TestJsonSchemaParser(unittest.TestCase):
         actual_entities: List[Entity] = self.parser.parse(
             file_content=CATEGORY_JSON_SCHEMA
         )
-        self.assertEqual(len(actual_entities), ONE)
-        self.assertEqual(actual_entities[0].name, "Category")
+        self.assertEqual(ONE, len(actual_entities))
+        self.assertEqual("Category", actual_entities[0].name)
         self.assertEqual(
-            actual_entities[0].non_ref_fields, ENTITY_NON_REF_FIELDS
+            ENTITY_NON_REF_FIELDS, actual_entities[0].non_ref_fields
         )
         self.assertEqual(
-            actual_entities[0].pk_fields, ENTITY_ID_PK_FIELD
+            ENTITY_ID_PK_FIELD, actual_entities[0].pk_fields
         )
         self.assertTrue(
             actual_entities[0].ref_fields
@@ -306,8 +306,10 @@ class TestJsonSchemaParser(unittest.TestCase):
         self.assertEqual(len(actual_entities), THREE)
         actual_entities.sort(key=lambda x: x.name)
 
+        # verify brand
         self.assertEqual(PRODUCT_BRAND_ENTITY, actual_entities[ZERO])
 
+        # Verify category
         product_category = actual_entities[ONE]
         self.assertEqual("Category", product_category.name)
         self.assertEqual(
@@ -315,6 +317,20 @@ class TestJsonSchemaParser(unittest.TestCase):
         )
         self.assertEqual(
             PRODUCT_CATEGORY_PK_FIELDS, product_category.pk_fields
+        )
+        self.assertTrue(product_category.ref_fields)
+        self.assertEqual(ONE, len(product_category.ref_fields))
+
+        # Verify parent category
+        parent_category = product_category.ref_fields[0]
+        self.assertEqual("parent_category", parent_category.name)
+        self.assertEqual("Category", parent_category.ref_entity.name)
+        self.assertEqual(
+            PRODUCT_CATEGORY_NON_REF_FIELDS,
+            parent_category.ref_entity.non_ref_fields
+        )
+        self.assertEqual(
+            PRODUCT_CATEGORY_PK_FIELDS, parent_category.ref_entity.pk_fields
         )
 
 
