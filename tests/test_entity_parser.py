@@ -146,6 +146,19 @@ PRODUCT_JSON_SCHEMA: str = '''
           "description": "Description of the product",
           "maxLength": "max"
         },
+        "price": {
+          "type": "number",
+          "format": "decimal",
+          "description": "Price of the product"
+        },
+        "quantity": {
+          "type": "integer",
+          "description": "The quantity of the product currently in stock"
+        },
+        "brand": {
+          "$ref": "#/definitions/Brand",
+          "description": "The product brand"
+        },
         "category": {
           "$ref": "#/definitions/Category",
           "description": "The product category"
