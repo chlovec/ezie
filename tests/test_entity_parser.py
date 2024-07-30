@@ -4,7 +4,9 @@ import unittest
 from entity_parser.entity import Entity, EntityField
 from entity_parser.entity_parser import JsonSchemaParser
 
+ZERO: int = 0
 ONE: int = 1
+TWO: int = 2
 THREE: int = 3
 
 BRAND_JSON_SCHEMA: str = '''
@@ -83,7 +85,6 @@ PRODUCT_JSON_SCHEMA: str = '''
         "id": {
           "type": "string",
           "description": "Unique identifier for the category",
-          "primaryKey": true,
           "maxLength": 30
         },
         "name": {
@@ -107,10 +108,9 @@ PRODUCT_JSON_SCHEMA: str = '''
     "Brand": {
       "type": "object",
       "properties": {
-        "id": {
+        "brand_id": {
           "type": "string",
           "description": "Unique identifier for the brand",
-          "primaryKey": true,
           "maxLength": 30
         },
         "name": {
@@ -124,7 +124,7 @@ PRODUCT_JSON_SCHEMA: str = '''
           "maxLength": "max"
         }
       },
-      "required": ["id", "name"],
+      "required": ["brand_id", "name"],
       "additionalProperties": false
     },
     "Product": {
@@ -132,6 +132,7 @@ PRODUCT_JSON_SCHEMA: str = '''
       "properties": {
         "productId": {
           "type": "string",
+          "format": "uuid",
           "description": "Unique identifier for the product",
           "maxLength": 30
         },
@@ -197,6 +198,39 @@ ENTITY_ID_PK_FIELD = [
     )
 ]
 
+PRODUCT_BRAND_ENTITY = Entity(
+    name='Brand',
+    non_ref_fields=[
+        EntityField(
+            name='name',
+            field_type='string',
+            max_length=50,
+            is_required=True,
+            is_primary_key=False,
+            type_ref=None
+        ),
+        EntityField(
+            name='description',
+            field_type='string',
+            max_length='max',
+            is_required=False,
+            is_primary_key=False,
+            type_ref=None
+        )
+    ],
+    ref_fields=[],
+    pk_fields=[
+        EntityField(
+            name='brand_id',
+            field_type='string',
+            max_length=30,
+            is_required=True,
+            is_primary_key=False,
+            type_ref=None
+        )
+    ]
+)
+
 
 class TestJsonSchemaParser(unittest.TestCase):
     def setUp(self):
@@ -240,6 +274,11 @@ class TestJsonSchemaParser(unittest.TestCase):
             file_content=PRODUCT_JSON_SCHEMA
         )
         self.assertEqual(len(actual_entities), THREE)
+        actual_entities.sort(key=lambda x: x.name)
+
+        actual_brand_entity = actual_entities[ZERO]
+        print(actual_brand_entity)
+        self.assertEqual(PRODUCT_BRAND_ENTITY, actual_brand_entity)
 
 
 if __name__ == '__main__':
