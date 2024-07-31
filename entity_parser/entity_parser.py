@@ -1,7 +1,7 @@
 
 from abc import ABC, abstractmethod
 import json
-from typing import Dict, List
+from typing import Any, Dict, List, Union
 
 from entity_parser.entity import Entity, EntityField, RefEntityField
 
@@ -19,21 +19,21 @@ class EntityParser(ABC):
 
     def _get_pk_fields(
         self, pk_field_names: List[str], non_ref_field: List[EntityField]
-    ) -> List[EntityField]:
+    ) -> Union[EntityField, None]:
         # Respect order of precedence in pk_field_names
         for field_name in pk_field_names:
             for field in non_ref_field:
                 if field.name.lower() == field_name:
-                    return [field]
+                    return field
 
-        return []
+        return None
 
     def _get_type_ref(self, type_ref: str) -> str:
         refs = type_ref.split("/")
-        if len(refs) != THREE:
-            raise ValueError(f"Json schema contains invalid ref '{type_ref}'")
+        if len(refs) == THREE:
+            return refs[TWO]
 
-        return refs[TWO]
+        raise ValueError(f"Json schema contains invalid ref '{type_ref}'")
 
     def _set_entity_attributes(
         self,
@@ -78,14 +78,16 @@ class EntityParser(ABC):
                 non_ref_fields.append(field)
 
         if not pk_fields:
-            pk_fields = self._get_pk_fields(
+            pk_field = self._get_pk_fields(
                 ["id", f"{class_name}_id".lower(), f"{class_name}id".lower()],
                 non_ref_fields
             )
-        if not pk_fields:
-            raise ValueError(
-                f"No primary key field found for entity '{class_name}'"
-            )
+            if not pk_field:
+                raise ValueError(
+                    f"No primary key field found for entity '{class_name}'"
+                )
+
+            pk_fields = [pk_field]
 
         # Remove all pk_fields from non_ref_fields
         non_ref_fields = [
@@ -186,7 +188,7 @@ class JsonSchemaParser(EntityParser):
             )
 
     def _map_class_attributes(
-        self, schema
+        self, schema: Dict[str, Any]
     ) -> Dict[str, List[EntityField]]:
         # Extract definitions and process classes within it
         definitions = schema.get("definitions", {})
@@ -219,7 +221,7 @@ class JsonSchemaParser(EntityParser):
 
         return class_attributes_map
 
-    def _parse_schema(self, schema) -> List[Entity]:
+    def _parse_schema(self, schema: Dict[str, Any]) -> List[Entity]:
         # Extract class attributes mapping
         class_attributes: Dict[str, List[EntityField]] = (
             self._map_class_attributes(schema)
