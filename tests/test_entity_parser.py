@@ -8,12 +8,13 @@ ZERO: int = 0
 ONE: int = 1
 TWO: int = 2
 THREE: int = 3
-NAME: str = 'name'
-STRING: str = 'string'
-DESCR: str = 'description'
+
 BRAND: str = 'Brand'
 CATEGORY: str = 'Category'
+DESCRIPTION: str = 'description'
+NAME: str = 'name'
 PARENT_CATEGORY: str = 'parent_category'
+STRING: str = 'string'
 
 BRAND_JSON_SCHEMA: str = '''
 {
@@ -187,7 +188,7 @@ ENTITY_NON_REF_FIELDS = [
         is_primary_key=False
     ),
     EntityField(
-        name=DESCR,
+        name=DESCRIPTION,
         field_type=STRING,
         max_length='max',
         is_required=False,
@@ -217,7 +218,7 @@ PRODUCT_BRAND_ENTITY = Entity(
             type_ref=None
         ),
         EntityField(
-            name=DESCR,
+            name=DESCRIPTION,
             field_type=STRING,
             max_length='max',
             is_required=False,
@@ -248,7 +249,7 @@ PRODUCT_CATEGORY_NON_REF_FIELDS = [
         type_ref=None
     ),
     EntityField(
-        name=DESCR,
+        name=DESCRIPTION,
         field_type=STRING,
         max_length='max',
         is_required=False,
@@ -278,7 +279,7 @@ PRODUCT_NON_REF_FIELDS = [
         type_ref=None
     ),
     EntityField(
-        name=DESCR,
+        name=DESCRIPTION,
         field_type=STRING,
         max_length='max',
         is_required=False,
