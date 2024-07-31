@@ -10,6 +10,7 @@ class EntityField:
     is_required: bool = False
     is_primary_key: bool = False
     type_ref: str = None
+    format: str = None
 
 
 @dataclass

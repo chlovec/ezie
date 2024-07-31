@@ -196,17 +196,15 @@ class JsonSchemaParser(EntityParser):
 
             # Extract and create class attributes
             for prop_name, prop_def in properties.items():
-                attr_type = prop_def.get("type", None)
-                max_length = prop_def.get("maxLength", None)
-                is_primary_key = prop_def.get("primaryKey", False)
                 type_ref = prop_def.get("$ref", None)
                 type_ref = self._get_type_ref(type_ref) if type_ref else None
                 ent_field = EntityField(
                     name=prop_name,
-                    field_type=attr_type,
-                    max_length=max_length,
-                    is_primary_key=is_primary_key,
-                    type_ref=type_ref
+                    field_type=prop_def.get("type", None),
+                    max_length=prop_def.get("maxLength", None),
+                    is_primary_key=prop_def.get("primaryKey", False),
+                    type_ref=type_ref,
+                    format=prop_def.get("format", None)
                 )
                 attributes[prop_name] = ent_field
 
