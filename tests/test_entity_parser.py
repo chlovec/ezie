@@ -1,5 +1,6 @@
 from typing import List
 import unittest
+from unittest.mock import mock_open, patch
 
 from entity_parser.entity import Entity, EntityField, RefEntityField
 from entity_parser.entity_parser import JsonSchemaParser
@@ -380,6 +381,22 @@ class TestJsonSchemaParser(unittest.TestCase):
         actual_entities: List[Entity] = self.parser.parse(
             file_content=PRODUCT_JSON_SCHEMA
         )
+        self._verify_product_json_schema_test(actual_entities)
+
+    @patch(
+      'builtins.open', new_callable=mock_open, read_data=PRODUCT_JSON_SCHEMA
+    )
+    def test_parser_file_path(self, mock_file):
+        file_path = 'tests/file/path'
+        actual_entities: List[Entity] = self.parser.parse(
+            file_path=file_path
+        )
+        mock_file.assert_called_once_with(file_path)
+        self._verify_product_json_schema_test(actual_entities)
+
+    def _verify_product_json_schema_test(
+        self, actual_entities: List[Entity]
+    ) -> None:
         self.assertEqual(len(actual_entities), THREE)
         actual_entities.sort(key=lambda x: x.name)
 
