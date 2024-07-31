@@ -1,3 +1,4 @@
+import textwrap
 from typing import List
 import unittest
 from unittest.mock import mock_open, patch
@@ -173,6 +174,155 @@ PRODUCT_JSON_SCHEMA: str = '''
         }
       },
       "required": ["productId", "name"],
+      "additionalProperties": false
+    }
+  }
+}
+'''
+
+INVALID_REF_JSON_SCHEMA: str = '''
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "Category": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the category",
+          "primaryKey": true,
+          "maxLength": 30
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the category",
+          "maxLength": 50
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the category",
+          "maxLength": "max"
+        },
+        "parent_category": {
+          "$ref": "#/definitions/files/Category",
+          "description": "Parent category associated with the category"
+        }
+      },
+      "required": ["id", "name"],
+      "additionalProperties": false
+    }
+  }
+}
+'''
+
+INVALID_PRIMARY_KEY_SCHEMA: str = '''
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "Category": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the category",
+          "primaryKey": true,
+          "maxLength": 30
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the category",
+          "maxLength": 50
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the category",
+          "maxLength": "max"
+        },
+        "parent_category": {
+          "$ref": "#/definitions/Category",
+          "primaryKey": true,
+          "description": "Parent category associated with the category"
+        }
+      },
+      "required": ["id", "name"],
+      "additionalProperties": false
+    }
+  }
+}
+'''
+
+MISSING_REF_DEFINITION: str = '''
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "Product": {
+      "type": "object",
+      "properties": {
+        "productId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifier for the product",
+          "maxLength": 30
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the product",
+          "maxLength": 50
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the product",
+          "maxLength": "max"
+        },
+        "price": {
+          "type": "number",
+          "format": "decimal",
+          "description": "Price of the product"
+        },
+        "quantity": {
+          "type": "integer",
+          "description": "The quantity of the product currently in stock"
+        },
+        "brand": {
+          "$ref": "#/definitions/Brand",
+          "description": "The product brand"
+        },
+        "category": {
+          "$ref": "#/definitions/Category",
+          "description": "The product category"
+        }
+      },
+      "required": ["productId", "name"],
+      "additionalProperties": false
+    }
+  }
+}
+'''
+
+MISSING_PRIMARY_KEY_SCHEMA: str = '''
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "Brand": {
+      "type": "object",
+      "properties": {
+        "data_id": {
+          "type": "string",
+          "description": "Unique identifier for the brand",
+          "maxLength": 30
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the brand",
+          "maxLength": 50
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the brand",
+          "maxLength": "max"
+        }
+      },
+      "required": ["data_id", "name"],
       "additionalProperties": false
     }
   }
@@ -384,7 +534,7 @@ class TestJsonSchemaParser(unittest.TestCase):
         self._verify_product_json_schema_test(actual_entities)
 
     @patch(
-      'builtins.open', new_callable=mock_open, read_data=PRODUCT_JSON_SCHEMA
+        'builtins.open', new_callable=mock_open, read_data=PRODUCT_JSON_SCHEMA
     )
     def test_parser_file_path(self, mock_file):
         file_path = 'tests/file/path'
@@ -456,6 +606,61 @@ class TestJsonSchemaParser(unittest.TestCase):
         )
         self.assertEqual(
             PRODUCT_CATEGORY_PK_FIELDS, ref_entity.pk_fields
+        )
+
+    def test_parser_invalid_ref(self):
+        with self.assertRaises(ValueError) as context:
+            self.parser.parse(file_content=INVALID_REF_JSON_SCHEMA)
+        self.assertEqual(
+            "Json schema contains invalid ref `#/definitions/files/Category`",
+            str(context.exception)
+        )
+
+    def test_parser_invalid_primary_key(self):
+        with self.assertRaises(ValueError) as context:
+            self.parser.parse(file_content=INVALID_PRIMARY_KEY_SCHEMA)
+        self.assertEqual(
+            textwrap.dedent(
+                """
+                Cannot use a referenced entity as primary key field -
+                `Category.parent_category`
+                """
+            ),
+            textwrap.dedent(str(context.exception))
+        )
+
+    def test_parser_missing_definition(self):
+        with self.assertRaises(ValueError) as context:
+            self.parser.parse(file_content=MISSING_REF_DEFINITION)
+        self.assertEqual(
+            textwrap.dedent(
+                """
+                `Brand` is referenced in `Product` but
+                does not have a definition
+                """
+            ),
+            textwrap.dedent(str(context.exception))
+        )
+
+    def test_parser_missing_primary(self):
+        with self.assertRaises(ValueError) as context:
+            self.parser.parse(file_content=MISSING_PRIMARY_KEY_SCHEMA)
+        self.assertEqual(
+            "No primary key field found for entity `Brand`",
+            str(context.exception)
+        )
+
+    def test_parser_missing_input(self):
+        with self.assertRaises(ValueError) as context:
+            self.parser.parse()
+        self.assertEqual(
+            textwrap.dedent(
+                """
+                Either `file_content` or `file_path` is require but
+                none was provided
+                """
+            ),
+            textwrap.dedent(str(context.exception))
         )
 
 

@@ -33,7 +33,7 @@ class EntityParser(ABC):
         if len(refs) == THREE:
             return refs[TWO]
 
-        raise ValueError(f"Json schema contains invalid ref '{type_ref}'")
+        raise ValueError(f"Json schema contains invalid ref `{type_ref}`")
 
     def _set_entity_attributes(
         self,
@@ -54,7 +54,7 @@ class EntityParser(ABC):
                 raise ValueError(
                     f"""
                     Cannot use a referenced entity as primary key field -
-                    '{class_name}.{field.name}'
+                    `{class_name}.{field.name}`
                     """
                 )
             elif field.type_ref and field.type_ref not in created_entities:
@@ -84,7 +84,7 @@ class EntityParser(ABC):
             )
             if not pk_field:
                 raise ValueError(
-                    f"No primary key field found for entity '{class_name}'"
+                    f"No primary key field found for entity `{class_name}`"
                 )
 
             pk_fields = [pk_field]
