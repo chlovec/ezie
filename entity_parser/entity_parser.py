@@ -18,22 +18,15 @@ class EntityParser(ABC):
         pass
 
     def _get_pk_fields(
-        self, class_name: str, non_ref_field: List[EntityField]
+        self, pk_field_names: List[str], non_ref_field: List[EntityField]
     ) -> List[EntityField]:
-        for field in non_ref_field:
-            if field.name.lower() == "id":
-                return [field]
+        # Respect order of precedence in pk_field_names
+        for field_name in pk_field_names:
+            for field in non_ref_field:
+                if field.name.lower() == field_name:
+                    return [field]
 
-        pk_field_name_1 = f"{class_name.lower()}_id"
-        pk_field_name_2 = f"{class_name.lower()}id"
-
-        for field in non_ref_field:
-            if field.name.lower() in [pk_field_name_1, pk_field_name_2]:
-                return [field]
-
-        raise ValueError(
-            f"No primary key field found for entity '{class_name}'"
-        )
+        return []
 
     def _get_type_ref(self, type_ref: str) -> str:
         refs = type_ref.split("/")
@@ -44,7 +37,7 @@ class EntityParser(ABC):
 
     def _set_entity_attributes(
         self,
-        class_name: Entity,
+        class_name: str,
         attributes: List[EntityField],
         created_entities: Dict[str, Entity]
     ) -> None:
@@ -85,13 +78,21 @@ class EntityParser(ABC):
                 non_ref_fields.append(field)
 
         if not pk_fields:
-            pk_fields = self._get_pk_fields(class_name, non_ref_fields)
+            pk_fields = self._get_pk_fields(
+                ["id", f"{class_name}_id".lower(), f"{class_name}id".lower()],
+                non_ref_fields
+            )
+        if not pk_fields:
+            raise ValueError(
+                f"No primary key field found for entity '{class_name}'"
+            )
 
         # Remove all pk_fields from non_ref_fields
         non_ref_fields = [
             field for field in non_ref_fields if field not in pk_fields
         ]
 
+        # Update entity
         created_entities[class_name].non_ref_fields = non_ref_fields
         created_entities[class_name].ref_fields = ref_fields
         created_entities[class_name].pk_fields = pk_fields
@@ -99,7 +100,7 @@ class EntityParser(ABC):
     def _create_entities(
         self, class_attributes: Dict[str, List[EntityField]]
     ) -> List[Entity]:
-        # create entities
+        # Create entities
         created_entities: Dict[str, Entity] = {}
         for class_name in class_attributes:
             created_entities[class_name] = Entity(class_name, [], [], [])
