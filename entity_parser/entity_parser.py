@@ -68,7 +68,7 @@ class EntityParser(ABC):
                 ref_fields.append(
                     RefEntityField(
                         name=field.name,
-                        ref_entity=created_entities[class_name],
+                        ref_entity=created_entities[field.type_ref],
                         is_required=field.is_required
                     )
                 )
@@ -114,59 +114,6 @@ class EntityParser(ABC):
             )
 
         return list(created_entities.values())
-
-    def _create_entity(
-        self,
-        class_name: str,
-        class_attributes: Dict[str, List[EntityField]],
-        created_entities: Dict[str, Entity]
-    ) -> Entity:
-        if class_name in created_entities.keys():
-            return created_entities[class_name]
-
-        entity_fields = class_attributes.get(class_name, None)
-        if not entity_fields:
-            raise ValueError(
-                f"Definition for reference entity '{class_name}' was found"
-            )
-
-        ref_fields: List[RefEntityField] = []
-        non_ref_fields: List[EntityField] = []
-        pk_fields: List[EntityField] = []
-        for field in entity_fields:
-            # Validate that a referenced entity is not used as primary key
-            # field
-            if field.field_type == 'object' and field.is_primary_key:
-                raise ValueError(
-                    f"""
-                    Cannot use a referenced entity as primary key field -
-                    '{class_name}.{field.name}'
-                    """
-                )
-            elif field.field_type == 'object':
-                ref_entity = self._create_entity(
-                    field.name, class_attributes, created_entities
-                )
-                ref_fields.append(
-                    RefEntityField(field.name, ref_entity, field.is_required)
-                )
-            else:
-                non_ref_fields.append(field)
-
-            if field.is_primary_key:
-                pk_fields.append(field)
-
-        if not pk_fields:
-            pk_fields = self._get_pk_fields(class_name, non_ref_fields)
-
-        # Remove all pk_fields from non_ref_fields
-        non_ref_fields = [
-            field for field in non_ref_fields if field not in pk_fields
-        ]
-
-        created_entities[class_name] = Entity(
-            class_name, non_ref_fields, ref_fields, pk_fields
-        )
 
 
 class JsonSchemaParser(EntityParser):

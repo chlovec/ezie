@@ -1,7 +1,7 @@
 from typing import List
 import unittest
 
-from entity_parser.entity import Entity, EntityField
+from entity_parser.entity import Entity, EntityField, RefEntityField
 from entity_parser.entity_parser import JsonSchemaParser
 
 ZERO: int = 0
@@ -261,6 +261,60 @@ PRODUCT_CATEGORY_PK_FIELDS = [
     )
 ]
 
+PRODUCT_NON_REF_FIELDS = [
+    EntityField(
+        name='name',
+        field_type='string',
+        max_length=50,
+        is_required=True,
+        is_primary_key=False,
+        type_ref=None
+    ),
+    EntityField(
+        name='description',
+        field_type='string',
+        max_length='max',
+        is_required=False,
+        is_primary_key=False,
+        type_ref=None
+    ),
+    EntityField(
+        name='price',
+        field_type='number',
+        max_length=None,
+        is_required=False,
+        is_primary_key=False,
+        type_ref=None,
+        format="decimal"
+    ),
+    EntityField(
+        name='quantity',
+        field_type='integer',
+        max_length=None,
+        is_required=False,
+        is_primary_key=False,
+        type_ref=None
+    ),
+]
+
+PRODUCT_PK_FIELDS = [
+    EntityField(
+        name='productId',
+        field_type='string',
+        max_length=30,
+        is_required=True,
+        is_primary_key=False,
+        type_ref=None,
+        format="uuid"
+    )
+]
+
+PRODUCT_BRAND_REF_ENTITY = RefEntityField(
+    name='brand',
+    ref_entity=PRODUCT_BRAND_ENTITY,
+    is_required=False
+)
+
 
 class TestJsonSchemaParser(unittest.TestCase):
     def setUp(self):
@@ -325,20 +379,21 @@ class TestJsonSchemaParser(unittest.TestCase):
         self.assertEqual(PRODUCT_BRAND_ENTITY, actual_entities[ZERO])
 
         # Verify category
-        product_category = actual_entities[ONE]
-        self.assertEqual("Category", product_category.name)
+        category = actual_entities[ONE]
+        self.assertEqual("Category", category.name)
         self.assertEqual(
-            PRODUCT_CATEGORY_NON_REF_FIELDS, product_category.non_ref_fields
+            PRODUCT_CATEGORY_NON_REF_FIELDS, category.non_ref_fields
         )
         self.assertEqual(
-            PRODUCT_CATEGORY_PK_FIELDS, product_category.pk_fields
+            PRODUCT_CATEGORY_PK_FIELDS, category.pk_fields
         )
-        self.assertTrue(product_category.ref_fields)
-        self.assertEqual(ONE, len(product_category.ref_fields))
+        self.assertTrue(category.ref_fields)
+        self.assertEqual(ONE, len(category.ref_fields))
 
         # Verify parent category
-        parent_category = product_category.ref_fields[0]
+        parent_category = category.ref_fields[0]
         self.assertEqual("parent_category", parent_category.name)
+        self.assertFalse(parent_category.is_required)
         self.assertEqual("Category", parent_category.ref_entity.name)
         self.assertEqual(
             PRODUCT_CATEGORY_NON_REF_FIELDS,
@@ -346,6 +401,36 @@ class TestJsonSchemaParser(unittest.TestCase):
         )
         self.assertEqual(
             PRODUCT_CATEGORY_PK_FIELDS, parent_category.ref_entity.pk_fields
+        )
+
+        # Verify product
+        product = actual_entities[TWO]
+        self.assertEqual("Product", product.name)
+        self.assertEqual(PRODUCT_NON_REF_FIELDS, product.non_ref_fields)
+        self.assertEqual(PRODUCT_PK_FIELDS, product.pk_fields)
+        self.assertTrue(product.ref_fields)
+        self.assertEqual(TWO, len(product.ref_fields))
+
+        # Verify product ref fields
+        product_ref_fields = product.ref_fields
+        product_ref_fields.sort(key=lambda x: x.name)
+
+        # Verify product brand reference
+        self.assertEqual(PRODUCT_BRAND_REF_ENTITY, product_ref_fields[ZERO])
+
+        # Verify product category reference
+        category_ref = product_ref_fields[ONE]
+        self.assertEqual("category", category_ref.name)
+        self.assertFalse(category_ref.is_required)
+
+        # Verify product category reference entity
+        ref_entity = category_ref.ref_entity
+        self.assertEqual("Category", ref_entity.name)
+        self.assertEqual(
+            PRODUCT_CATEGORY_NON_REF_FIELDS, ref_entity.non_ref_fields
+        )
+        self.assertEqual(
+            PRODUCT_CATEGORY_PK_FIELDS, ref_entity.pk_fields
         )
 
 
