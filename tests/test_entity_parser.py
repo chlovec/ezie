@@ -3,7 +3,7 @@ from typing import List
 import unittest
 from unittest.mock import mock_open, patch
 
-from entity_parser.entity import Entity, EntityField, RefEntityField
+from entity_parser.entity import Entity, EntityField, FieldType, RefEntityField
 from entity_parser.entity_parser import JsonSchemaParser
 
 ZERO: int = 0
@@ -16,7 +16,6 @@ CATEGORY: str = 'Category'
 DESCRIPTION: str = 'description'
 NAME: str = 'name'
 PARENT_CATEGORY: str = 'parent_category'
-STRING: str = 'string'
 
 BRAND_JSON_SCHEMA: str = '''
 {
@@ -333,14 +332,14 @@ MISSING_PRIMARY_KEY_SCHEMA: str = '''
 ENTITY_NON_REF_FIELDS = [
     EntityField(
         name=NAME,
-        field_type=STRING,
+        field_type=FieldType.STRING,
         max_length=50,
         is_required=True,
         is_primary_key=False
     ),
     EntityField(
         name=DESCRIPTION,
-        field_type=STRING,
+        field_type=FieldType.STRING,
         max_length='max',
         is_required=False,
         is_primary_key=False
@@ -350,7 +349,7 @@ ENTITY_NON_REF_FIELDS = [
 ENTITY_ID_PK_FIELD = [
     EntityField(
         name='id',
-        field_type=STRING,
+        field_type=FieldType.STRING,
         max_length=30,
         is_required=True,
         is_primary_key=True
@@ -362,7 +361,7 @@ PRODUCT_BRAND_ENTITY = Entity(
     non_ref_fields=[
         EntityField(
             name=NAME,
-            field_type=STRING,
+            field_type=FieldType.STRING,
             max_length=50,
             is_required=True,
             is_primary_key=False,
@@ -370,7 +369,7 @@ PRODUCT_BRAND_ENTITY = Entity(
         ),
         EntityField(
             name=DESCRIPTION,
-            field_type=STRING,
+            field_type=FieldType.STRING,
             max_length='max',
             is_required=False,
             is_primary_key=False,
@@ -381,7 +380,7 @@ PRODUCT_BRAND_ENTITY = Entity(
     pk_fields=[
         EntityField(
             name='brand_id',
-            field_type=STRING,
+            field_type=FieldType.STRING,
             max_length=30,
             is_required=True,
             is_primary_key=False,
@@ -393,7 +392,7 @@ PRODUCT_BRAND_ENTITY = Entity(
 PRODUCT_CATEGORY_NON_REF_FIELDS = [
     EntityField(
         name=NAME,
-        field_type=STRING,
+        field_type=FieldType.STRING,
         max_length=50,
         is_required=True,
         is_primary_key=False,
@@ -401,7 +400,7 @@ PRODUCT_CATEGORY_NON_REF_FIELDS = [
     ),
     EntityField(
         name=DESCRIPTION,
-        field_type=STRING,
+        field_type=FieldType.STRING,
         max_length='max',
         is_required=False,
         is_primary_key=False,
@@ -412,7 +411,7 @@ PRODUCT_CATEGORY_NON_REF_FIELDS = [
 PRODUCT_CATEGORY_PK_FIELDS = [
     EntityField(
         name='id',
-        field_type=STRING,
+        field_type=FieldType.STRING,
         max_length=30,
         is_required=True,
         is_primary_key=False,
@@ -423,7 +422,7 @@ PRODUCT_CATEGORY_PK_FIELDS = [
 PRODUCT_NON_REF_FIELDS = [
     EntityField(
         name=NAME,
-        field_type=STRING,
+        field_type=FieldType.STRING,
         max_length=50,
         is_required=True,
         is_primary_key=False,
@@ -431,7 +430,7 @@ PRODUCT_NON_REF_FIELDS = [
     ),
     EntityField(
         name=DESCRIPTION,
-        field_type=STRING,
+        field_type=FieldType.STRING,
         max_length='max',
         is_required=False,
         is_primary_key=False,
@@ -439,7 +438,7 @@ PRODUCT_NON_REF_FIELDS = [
     ),
     EntityField(
         name='price',
-        field_type='number',
+        field_type=FieldType.NUMBER,
         max_length=None,
         is_required=False,
         is_primary_key=False,
@@ -448,7 +447,7 @@ PRODUCT_NON_REF_FIELDS = [
     ),
     EntityField(
         name='quantity',
-        field_type='integer',
+        field_type=FieldType.INTEGER,
         max_length=None,
         is_required=False,
         is_primary_key=False,
@@ -459,7 +458,7 @@ PRODUCT_NON_REF_FIELDS = [
 PRODUCT_PK_FIELDS = [
     EntityField(
         name='productId',
-        field_type=STRING,
+        field_type=FieldType.STRING,
         max_length=30,
         is_required=True,
         is_primary_key=False,

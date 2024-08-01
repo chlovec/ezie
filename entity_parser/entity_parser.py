@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 import json
 from typing import Any, Dict, List, Union
 
-from entity_parser.entity import Entity, EntityField, RefEntityField
+from entity_parser.entity import Entity, EntityField, FieldType, RefEntityField
 
 
 TWO: int = 2
@@ -16,6 +16,15 @@ class EntityParser(ABC):
         self, file_content: str = None, file_path: str = None
     ) -> List[Entity]:
         pass
+
+    def _get_field_type(self, field_type: str) -> Union[FieldType, None]:
+        if not field_type:
+            return None
+
+        try:
+            return FieldType(field_type)
+        except KeyError:
+            raise ValueError(f"`{field_type}` is not a valid JSON type")
 
     def _get_pk_fields(
         self, pk_field_names: List[str], non_ref_field: List[EntityField]
@@ -150,7 +159,8 @@ class JsonSchemaParser(EntityParser):
                 type_ref = self._get_type_ref(type_ref) if type_ref else None
                 ent_field = EntityField(
                     name=prop_name,
-                    field_type=prop_def.get("type", None),
+                    field_type=self._get_field_type(
+                        prop_def.get("type", None)),
                     max_length=prop_def.get("maxLength", None),
                     is_primary_key=prop_def.get("primaryKey", False),
                     type_ref=type_ref,
