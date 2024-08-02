@@ -10,12 +10,19 @@ ZERO: int = 0
 ONE: int = 1
 TWO: int = 2
 THREE: int = 3
+THIRTY: int = 30
+FIFTY: int = 50
 
-BRAND: str = 'Brand'
-CATEGORY: str = 'Category'
-DESCRIPTION: str = 'description'
-NAME: str = 'name'
-PARENT_CATEGORY: str = 'parent_category'
+ADDRESS: str = "address"
+BRAND: str = "Brand"
+CATEGORY: str = "Category"
+CITY: str = "city"
+DESCRIPTION: str = "description"
+ID: str = "id"
+MAX_LEN: str = "max"
+NAME: str = "name"
+PARENT_CATEGORY: str = "parent_category"
+STREET: str = "street"
 
 BRAND_JSON_SCHEMA: str = '''
 {
@@ -362,14 +369,14 @@ ENTITY_NON_REF_FIELDS = [
     EntityField(
         name=NAME,
         field_type=FieldType.STRING,
-        max_length=50,
+        max_length=FIFTY,
         is_required=True,
         is_primary_key=False
     ),
     EntityField(
         name=DESCRIPTION,
         field_type=FieldType.STRING,
-        max_length='max',
+        max_length=MAX_LEN,
         is_required=False,
         is_primary_key=False
     )
@@ -377,9 +384,9 @@ ENTITY_NON_REF_FIELDS = [
 
 ENTITY_ID_PK_FIELD = [
     EntityField(
-        name='id',
+        name=ID,
         field_type=FieldType.STRING,
-        max_length=30,
+        max_length=THIRTY,
         is_required=True,
         is_primary_key=True
     )
@@ -391,7 +398,7 @@ PRODUCT_BRAND_ENTITY = Entity(
         EntityField(
             name=NAME,
             field_type=FieldType.STRING,
-            max_length=50,
+            max_length=FIFTY,
             is_required=True,
             is_primary_key=False,
             type_ref=None
@@ -399,7 +406,7 @@ PRODUCT_BRAND_ENTITY = Entity(
         EntityField(
             name=DESCRIPTION,
             field_type=FieldType.STRING,
-            max_length='max',
+            max_length=MAX_LEN,
             is_required=False,
             is_primary_key=False,
             type_ref=None
@@ -408,9 +415,9 @@ PRODUCT_BRAND_ENTITY = Entity(
     ref_fields=[],
     pk_fields=[
         EntityField(
-            name='brand_id',
+            name="brand_id",
             field_type=FieldType.STRING,
-            max_length=30,
+            max_length=THIRTY,
             is_required=True,
             is_primary_key=False,
             type_ref=None
@@ -422,7 +429,7 @@ PRODUCT_CATEGORY_NON_REF_FIELDS = [
     EntityField(
         name=NAME,
         field_type=FieldType.STRING,
-        max_length=50,
+        max_length=FIFTY,
         is_required=True,
         is_primary_key=False,
         type_ref=None
@@ -430,7 +437,7 @@ PRODUCT_CATEGORY_NON_REF_FIELDS = [
     EntityField(
         name=DESCRIPTION,
         field_type=FieldType.STRING,
-        max_length='max',
+        max_length=MAX_LEN,
         is_required=False,
         is_primary_key=False,
         type_ref=None
@@ -439,9 +446,9 @@ PRODUCT_CATEGORY_NON_REF_FIELDS = [
 
 PRODUCT_CATEGORY_PK_FIELDS = [
     EntityField(
-        name='id',
+        name=ID,
         field_type=FieldType.STRING,
-        max_length=30,
+        max_length=THIRTY,
         is_required=True,
         is_primary_key=False,
         type_ref=None
@@ -452,7 +459,7 @@ PRODUCT_NON_REF_FIELDS = [
     EntityField(
         name=NAME,
         field_type=FieldType.STRING,
-        max_length=50,
+        max_length=FIFTY,
         is_required=True,
         is_primary_key=False,
         type_ref=None
@@ -460,22 +467,22 @@ PRODUCT_NON_REF_FIELDS = [
     EntityField(
         name=DESCRIPTION,
         field_type=FieldType.STRING,
-        max_length='max',
+        max_length=MAX_LEN,
         is_required=False,
         is_primary_key=False,
         type_ref=None
     ),
     EntityField(
-        name='price',
+        name="price",
         field_type=FieldType.NUMBER,
         max_length=None,
         is_required=False,
         is_primary_key=False,
         type_ref=None,
-        format='decimal'
+        format="decimal"
     ),
     EntityField(
-        name='quantity',
+        name="quantity",
         field_type=FieldType.INTEGER,
         max_length=None,
         is_required=False,
@@ -486,28 +493,28 @@ PRODUCT_NON_REF_FIELDS = [
 
 PRODUCT_PK_FIELDS = [
     EntityField(
-        name='productId',
+        name="productId",
         field_type=FieldType.STRING,
-        max_length=30,
+        max_length=THIRTY,
         is_required=True,
         is_primary_key=False,
         type_ref=None,
-        format='uuid'
+        format="uuid"
     )
 ]
 
 PRODUCT_BRAND_REF_ENTITY = RefEntityField(
-    name='brand',
+    name="brand",
     ref_entity=PRODUCT_BRAND_ENTITY,
     is_required=False
 )
 
 TITLE_SCHEMA_WITH_NESTED_OBJECT_ENTITIES: List[Entity] = [
     Entity(
-        name='Person',
+        name="Person",
         non_ref_fields=[
             EntityField(
-                name='name',
+                name="name",
                 field_type=FieldType.STRING,
                 max_length=None,
                 is_required=True,
@@ -518,7 +525,7 @@ TITLE_SCHEMA_WITH_NESTED_OBJECT_ENTITIES: List[Entity] = [
                 enum_values=[]
             ),
             EntityField(
-                name='age',
+                name="age",
                 field_type=FieldType.INTEGER,
                 max_length=None,
                 is_required=True,
@@ -531,12 +538,12 @@ TITLE_SCHEMA_WITH_NESTED_OBJECT_ENTITIES: List[Entity] = [
         ],
         ref_fields=[
             RefEntityField(
-                name='address',
+                name=ADDRESS,
                 ref_entity=Entity(
-                    name='address',
+                    name=ADDRESS,
                     non_ref_fields=[
                         EntityField(
-                            name='street',
+                            name=STREET,
                             field_type=FieldType.STRING,
                             max_length=None,
                             is_required=True,
@@ -547,7 +554,7 @@ TITLE_SCHEMA_WITH_NESTED_OBJECT_ENTITIES: List[Entity] = [
                             enum_values=[]
                         ),
                         EntityField(
-                            name='city',
+                            name=CITY,
                             field_type=FieldType.STRING,
                             max_length=None,
                             is_required=True,
@@ -567,10 +574,10 @@ TITLE_SCHEMA_WITH_NESTED_OBJECT_ENTITIES: List[Entity] = [
         pk_fields=[]
     ),
     Entity(
-        name='address',
+        name=ADDRESS,
         non_ref_fields=[
             EntityField(
-                name='street',
+                name=STREET,
                 field_type=FieldType.STRING,
                 max_length=None,
                 is_required=True,
@@ -581,7 +588,7 @@ TITLE_SCHEMA_WITH_NESTED_OBJECT_ENTITIES: List[Entity] = [
                 enum_values=[]
             ),
             EntityField(
-                name='city',
+                name=CITY,
                 field_type=FieldType.STRING,
                 max_length=None,
                 is_required=True,
@@ -657,10 +664,10 @@ class TestJsonSchemaParser(unittest.TestCase):
         self._verify_product_json_schema_test(actual_entities)
 
     @patch(
-        'builtins.open', new_callable=mock_open, read_data=PRODUCT_JSON_SCHEMA
+        "builtins.open", new_callable=mock_open, read_data=PRODUCT_JSON_SCHEMA
     )
     def test_parser_file_path(self, mock_file):
-        file_path = 'tests/file/path'
+        file_path = "tests/file/path"
         actual_entities: List[Entity] = self.parser.parse(
             file_path=file_path
         )
@@ -703,7 +710,7 @@ class TestJsonSchemaParser(unittest.TestCase):
 
         # Verify product
         product = actual_entities[TWO]
-        self.assertEqual('Product', product.name)
+        self.assertEqual("Product", product.name)
         self.assertEqual(PRODUCT_NON_REF_FIELDS, product.non_ref_fields)
         self.assertEqual(PRODUCT_PK_FIELDS, product.pk_fields)
         self.assertTrue(product.ref_fields)
@@ -718,7 +725,7 @@ class TestJsonSchemaParser(unittest.TestCase):
 
         # Verify product category reference
         category_ref = product_ref_fields[ONE]
-        self.assertEqual('category', category_ref.name)
+        self.assertEqual("category", category_ref.name)
         self.assertFalse(category_ref.is_required)
 
         # Verify product category reference entity
@@ -735,7 +742,7 @@ class TestJsonSchemaParser(unittest.TestCase):
         with self.assertRaises(ValueError) as context:
             self.parser.parse(file_content=INVALID_REF_JSON_SCHEMA)
         self.assertEqual(
-            'Json schema contains invalid ref `#/definitions/files/Category`',
+            "Json schema contains invalid ref `#/definitions/files/Category`",
             str(context.exception)
         )
 
@@ -744,10 +751,10 @@ class TestJsonSchemaParser(unittest.TestCase):
             self.parser.parse(file_content=INVALID_PRIMARY_KEY_SCHEMA)
         self.assertEqual(
             textwrap.dedent(
-                '''
+                """
                 Cannot use a referenced entity as primary key field -
                 `Category.parent_category`
-                '''
+                """
             ),
             textwrap.dedent(str(context.exception))
         )
@@ -757,10 +764,10 @@ class TestJsonSchemaParser(unittest.TestCase):
             self.parser.parse(file_content=MISSING_REF_DEFINITION)
         self.assertEqual(
             textwrap.dedent(
-                '''
+                """
                 `Brand` is referenced in `Product` but
                 does not have a definition
-                '''
+                """
             ),
             textwrap.dedent(str(context.exception))
         )
@@ -770,10 +777,10 @@ class TestJsonSchemaParser(unittest.TestCase):
             self.parser.parse()
         self.assertEqual(
             textwrap.dedent(
-                '''
+                """
                 Either `file_content` or `file_path` is require but
                 none was provided
-                '''
+                """
             ),
             textwrap.dedent(str(context.exception))
         )
@@ -787,5 +794,5 @@ class TestJsonSchemaParser(unittest.TestCase):
         )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
