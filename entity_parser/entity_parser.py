@@ -120,11 +120,13 @@ class JsonSchemaParser(EntityParser):
     def _process_definitions(
         self, schema: Dict[str, Any], obj_key: str
     ) -> None:
+        if not schema:
+            return
+
         definitions = schema.get(obj_key, {})
-        self._process_schema(definitions)
 
         # Create the entities first
-        for obj_name in definitions:
+        for obj_name, obj_defs in definitions.items():
             if self.created_objects.get(obj_name, None):
                 continue
 
@@ -135,7 +137,13 @@ class JsonSchemaParser(EntityParser):
                 pk_fields=[]
             )
 
+            # Check if object is an enum
+            if (enum_values := obj_defs.get("enum")):
+                self.created_objects[obj_name].is_enum = True
+                self.created_objects[obj_name].enum_values = enum_values
+
         for obj_name, obj_defs in definitions.items():
+            self._process_schema(obj_defs)
             self._process_obj_properties(
                 obj_name=obj_name,
                 obj_properties=obj_defs.get(PROPERTIES, {}),
@@ -193,7 +201,6 @@ class JsonSchemaParser(EntityParser):
             else:
                 type_ref = self._get_type_ref(prop_def.get("$ref", None))
 
-            enum_values: List[Any] = prop_def.get("enum", [])
             attributes.append(
                 EntityField(
                     name=prop_name,
@@ -202,9 +209,7 @@ class JsonSchemaParser(EntityParser):
                     is_required=(prop_name in required_props),
                     is_primary_key=prop_def.get("primaryKey", False),
                     type_ref=type_ref,
-                    format=prop_def.get("format", None),
-                    is_enum=bool(enum_values),
-                    enum_values=enum_values
+                    format=prop_def.get("format", None)
                 ))
 
         self.obj_attributes[obj_name] = attributes

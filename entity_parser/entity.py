@@ -38,3 +38,5 @@ class Entity:
     non_ref_fields: List[EntityField]
     ref_fields: List[RefEntityField]
     pk_fields: List[EntityField]
+    is_enum: bool = False
+    enum_values: Any = None

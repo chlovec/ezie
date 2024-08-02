@@ -22,6 +22,7 @@ ID: str = "id"
 MAX_LEN: str = "max"
 NAME: str = "name"
 PARENT_CATEGORY: str = "parent_category"
+STATE: str = "state"
 STREET: str = "street"
 
 BRAND_JSON_SCHEMA: str = '''
@@ -364,6 +365,43 @@ TITLE_SCHEMA_WITH_NESTED_OBJECT: str = '''
 }
 '''
 
+ID_DEFS_DEFINITIONS_ENUM_SCHEMA = '''
+{
+  "$id": "https://example.com/schemas/customer",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+
+  "type": "object",
+  "properties": {
+    "first_name": { "type": "string" },
+    "last_name": { "type": "string" },
+    "shipping_address": { "$ref": "/schemas/address" },
+    "billing_address": { "$ref": "/schemas/address" }
+  },
+  "required": [
+    "first_name", "last_name", "shipping_address", "billing_address"
+  ],
+
+  "$defs": {
+    "address": {
+      "$id": "https://example.com/schemas/address",
+      "$schema": "http://json-schema.org/draft-07/schema#",
+
+      "type": "object",
+      "properties": {
+        "street_address": { "type": "string" },
+        "city": { "type": "string" },
+        "state": { "$ref": "#/definitions/state" }
+      },
+      "required": ["street_address", "city", "state"],
+
+      "definitions": {
+        "state": { "enum": ["CA", "NY", "... etc ..."] }
+      }
+    }
+  }
+}
+'''
+
 
 ENTITY_NON_REF_FIELDS = [
     EntityField(
@@ -604,6 +642,96 @@ TITLE_SCHEMA_WITH_NESTED_OBJECT_ENTITIES: List[Entity] = [
     )
 ]
 
+STATE_ENUM_ENTITY = Entity(
+    name=STATE,
+    non_ref_fields=[],
+    ref_fields=[],
+    pk_fields=[],
+    is_enum=True,
+    enum_values=["CA", "NY", "... etc ..."]
+)
+
+ADDRESS_ENTITY = Entity(
+    name=ADDRESS,
+    non_ref_fields=[
+        EntityField(
+            name="street_address",
+            field_type=FieldType.STRING,
+            max_length=None,
+            is_required=True,
+            is_primary_key=False,
+            type_ref=None,
+            format=None,
+            is_enum=False,
+            enum_values=[]
+        ),
+        EntityField(
+            name=CITY,
+            field_type=FieldType.STRING,
+            max_length=None,
+            is_required=True,
+            is_primary_key=False,
+            type_ref=None,
+            format=None,
+            is_enum=False,
+            enum_values=[]
+        )
+    ],
+    ref_fields=[
+        RefEntityField(
+            name=STATE,
+            ref_entity=STATE_ENUM_ENTITY,
+            is_required=True
+        )
+    ],
+    pk_fields=[],
+    is_enum=False,
+    enum_values=None
+)
+
+CUSTOMER_ENTITY = Entity(
+    name="customer",
+    non_ref_fields=[
+        EntityField(
+            name="first_name",
+            field_type=FieldType.STRING,
+            max_length=None,
+            is_required=True,
+            is_primary_key=False,
+            type_ref=None,
+            format=None,
+            is_enum=False,
+            enum_values=[]
+        ),
+        EntityField(
+            name="last_name",
+            field_type=FieldType.STRING,
+            max_length=None,
+            is_required=True,
+            is_primary_key=False,
+            type_ref=None,
+            format=None,
+            is_enum=False,
+            enum_values=[]
+        )
+    ],
+    ref_fields=[
+        RefEntityField(
+            name="shipping_address",
+            ref_entity=ADDRESS_ENTITY,
+            is_required=True
+        ),
+        RefEntityField(
+            name="billing_address",
+            ref_entity=ADDRESS_ENTITY,
+            is_required=True
+        )
+    ],
+    pk_fields=[],
+    is_enum=False,
+    enum_values=None
+)
+
 
 class TestJsonSchemaParser(unittest.TestCase):
     def setUp(self):
@@ -615,15 +743,15 @@ class TestJsonSchemaParser(unittest.TestCase):
             file_content=BRAND_JSON_SCHEMA
         )
         self.assertEqual(ONE, len(actual_entities))
-        self.assertEqual(BRAND, actual_entities[0].name)
+        self.assertEqual(BRAND, actual_entities[ZERO].name)
         self.assertEqual(
-            ENTITY_NON_REF_FIELDS, actual_entities[0].non_ref_fields
+            ENTITY_NON_REF_FIELDS, actual_entities[ZERO].non_ref_fields
         )
         self.assertEqual(
-            ENTITY_ID_PK_FIELD, actual_entities[0].pk_fields
+            ENTITY_ID_PK_FIELD, actual_entities[ZERO].pk_fields
         )
         self.assertFalse(
-            actual_entities[0].ref_fields
+            actual_entities[ZERO].ref_fields
         )
 
     def test_category_json_schema(self):
@@ -631,22 +759,22 @@ class TestJsonSchemaParser(unittest.TestCase):
             file_content=CATEGORY_JSON_SCHEMA
         )
         self.assertEqual(ONE, len(actual_entities))
-        self.assertEqual(CATEGORY, actual_entities[0].name)
+        self.assertEqual(CATEGORY, actual_entities[ZERO].name)
         self.assertEqual(
-            ENTITY_NON_REF_FIELDS, actual_entities[0].non_ref_fields
+            ENTITY_NON_REF_FIELDS, actual_entities[ZERO].non_ref_fields
         )
         self.assertEqual(
-            ENTITY_ID_PK_FIELD, actual_entities[0].pk_fields
+            ENTITY_ID_PK_FIELD, actual_entities[ZERO].pk_fields
         )
         self.assertTrue(
-            actual_entities[0].ref_fields
+            actual_entities[ZERO].ref_fields
         )
         self.assertEqual(
-            ONE, len(actual_entities[0].ref_fields)
+            ONE, len(actual_entities[ZERO].ref_fields)
         )
 
         # Verify parent category
-        parent_category = actual_entities[0].ref_fields[0]
+        parent_category = actual_entities[ZERO].ref_fields[ZERO]
         self.assertEqual(PARENT_CATEGORY, parent_category.name)
         self.assertEqual(CATEGORY, parent_category.ref_entity.name)
         self.assertEqual(
@@ -696,7 +824,7 @@ class TestJsonSchemaParser(unittest.TestCase):
         self.assertEqual(ONE, len(category.ref_fields))
 
         # Verify parent category
-        parent_category = category.ref_fields[0]
+        parent_category = category.ref_fields[ZERO]
         self.assertEqual(PARENT_CATEGORY, parent_category.name)
         self.assertFalse(parent_category.is_required)
         self.assertEqual(CATEGORY, parent_category.ref_entity.name)
@@ -793,6 +921,11 @@ class TestJsonSchemaParser(unittest.TestCase):
             TITLE_SCHEMA_WITH_NESTED_OBJECT_ENTITIES, actual_entities
         )
 
-
-if __name__ == "__main__":
-    unittest.main()
+    def test_id_defs_definitions_enum_nested_schema(self):
+        actual_entities: List[Entity] = self.parser.parse(
+            file_content=ID_DEFS_DEFINITIONS_ENUM_SCHEMA
+        )
+        self.assertEqual(
+            [ADDRESS_ENTITY, STATE_ENUM_ENTITY, CUSTOMER_ENTITY],
+            actual_entities
+        )
