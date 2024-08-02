@@ -88,7 +88,7 @@ class JsonSchemaParser(EntityParser):
 
         try:
             return FieldType(field_type)
-        except KeyError:
+        except (KeyError, ValueError):
             raise ValueError(f"`{field_type}` is not a valid JSON type")
 
     def _get_type_ref(self, type_ref: str) -> str:
@@ -120,9 +120,6 @@ class JsonSchemaParser(EntityParser):
     def _process_definitions(
         self, schema: Dict[str, Any], obj_key: str
     ) -> None:
-        if not schema:
-            return
-
         definitions = schema.get(obj_key, {})
 
         # Create the entities first

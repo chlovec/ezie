@@ -6,3 +6,4 @@ branch = True
 omit =
     */tests/*
     */venv/*
+show_missing=true

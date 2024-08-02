@@ -402,6 +402,36 @@ ID_DEFS_DEFINITIONS_ENUM_SCHEMA = '''
 }
 '''
 
+INVALID_JSON_TYPE: str = '''
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "Brand": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "guid",
+          "description": "Unique identifier for the brand",
+          "primaryKey": true
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the brand",
+          "maxLength": 50
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the brand",
+          "maxLength": "max"
+        }
+      },
+      "required": ["id", "name"],
+      "additionalProperties": false
+    }
+  }
+}
+'''
+
 
 ENTITY_NON_REF_FIELDS = [
     EntityField(
@@ -871,6 +901,14 @@ class TestJsonSchemaParser(unittest.TestCase):
             self.parser.parse(file_content=INVALID_REF_JSON_SCHEMA)
         self.assertEqual(
             "Json schema contains invalid ref `#/definitions/files/Category`",
+            str(context.exception)
+        )
+
+    def test_invalid_json_type(self):
+        with self.assertRaises(ValueError) as context:
+            self.parser.parse(file_content=INVALID_JSON_TYPE)
+        self.assertEqual(
+            "`guid` is not a valid JSON type",
             str(context.exception)
         )
 
