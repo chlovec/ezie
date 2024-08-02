@@ -46,10 +46,10 @@ class JsonSchemaParser(EntityParser):
                 schema = json.load(file)
         else:
             raise ValueError(
-                """
+                '''
                 Either `file_content` or `file_path` is require but
                 none was provided
-                """
+                '''
             )
 
         self._process_schema(schema, True)
@@ -65,17 +65,17 @@ class JsonSchemaParser(EntityParser):
         try:
             return FieldType(field_type)
         except KeyError:
-            raise ValueError(f"`{field_type}` is not a valid JSON type")
+            raise ValueError(f'`{field_type}` is not a valid JSON type')
 
     def _get_type_ref(self, type_ref: str) -> str:
         if not type_ref:
             return None
 
-        refs = type_ref.split("/")
+        refs = type_ref.split('/')
         if len(refs) == THREE:
             return refs[TWO]
 
-        raise ValueError(f"Json schema contains invalid ref `{type_ref}`")
+        raise ValueError(f'Json schema contains invalid ref `{type_ref}`')
 
     def _process_schema(
         self, schema: Dict[str, Any], process_title: bool = False
@@ -84,10 +84,10 @@ class JsonSchemaParser(EntityParser):
             return
 
         self._process_definitions(
-            schema, "definitions"
+            schema, 'definitions'
         )
         self._process_definitions(
-            schema, "$defs"
+            schema, '$defs'
         )
 
         if process_title:
@@ -114,14 +114,14 @@ class JsonSchemaParser(EntityParser):
         for obj_name, obj_defs in definitions.items():
             self._process_obj_properties(
                 obj_name=obj_name,
-                obj_properties=obj_defs.get("properties", {}),
-                required_props=set(obj_defs.get("required", []))
+                obj_properties=obj_defs.get('properties', {}),
+                required_props=set(obj_defs.get('required', []))
             )
 
     def _process_titles(self, schema: Dict[str, Any]) -> None:
-        id: str = schema.get("title", '')
+        id: str = schema.get('title', '')
         if not id:
-            id = schema.get("$id", '')
+            id = schema.get('$id', '')
 
         if not id:
             return
@@ -135,8 +135,8 @@ class JsonSchemaParser(EntityParser):
         )
         self._process_obj_properties(
             obj_name=obj_name,
-            obj_properties=schema.get("properties", {}),
-            required_props=set(schema.get("required", []))
+            obj_properties=schema.get('properties', {}),
+            required_props=set(schema.get('required', []))
         )
 
     def _process_obj_properties(
@@ -149,9 +149,9 @@ class JsonSchemaParser(EntityParser):
 
         attributes: List[EntityField] = []
         for prop_name, prop_def in obj_properties.items():
-            type_ref: str = ""
+            type_ref: str = ''
             prop_type: FieldType = self._get_field_type(
-                prop_def.get("type", "")
+                prop_def.get('type', '')
             )
             if prop_type and prop_type == FieldType.OBJECT:
                 self.created_objects[prop_name] = Entity(
@@ -162,23 +162,23 @@ class JsonSchemaParser(EntityParser):
                 )
                 self._process_obj_properties(
                     obj_name=prop_name,
-                    obj_properties=prop_def.get("properties", {}),
-                    required_props=prop_def.get("required", [])
+                    obj_properties=prop_def.get('properties', {}),
+                    required_props=prop_def.get('required', [])
                 )
                 type_ref = prop_name
             else:
-                type_ref = self._get_type_ref(prop_def.get("$ref", None))
+                type_ref = self._get_type_ref(prop_def.get('$ref', None))
 
-            enum_values: List[Any] = prop_def.get("enum", [])
+            enum_values: List[Any] = prop_def.get('enum', [])
             attributes.append(
                 EntityField(
                     name=prop_name,
                     field_type=prop_type,
-                    max_length=prop_def.get("maxLength", None),
+                    max_length=prop_def.get('maxLength', None),
                     is_required=(prop_name in required_props),
-                    is_primary_key=prop_def.get("primaryKey", False),
+                    is_primary_key=prop_def.get('primaryKey', False),
                     type_ref=type_ref,
-                    format=prop_def.get("format", None),
+                    format=prop_def.get('format', None),
                     is_enum=bool(enum_values),
                     enum_values=enum_values
                 ))
@@ -195,21 +195,21 @@ class JsonSchemaParser(EntityParser):
             # Validate that a referenced entity is not used as primary key
             # field
             if (
-                (field.field_type == "object" or field.type_ref)
+                (field.field_type == 'object' or field.type_ref)
                 and field.is_primary_key
             ):
                 raise ValueError(
-                    f"""
+                    f'''
                     Cannot use a referenced entity as primary key field -
                     `{class_name}.{field.name}`
-                    """
+                    '''
                 )
             elif field.type_ref and field.type_ref not in self.created_objects:
                 raise ValueError(
-                    f"""
+                    f'''
                     `{field.type_ref}` is referenced in `{class_name}` but
                     does not have a definition
-                    """
+                    '''
                 )
             elif field.type_ref:
                 ref_fields.append(
@@ -226,7 +226,7 @@ class JsonSchemaParser(EntityParser):
 
         if not pk_fields:
             pk_field = self._get_pk_fields(
-                ["id", f"{class_name}_id".lower(), f"{class_name}id".lower()],
+                ['id', f'{class_name}_id'.lower(), f'{class_name}id'.lower()],
                 non_ref_fields
             )
             if pk_field:

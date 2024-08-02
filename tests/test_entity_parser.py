@@ -735,7 +735,7 @@ class TestJsonSchemaParser(unittest.TestCase):
         with self.assertRaises(ValueError) as context:
             self.parser.parse(file_content=INVALID_REF_JSON_SCHEMA)
         self.assertEqual(
-            "Json schema contains invalid ref `#/definitions/files/Category`",
+            'Json schema contains invalid ref `#/definitions/files/Category`',
             str(context.exception)
         )
 
@@ -744,10 +744,10 @@ class TestJsonSchemaParser(unittest.TestCase):
             self.parser.parse(file_content=INVALID_PRIMARY_KEY_SCHEMA)
         self.assertEqual(
             textwrap.dedent(
-                """
+                '''
                 Cannot use a referenced entity as primary key field -
                 `Category.parent_category`
-                """
+                '''
             ),
             textwrap.dedent(str(context.exception))
         )
@@ -757,10 +757,10 @@ class TestJsonSchemaParser(unittest.TestCase):
             self.parser.parse(file_content=MISSING_REF_DEFINITION)
         self.assertEqual(
             textwrap.dedent(
-                """
+                '''
                 `Brand` is referenced in `Product` but
                 does not have a definition
-                """
+                '''
             ),
             textwrap.dedent(str(context.exception))
         )
@@ -770,10 +770,10 @@ class TestJsonSchemaParser(unittest.TestCase):
             self.parser.parse()
         self.assertEqual(
             textwrap.dedent(
-                """
+                '''
                 Either `file_content` or `file_path` is require but
                 none was provided
-                """
+                '''
             ),
             textwrap.dedent(str(context.exception))
         )
