@@ -1,6 +1,6 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
-from typing import List, Union
+from typing import Any, List, Union
 
 
 class FieldType(Enum):
@@ -22,6 +22,7 @@ class EntityField:
     type_ref: str = None
     format: str = None
     is_enum: bool = False
+    enum_values: List[Any] = field(default_factory=list)
 
 
 @dataclass

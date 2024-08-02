@@ -328,6 +328,35 @@ MISSING_PRIMARY_KEY_SCHEMA: str = '''
 }
 '''
 
+TITLE_SCHEMA_WITH_NESTED_OBJECT: str = '''
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Person",
+    "type": "object",
+    "properties": {
+        "name": {
+            "type": "string"
+        },
+        "age": {
+            "type": "integer"
+        },
+        "address": {
+            "type": "object",
+            "properties": {
+                "street": {
+                    "type": "string"
+                },
+                "city": {
+                    "type": "string"
+                }
+            },
+            "required": ["street", "city"]
+        }
+    },
+    "required": ["name", "age"]
+}
+'''
+
 
 ENTITY_NON_REF_FIELDS = [
     EntityField(
@@ -472,6 +501,101 @@ PRODUCT_BRAND_REF_ENTITY = RefEntityField(
     ref_entity=PRODUCT_BRAND_ENTITY,
     is_required=False
 )
+
+TITLE_SCHEMA_WITH_NESTED_OBJECT_ENTITIES: List[Entity] = [
+    Entity(
+        name='Person',
+        non_ref_fields=[
+            EntityField(
+                name='name',
+                field_type=FieldType.STRING,
+                max_length=None,
+                is_required=True,
+                is_primary_key=False,
+                type_ref=None,
+                format=None,
+                is_enum=False,
+                enum_values=[]
+            ),
+            EntityField(
+                name='age',
+                field_type=FieldType.INTEGER,
+                max_length=None,
+                is_required=True,
+                is_primary_key=False,
+                type_ref=None,
+                format=None,
+                is_enum=False,
+                enum_values=[]
+            )
+        ],
+        ref_fields=[
+            RefEntityField(
+                name='address',
+                ref_entity=Entity(
+                    name='address',
+                    non_ref_fields=[
+                        EntityField(
+                            name='street',
+                            field_type=FieldType.STRING,
+                            max_length=None,
+                            is_required=True,
+                            is_primary_key=False,
+                            type_ref=None,
+                            format=None,
+                            is_enum=False,
+                            enum_values=[]
+                        ),
+                        EntityField(
+                            name='city',
+                            field_type=FieldType.STRING,
+                            max_length=None,
+                            is_required=True,
+                            is_primary_key=False,
+                            type_ref=None,
+                            format=None,
+                            is_enum=False,
+                            enum_values=[]
+                        )
+                    ],
+                    ref_fields=[],
+                    pk_fields=[]
+                ),
+                is_required=False
+            )
+        ],
+        pk_fields=[]
+    ),
+    Entity(
+        name='address',
+        non_ref_fields=[
+            EntityField(
+                name='street',
+                field_type=FieldType.STRING,
+                max_length=None,
+                is_required=True,
+                is_primary_key=False,
+                type_ref=None,
+                format=None,
+                is_enum=False,
+                enum_values=[]
+            ),
+            EntityField(
+                name='city',
+                field_type=FieldType.STRING,
+                max_length=None,
+                is_required=True,
+                is_primary_key=False,
+                type_ref=None,
+                format=None,
+                is_enum=False,
+                enum_values=[]
+            )
+        ],
+        ref_fields=[],
+        pk_fields=[]
+    )
+]
 
 
 class TestJsonSchemaParser(unittest.TestCase):
@@ -641,14 +765,6 @@ class TestJsonSchemaParser(unittest.TestCase):
             textwrap.dedent(str(context.exception))
         )
 
-    def test_parser_missing_primary(self):
-        with self.assertRaises(ValueError) as context:
-            self.parser.parse(file_content=MISSING_PRIMARY_KEY_SCHEMA)
-        self.assertEqual(
-            "No primary key field found for entity `Brand`",
-            str(context.exception)
-        )
-
     def test_parser_missing_input(self):
         with self.assertRaises(ValueError) as context:
             self.parser.parse()
@@ -660,6 +776,14 @@ class TestJsonSchemaParser(unittest.TestCase):
                 """
             ),
             textwrap.dedent(str(context.exception))
+        )
+
+    def test_title_schema_with_nested_object(self):
+        actual_entities: List[Entity] = self.parser.parse(
+            file_content=TITLE_SCHEMA_WITH_NESTED_OBJECT
+        )
+        self.assertEqual(
+            TITLE_SCHEMA_WITH_NESTED_OBJECT_ENTITIES, actual_entities
         )
 
 

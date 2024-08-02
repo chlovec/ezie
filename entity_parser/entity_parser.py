@@ -1,7 +1,7 @@
 
 from abc import ABC, abstractmethod
 import json
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Set, Union
 
 from entity_parser.entity import Entity, EntityField, FieldType, RefEntityField
 
@@ -17,15 +17,6 @@ class EntityParser(ABC):
     ) -> List[Entity]:
         pass
 
-    def _get_field_type(self, field_type: str) -> Union[FieldType, None]:
-        if not field_type:
-            return None
-
-        try:
-            return FieldType(field_type)
-        except KeyError:
-            raise ValueError(f"`{field_type}` is not a valid JSON type")
-
     def _get_pk_fields(
         self, pk_field_names: List[str], non_ref_field: List[EntityField]
     ) -> Union[EntityField, None]:
@@ -37,18 +28,165 @@ class EntityParser(ABC):
 
         return None
 
+
+class JsonSchemaParser(EntityParser):
+    def __init__(self) -> None:
+        super().__init__()
+        self.created_objects: Dict[str, Entity] = {}
+        self.obj_attributes: Dict[str. List[EntityField]] = {}
+
+    def parse(
+        self, file_content: str = None, file_path: str = None
+    ) -> List[Entity]:
+        schema: Dict[str, Any] = {}
+        if file_content:
+            schema = json.loads(file_content)
+        elif file_path:
+            with open(file_path) as file:
+                schema = json.load(file)
+        else:
+            raise ValueError(
+                """
+                Either `file_content` or `file_path` is require but
+                none was provided
+                """
+            )
+
+        self._process_schema(schema, True)
+        for obj_name, attributes in self.obj_attributes.items():
+            self._update_entity_fields(obj_name, attributes)
+
+        return list(self.created_objects.values())
+
+    def _get_field_type(self, field_type: str) -> Union[FieldType, None]:
+        if not field_type:
+            return None
+
+        try:
+            return FieldType(field_type)
+        except KeyError:
+            raise ValueError(f"`{field_type}` is not a valid JSON type")
+
     def _get_type_ref(self, type_ref: str) -> str:
+        if not type_ref:
+            return None
+
         refs = type_ref.split("/")
         if len(refs) == THREE:
             return refs[TWO]
 
         raise ValueError(f"Json schema contains invalid ref `{type_ref}`")
 
-    def _set_entity_attributes(
+    def _process_schema(
+        self, schema: Dict[str, Any], process_title: bool = False
+    ) -> None:
+        if not schema:
+            return
+
+        self._process_definitions(
+            schema, "definitions"
+        )
+        self._process_definitions(
+            schema, "$defs"
+        )
+
+        if process_title:
+            self._process_titles(schema)
+
+    def _process_definitions(
+        self, schema: Dict[str, Any], obj_key: str
+    ) -> None:
+        definitions = schema.get(obj_key, {})
+        self._process_schema(definitions)
+
+        # Create the entities first
+        for obj_name in definitions:
+            if self.created_objects.get(obj_name, None):
+                continue
+
+            self.created_objects[obj_name] = Entity(
+                name=obj_name,
+                non_ref_fields=[],
+                ref_fields=[],
+                pk_fields=[]
+            )
+
+        for obj_name, obj_defs in definitions.items():
+            self._process_obj_properties(
+                obj_name=obj_name,
+                obj_properties=obj_defs.get("properties", {}),
+                required_props=set(obj_defs.get("required", []))
+            )
+
+    def _process_titles(self, schema: Dict[str, Any]) -> None:
+        id: str = schema.get("title", '')
+        if not id:
+            id = schema.get("$id", '')
+
+        if not id:
+            return
+
+        obj_name: str = id.split('/')[-1]
+        self.created_objects[obj_name] = Entity(
+            name=obj_name,
+            non_ref_fields=[],
+            ref_fields=[],
+            pk_fields=[]
+        )
+        self._process_obj_properties(
+            obj_name=obj_name,
+            obj_properties=schema.get("properties", {}),
+            required_props=set(schema.get("required", []))
+        )
+
+    def _process_obj_properties(
         self,
-        class_name: str,
-        attributes: List[EntityField],
-        created_entities: Dict[str, Entity]
+        obj_name: str,
+        obj_properties: Dict[str, Any],
+        required_props: Set[str]
+    ) -> None:
+        self._process_schema(obj_properties)
+
+        attributes: List[EntityField] = []
+        for prop_name, prop_def in obj_properties.items():
+            type_ref: str = ""
+            prop_type: FieldType = self._get_field_type(
+                prop_def.get("type", "")
+            )
+            if prop_type and prop_type == FieldType.OBJECT:
+                self.created_objects[prop_name] = Entity(
+                    name=prop_name,
+                    non_ref_fields=[],
+                    ref_fields=[],
+                    pk_fields=[]
+                )
+                self._process_obj_properties(
+                    obj_name=prop_name,
+                    obj_properties=prop_def.get("properties", {}),
+                    required_props=prop_def.get("required", [])
+                )
+                type_ref = prop_name
+            else:
+                type_ref = self._get_type_ref(prop_def.get("$ref", None))
+
+            enum_values: List[Any] = prop_def.get("enum", [])
+            attributes.append(
+                EntityField(
+                    name=prop_name,
+                    field_type=prop_type,
+                    max_length=prop_def.get("maxLength", None),
+                    is_required=(prop_name in required_props),
+                    is_primary_key=prop_def.get("primaryKey", False),
+                    type_ref=type_ref,
+                    format=prop_def.get("format", None),
+                    is_enum=bool(enum_values),
+                    enum_values=enum_values
+                ))
+
+        self.obj_attributes[obj_name] = attributes
+
+    def _update_entity_fields(
+        self, class_name: str, attributes: List[EntityField]
     ) -> None:
         ref_fields: List[RefEntityField] = []
         non_ref_fields: List[EntityField] = []
@@ -66,7 +204,7 @@ class EntityParser(ABC):
                     `{class_name}.{field.name}`
                     """
                 )
-            elif field.type_ref and field.type_ref not in created_entities:
+            elif field.type_ref and field.type_ref not in self.created_objects:
                 raise ValueError(
                     f"""
                     `{field.type_ref}` is referenced in `{class_name}` but
@@ -77,7 +215,7 @@ class EntityParser(ABC):
                 ref_fields.append(
                     RefEntityField(
                         name=field.name,
-                        ref_entity=created_entities[field.type_ref],
+                        ref_entity=self.created_objects[field.type_ref],
                         is_required=field.is_required
                     )
                 )
@@ -91,12 +229,8 @@ class EntityParser(ABC):
                 ["id", f"{class_name}_id".lower(), f"{class_name}id".lower()],
                 non_ref_fields
             )
-            if not pk_field:
-                raise ValueError(
-                    f"No primary key field found for entity `{class_name}`"
-                )
-
-            pk_fields = [pk_field]
+            if pk_field:
+                pk_fields = [pk_field]
 
         # Remove all pk_fields from non_ref_fields
         non_ref_fields = [
@@ -104,83 +238,6 @@ class EntityParser(ABC):
         ]
 
         # Update entity
-        created_entities[class_name].non_ref_fields = non_ref_fields
-        created_entities[class_name].ref_fields = ref_fields
-        created_entities[class_name].pk_fields = pk_fields
-
-    def _create_entities(
-        self, class_attributes: Dict[str, List[EntityField]]
-    ) -> List[Entity]:
-        # Create entities
-        created_entities: Dict[str, Entity] = {}
-        for class_name in class_attributes:
-            created_entities[class_name] = Entity(class_name, [], [], [])
-
-        # Create entities attributes
-        for class_name, attributes in class_attributes.items():
-            self._set_entity_attributes(
-                class_name, attributes, created_entities
-            )
-
-        return list(created_entities.values())
-
-
-class JsonSchemaParser(EntityParser):
-    def parse(
-        self, file_content: str = None, file_path: str = None
-    ) -> List[Entity]:
-        if file_content:
-            schema = json.loads(file_content)
-            return self._parse_schema(schema)
-        elif file_path:
-            with open(file_path) as file:
-                return self._parse_schema(json.load(file))
-        else:
-            raise ValueError(
-                """
-                Either `file_content` or `file_path` is require but
-                none was provided
-                """
-            )
-
-    def _map_class_attributes(
-        self, schema: Dict[str, Any]
-    ) -> Dict[str, List[EntityField]]:
-        # Extract definitions and process classes within it
-        definitions = schema.get("definitions", {})
-        class_attributes_map: Dict[str, List[EntityField]] = {}
-        for class_name, class_def in definitions.items():
-            properties = class_def.get("properties", {})
-            attributes: List[str, EntityField] = {}
-
-            # Extract and create class attributes
-            for prop_name, prop_def in properties.items():
-                type_ref = prop_def.get("$ref", None)
-                type_ref = self._get_type_ref(type_ref) if type_ref else None
-                ent_field = EntityField(
-                    name=prop_name,
-                    field_type=self._get_field_type(
-                        prop_def.get("type", None)),
-                    max_length=prop_def.get("maxLength", None),
-                    is_primary_key=prop_def.get("primaryKey", False),
-                    type_ref=type_ref,
-                    format=prop_def.get("format", None)
-                )
-                attributes[prop_name] = ent_field
-
-            # Extract and set required attributes
-            required_attr = class_def.get("required", [])
-            for prop_name in required_attr:
-                attributes[prop_name].is_required = True
-
-            # Set class attributes
-            class_attributes_map[class_name] = attributes.values()
-
-        return class_attributes_map
-
-    def _parse_schema(self, schema: Dict[str, Any]) -> List[Entity]:
-        # Extract class attributes mapping
-        class_attributes: Dict[str, List[EntityField]] = (
-            self._map_class_attributes(schema)
-        )
-        return self._create_entities(class_attributes)
+        self.created_objects[class_name].non_ref_fields = non_ref_fields
+        self.created_objects[class_name].ref_fields = ref_fields
+        self.created_objects[class_name].pk_fields = pk_fields
