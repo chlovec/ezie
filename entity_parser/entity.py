@@ -40,3 +40,4 @@ class Entity:
     pk_fields: List[EntityField]
     is_enum: bool = False
     enum_values: Any = None
+    is_sub_def: bool = False

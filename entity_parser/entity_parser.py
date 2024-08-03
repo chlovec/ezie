@@ -12,6 +12,7 @@ THREE: int = 3
 ID: str = "id"
 PROPERTIES: str = "properties"
 REQUIRED: str = "required"
+SUB_DEFINITION: str = "$defs"
 
 
 class EntityParser(ABC):
@@ -111,7 +112,7 @@ class JsonSchemaParser(EntityParser):
             schema, "definitions"
         )
         self._process_definitions(
-            schema, "$defs"
+            schema, SUB_DEFINITION
         )
 
         if process_title:
@@ -131,7 +132,8 @@ class JsonSchemaParser(EntityParser):
                 name=obj_name,
                 non_ref_fields=[],
                 ref_fields=[],
-                pk_fields=[]
+                pk_fields=[],
+                is_sub_def=obj_key == SUB_DEFINITION
             )
 
             # Check if object is an enum

@@ -716,7 +716,8 @@ ADDRESS_ENTITY = Entity(
     ],
     pk_fields=[],
     is_enum=False,
-    enum_values=None
+    enum_values=None,
+    is_sub_def=True
 )
 
 CUSTOMER_ENTITY = Entity(
