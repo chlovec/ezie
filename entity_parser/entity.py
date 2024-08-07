@@ -24,6 +24,13 @@ class EntityField:
     is_enum: bool = False
     enum_values: List[Any] = field(default_factory=list)
 
+    def get_ref_name(
+        self, parent_field_name: str, ref_entity_name: str
+    ) -> str:
+        if self.name.startswith((parent_field_name, ref_entity_name)):
+            return self.name
+        return f"{parent_field_name}_{self.name}"
+
 
 @dataclass
 class RefEntityField:
@@ -36,20 +43,9 @@ class RefEntityField:
             return [self.name]
 
         return [
-            RefEntityField.get_ref_field_name(
-                fld.name, self.name, self.ref_entity.name
-            )
+            fld.get_ref_name(self.name, self.ref_entity.name)
             for fld in self.ref_entity.pk_fields
         ]
-
-    @staticmethod
-    def get_ref_field_name(
-        ref_field_name: str, field_name: str, ref_entity_name: str
-    ) -> str:
-        if ref_field_name.startswith((field_name, ref_entity_name)):
-            return ref_field_name
-
-        return f"{field_name}_{ref_field_name}"
 
 
 @dataclass
