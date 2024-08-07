@@ -4,7 +4,7 @@ from typing import List
 from entity_parser.entity import Entity, EntityField
 
 
-class SqlGenerator(ABC):
+class SqlCommandGenerator(ABC):
     def __init__(self, entity: Entity, param_marker: str = "@"):
         self.entity: Entity = entity
         self.param_marker = param_marker
@@ -87,7 +87,7 @@ class SqlGenerator(ABC):
         return f"DELETE FROM {self.entity.name} {self._get_where_clause()};"
 
 
-class PostgreSqlGenerator(SqlGenerator):
+class PgsqlCommandGenerator(SqlCommandGenerator):
     def _get_list_where_clause(self) -> str:
         field_names: List[str] = []
         for fld in self.entity.pk_fields:

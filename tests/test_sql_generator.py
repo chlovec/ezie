@@ -2,7 +2,7 @@ import unittest
 from parameterized import parameterized
 
 from entity_parser.entity import Entity, EntityField, FieldType, RefEntityField
-from sql_generator.sql_generator import PostgreSqlGenerator
+from sql_generator.sql_generator import PgsqlCommandGenerator
 
 THIRTY: int = 30
 FIFTY: int = 50
@@ -166,7 +166,7 @@ class TestPostgreSqlGenerator(unittest.TestCase):
     def test_gen_list_sql_statement(
         self, entity: Entity, expected_sql: str
     ):
-        sql_gen = PostgreSqlGenerator(entity)
+        sql_gen = PgsqlCommandGenerator(entity)
         actual_sql = sql_gen.gen_list_sql_statement()
         self.assertEqual(expected_sql, actual_sql)
 
@@ -190,7 +190,7 @@ class TestPostgreSqlGenerator(unittest.TestCase):
     def test_gen_get_sql_statement(
         self, entity: Entity, expected_sql: str
     ):
-        sql_gen = PostgreSqlGenerator(entity)
+        sql_gen = PgsqlCommandGenerator(entity)
         actual_sql = sql_gen.gen_get_sql_statement()
         self.assertEqual(expected_sql, actual_sql)
 
@@ -215,7 +215,7 @@ class TestPostgreSqlGenerator(unittest.TestCase):
     def test_gen_create_sql_statement(
         self, entity: Entity, expected_sql: str
     ):
-        sql_gen = PostgreSqlGenerator(entity)
+        sql_gen = PgsqlCommandGenerator(entity)
         actual_sql = sql_gen.gen_create_sql_statement()
         self.assertEqual(expected_sql, actual_sql)
 
@@ -239,7 +239,7 @@ class TestPostgreSqlGenerator(unittest.TestCase):
     def test_gen_update_sql_statement(
         self, entity: Entity, expected_sql: str
     ):
-        sql_gen = PostgreSqlGenerator(entity)
+        sql_gen = PgsqlCommandGenerator(entity)
         actual_sql = sql_gen.gen_update_sql_statement()
         self.assertEqual(expected_sql, actual_sql)
 
@@ -256,6 +256,6 @@ class TestPostgreSqlGenerator(unittest.TestCase):
     def test_gen_delete_sql_statement(
         self, entity: Entity, expected_sql: str
     ):
-        sql_gen = PostgreSqlGenerator(entity)
+        sql_gen = PgsqlCommandGenerator(entity)
         actual_sql = sql_gen.gen_delete_sql_statement()
         self.assertEqual(expected_sql, actual_sql)
