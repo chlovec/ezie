@@ -7,10 +7,14 @@ from sql_generator.sql_generator import PgsqlCommandGenerator
 THIRTY: int = 30
 FIFTY: int = 50
 
+ADDRESS: str = "address"
 CATEGORY: str = "Category"
+CITY: str = "city"
 DESCRIPTION: str = "description"
 MAX_LEN: str = "max"
 NAME: str = "name"
+STATE: str = "state"
+STREET: str = "street"
 
 ENTITY_WITH_NO_REF = Entity(
     name="Brand",
@@ -140,6 +144,54 @@ ENTITY_WITH_REF = Entity(
     ]
 )
 
+STATE_ENUM_ENTITY = Entity(
+    name=STATE,
+    non_ref_fields=[],
+    ref_fields=[],
+    pk_fields=[],
+    is_enum=True,
+    enum_values=["CA", "NY", "... etc ..."]
+)
+
+ADDRESS_ENTITY = Entity(
+    name=ADDRESS,
+    non_ref_fields=[
+        EntityField(
+            name="street_address",
+            field_type=FieldType.STRING,
+            max_length=None,
+            is_required=True,
+            is_primary_key=False,
+            type_ref=None,
+            format=None,
+            is_enum=False,
+            enum_values=[]
+        ),
+        EntityField(
+            name=CITY,
+            field_type=FieldType.STRING,
+            max_length=None,
+            is_required=True,
+            is_primary_key=False,
+            type_ref=None,
+            format=None,
+            is_enum=False,
+            enum_values=[]
+        )
+    ],
+    ref_fields=[
+        RefEntityField(
+            name=STATE,
+            ref_entity=STATE_ENUM_ENTITY,
+            is_required=True
+        )
+    ],
+    pk_fields=[],
+    is_enum=False,
+    enum_values=None,
+    is_sub_def=True
+)
+
 
 class TestPostgreSqlGenerator(unittest.TestCase):
     @parameterized.expand([
@@ -259,3 +311,11 @@ class TestPostgreSqlGenerator(unittest.TestCase):
         sql_gen = PgsqlCommandGenerator(entity)
         actual_sql = sql_gen.gen_delete_sql_statement()
         self.assertEqual(expected_sql, actual_sql)
+
+    def test_gen_sql_statement(self):
+        sql_gen = PgsqlCommandGenerator(ADDRESS_ENTITY)
+        actual_sql = sql_gen.gen_get_sql_statement()
+        self.assertEqual(
+            "SELECT street_address, city, state FROM address ;",
+            actual_sql
+        )

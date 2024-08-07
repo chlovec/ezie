@@ -32,30 +32,24 @@ class RefEntityField:
     is_required: bool = False
 
     def get_ref_names(self) -> List[str]:
-        """Returns a list of field that represents the names for the primary
-        key fields of the referenced entities.
+        if self.ref_entity.is_enum:
+            return [self.name]
 
-        Notes:
-            If a primary key field does not start with the name of this field
-            or the name of the referenced entity, it's name will be prefixed
-            with the name of this field.
-            This could return empty list of referenced entity does not have a
-            primary key field.
+        return [
+            RefEntityField.get_ref_field_name(
+                fld.name, self.name, self.ref_entity.name
+            )
+            for fld in self.ref_entity.pk_fields
+        ]
 
-        Returns:
-            List[str]: A list of string
-        """
-        result: List[str] = []
-        for fld in self.ref_entity.pk_fields:
-            if (
-                fld.name.startswith(self.name)
-                or fld.name.startswith(self.ref_entity.name)
-            ):
-                result.append(fld.name)
-            else:
-                result.append(f"{self.name}_{fld.name}")
+    @staticmethod
+    def get_ref_field_name(
+        ref_field_name: str, field_name: str, ref_entity_name: str
+    ) -> str:
+        if ref_field_name.startswith((field_name, ref_entity_name)):
+            return ref_field_name
 
-        return result
+        return f"{field_name}_{ref_field_name}"
 
 
 @dataclass
