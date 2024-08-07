@@ -2,9 +2,11 @@ import textwrap
 from typing import List
 import unittest
 from unittest.mock import mock_open, patch
+from parameterized import parameterized
 
 from entity_parser.entity import Entity, EntityField, FieldType, RefEntityField
 from entity_parser.entity_parser import JsonSchemaParser
+
 
 ZERO: int = 0
 ONE: int = 1
@@ -24,8 +26,9 @@ NAME: str = "name"
 PARENT_CATEGORY: str = "parent_category"
 STATE: str = "state"
 STREET: str = "street"
+FILE_PATH: str = "test/file/path"
 
-BRAND_JSON_SCHEMA: str = '''
+NO_REF_SCHEMA: str = '''
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
@@ -56,7 +59,7 @@ BRAND_JSON_SCHEMA: str = '''
 }
 '''
 
-CATEGORY_JSON_SCHEMA: str = '''
+SELF_REF_SCHEMA: str = '''
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
@@ -91,7 +94,7 @@ CATEGORY_JSON_SCHEMA: str = '''
 }
 '''
 
-PRODUCT_JSON_SCHEMA: str = '''
+SELF_REF_AND_ENTITY_REF_SCHEMA: str = '''
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
@@ -432,7 +435,6 @@ INVALID_JSON_TYPE: str = '''
 }
 '''
 
-
 ENTITY_NON_REF_FIELDS = [
     EntityField(
         name=NAME,
@@ -763,77 +765,63 @@ CUSTOMER_ENTITY = Entity(
     enum_values=None
 )
 
+ID_DEFS_DEFINITIONS_ENUM_SCHEMA_ENTITIES: List[Entity] = [
+    ADDRESS_ENTITY, STATE_ENUM_ENTITY, CUSTOMER_ENTITY
+]
+
+NO_REF_SCHEMA_ENTITIES = [
+    Entity(
+        name='Brand',
+        non_ref_fields=[
+            EntityField(
+                name='name',
+                field_type=FieldType.STRING,
+                max_length=50,
+                is_required=True,
+                is_primary_key=False,
+                type_ref=None,
+                format=None,
+                is_enum=False,
+                enum_values=[]
+            ),
+            EntityField(
+                name='description',
+                field_type=FieldType.STRING,
+                max_length='max',
+                is_required=False,
+                is_primary_key=False,
+                type_ref=None,
+                format=None,
+                is_enum=False,
+                enum_values=[]
+            )
+        ],
+        ref_fields=[],
+        pk_fields=[
+            EntityField(
+                name='id',
+                field_type=FieldType.STRING,
+                max_length=30,
+                is_required=True,
+                is_primary_key=True,
+                type_ref=None,
+                format=None,
+                is_enum=False,
+                enum_values=[]
+            )
+        ],
+        is_enum=False,
+        enum_values=None,
+        is_sub_def=False
+    )
+]
+
 
 class TestJsonSchemaParser(unittest.TestCase):
     def setUp(self):
-        self.maxDiff = None
         self.parser = JsonSchemaParser()
 
-    def test_brand_json_schema(self):
-        actual_entities: List[Entity] = self.parser.parse(
-            file_content=BRAND_JSON_SCHEMA
-        )
-        self.assertEqual(ONE, len(actual_entities))
-        self.assertEqual(BRAND, actual_entities[ZERO].name)
-        self.assertEqual(
-            ENTITY_NON_REF_FIELDS, actual_entities[ZERO].non_ref_fields
-        )
-        self.assertEqual(
-            ENTITY_ID_PK_FIELD, actual_entities[ZERO].pk_fields
-        )
-        self.assertFalse(
-            actual_entities[ZERO].ref_fields
-        )
-
-    def test_category_json_schema(self):
-        actual_entities: List[Entity] = self.parser.parse(
-            file_content=CATEGORY_JSON_SCHEMA
-        )
-        self.assertEqual(ONE, len(actual_entities))
-        self.assertEqual(CATEGORY, actual_entities[ZERO].name)
-        self.assertEqual(
-            ENTITY_NON_REF_FIELDS, actual_entities[ZERO].non_ref_fields
-        )
-        self.assertEqual(
-            ENTITY_ID_PK_FIELD, actual_entities[ZERO].pk_fields
-        )
-        self.assertTrue(
-            actual_entities[ZERO].ref_fields
-        )
-        self.assertEqual(
-            ONE, len(actual_entities[ZERO].ref_fields)
-        )
-
-        # Verify parent category
-        parent_category = actual_entities[ZERO].ref_fields[ZERO]
-        self.assertEqual(PARENT_CATEGORY, parent_category.name)
-        self.assertEqual(CATEGORY, parent_category.ref_entity.name)
-        self.assertEqual(
-            ENTITY_NON_REF_FIELDS,
-            parent_category.ref_entity.non_ref_fields
-        )
-        self.assertEqual(
-            ENTITY_ID_PK_FIELD, parent_category.ref_entity.pk_fields
-        )
-
-    def test_product_json_schema(self):
-        actual_entities: List[Entity] = self.parser.parse(
-            file_content=PRODUCT_JSON_SCHEMA
-        )
-        self._verify_product_json_schema_test(actual_entities)
-
-    @patch(
-        "builtins.open", new_callable=mock_open, read_data=PRODUCT_JSON_SCHEMA
-    )
-    def test_parser_file_path(self, mock_file):
-        file_path = "tests/file/path"
-        actual_entities: List[Entity] = self.parser.parse(
-            file_path=file_path
-        )
-        mock_file.assert_called_once_with(file_path)
-        self._verify_product_json_schema_test(actual_entities)
-
-    def _verify_product_json_schema_test(
+    def _verify_self_ref_and_entity_ref_entities(
         self, actual_entities: List[Entity]
     ) -> None:
         self.assertEqual(len(actual_entities), THREE)
@@ -897,74 +885,116 @@ class TestJsonSchemaParser(unittest.TestCase):
             PRODUCT_CATEGORY_PK_FIELDS, ref_entity.pk_fields
         )
 
-    def test_parser_invalid_ref(self):
-        with self.assertRaises(ValueError) as context:
-            self.parser.parse(file_content=INVALID_REF_JSON_SCHEMA)
+    def test_parser_with_self_ref_and_entity_ref_schema(self):
+        actual_entities: List[Entity] = self.parser.parse(
+            file_content=SELF_REF_AND_ENTITY_REF_SCHEMA
+        )
+        self._verify_self_ref_and_entity_ref_entities(actual_entities)
+
+    @patch(
+        "builtins.open",
+        new_callable=mock_open,
+        read_data=SELF_REF_AND_ENTITY_REF_SCHEMA
+    )
+    def test_parser_with_file_path(self, mock_file):
+        file_path = FILE_PATH
+        actual_entities: List[Entity] = self.parser.parse(
+            file_path=file_path
+        )
+        mock_file.assert_called_once_with(file_path)
+        self._verify_self_ref_and_entity_ref_entities(actual_entities)
+
+    def test_parser_with_self_ref_schema(self):
+        actual_entities: List[Entity] = self.parser.parse(
+            file_content=SELF_REF_SCHEMA
+        )
+        self.assertEqual(ONE, len(actual_entities))
+        self.assertEqual(CATEGORY, actual_entities[ZERO].name)
         self.assertEqual(
+            ENTITY_NON_REF_FIELDS, actual_entities[ZERO].non_ref_fields
+        )
+        self.assertEqual(
+            ENTITY_ID_PK_FIELD, actual_entities[ZERO].pk_fields
+        )
+        self.assertTrue(
+            actual_entities[ZERO].ref_fields
+        )
+        self.assertEqual(
+            ONE, len(actual_entities[ZERO].ref_fields)
+        )
+
+        # Verify parent category
+        parent_category = actual_entities[ZERO].ref_fields[ZERO]
+        self.assertEqual(PARENT_CATEGORY, parent_category.name)
+        self.assertEqual(CATEGORY, parent_category.ref_entity.name)
+        self.assertEqual(
+            ENTITY_NON_REF_FIELDS,
+            parent_category.ref_entity.non_ref_fields
+        )
+        self.assertEqual(
+            ENTITY_ID_PK_FIELD, parent_category.ref_entity.pk_fields
+        )
+
+    @parameterized.expand([
+        (
+            ID_DEFS_DEFINITIONS_ENUM_SCHEMA,
+            None,
+            ID_DEFS_DEFINITIONS_ENUM_SCHEMA_ENTITIES
+        ),
+        (
+            TITLE_SCHEMA_WITH_NESTED_OBJECT,
+            FILE_PATH,
+            TITLE_SCHEMA_WITH_NESTED_OBJECT_ENTITIES
+        ),
+        (NO_REF_SCHEMA, FILE_PATH, NO_REF_SCHEMA_ENTITIES)
+    ])
+    def test_parser_file_content(
+        self,
+        file_content: str,
+        file_path: str,
+        expected_entities: List[Entity]
+    ):
+        actual_entities: List[Entity] = self.parser.parse(
+            file_content, file_path
+        )
+        self.assertEqual(expected_entities, actual_entities)
+
+    @parameterized.expand([
+        (
+            "",
+            """
+            Either `file_content` or `file_path` is require but
+            none was provided
+            """
+        ),
+        (
+            MISSING_REF_DEFINITION,
+            """
+            `Brand` is referenced in `Product` but
+            does not have a definition
+            """
+        ),
+        (
+            INVALID_PRIMARY_KEY_SCHEMA,
+            """
+            Cannot use a referenced entity as primary key field -
+            `Category.parent_category`
+            """
+        ),
+        (
+            INVALID_JSON_TYPE,
+            "`guid` is not a valid JSON type"
+        ),
+        (
+            INVALID_REF_JSON_SCHEMA,
             "Json schema contains invalid ref `#/definitions/files/Category`",
-            str(context.exception)
         )
-
-    def test_invalid_json_type(self):
+    ])
+    def test_parser_errors(self, file_content: str, error_message: str):
         with self.assertRaises(ValueError) as context:
-            self.parser.parse(file_content=INVALID_JSON_TYPE)
-        self.assertEqual(
-            "`guid` is not a valid JSON type",
-            str(context.exception)
-        )
+            self.parser.parse(file_content=file_content)
 
-    def test_parser_invalid_primary_key(self):
-        with self.assertRaises(ValueError) as context:
-            self.parser.parse(file_content=INVALID_PRIMARY_KEY_SCHEMA)
         self.assertEqual(
-            textwrap.dedent(
-                """
-                Cannot use a referenced entity as primary key field -
-                `Category.parent_category`
-                """
-            ),
+            textwrap.dedent(error_message),
             textwrap.dedent(str(context.exception))
-        )
-
-    def test_parser_missing_definition(self):
-        with self.assertRaises(ValueError) as context:
-            self.parser.parse(file_content=MISSING_REF_DEFINITION)
-        self.assertEqual(
-            textwrap.dedent(
-                """
-                `Brand` is referenced in `Product` but
-                does not have a definition
-                """
-            ),
-            textwrap.dedent(str(context.exception))
-        )
-
-    def test_parser_missing_input(self):
-        with self.assertRaises(ValueError) as context:
-            self.parser.parse()
-        self.assertEqual(
-            textwrap.dedent(
-                """
-                Either `file_content` or `file_path` is require but
-                none was provided
-                """
-            ),
-            textwrap.dedent(str(context.exception))
-        )
-
-    def test_title_schema_with_nested_object(self):
-        actual_entities: List[Entity] = self.parser.parse(
-            file_content=TITLE_SCHEMA_WITH_NESTED_OBJECT
-        )
-        self.assertEqual(
-            TITLE_SCHEMA_WITH_NESTED_OBJECT_ENTITIES, actual_entities
-        )
-
-    def test_id_defs_definitions_enum_nested_schema(self):
-        actual_entities: List[Entity] = self.parser.parse(
-            file_content=ID_DEFS_DEFINITIONS_ENUM_SCHEMA
-        )
-        self.assertEqual(
-            [ADDRESS_ENTITY, STATE_ENUM_ENTITY, CUSTOMER_ENTITY],
-            actual_entities
         )
