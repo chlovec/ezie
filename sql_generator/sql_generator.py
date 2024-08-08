@@ -14,18 +14,30 @@ class SqlCommandGenerator(ABC):
         pass
 
     def _get_joined_fields(self, param_marker: str = "") -> str:
-        field_names: List[str] = []
-        for fld in self.entity.pk_fields:
-            field_names.append(param_marker + fld.name)
-
-        for fld in self.entity.non_ref_fields:
-            field_names.append(param_marker + fld.name)
-
-        for fld in self.entity.ref_fields:
-            for nm in fld.get_ref_names():
-                field_names.append(param_marker + nm)
-
+        field_names = self._join_fields(self.entity, param_marker)
         return ", ".join(field_names)
+
+    def _join_fields(
+        self, entity: Entity, param_marker: str, name_prefix: str = ""
+    ) -> List[str]:
+        field_names: List[str] = []
+        for fld in entity.pk_fields:
+            field_names.append(param_marker + name_prefix + fld.name)
+
+        for fld in entity.non_ref_fields:
+            field_names.append(param_marker + name_prefix + fld.name)
+
+        for fld in entity.ref_fields:
+            if not fld.ref_entity.is_enum and not fld.ref_entity.pk_fields:
+                field_names.extend(self._join_fields(
+                    fld.ref_entity, param_marker, fld.name + "_"
+                ))
+                continue
+
+            for nm in fld.get_ref_names():
+                field_names.append(param_marker + name_prefix + nm)
+
+        return field_names
 
     def _get_matched_fields(
         self,

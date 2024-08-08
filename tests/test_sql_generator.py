@@ -192,6 +192,49 @@ ADDRESS_ENTITY = Entity(
     is_sub_def=True
 )
 
+CUSTOMER_ENTITY = Entity(
+    name="customer",
+    non_ref_fields=[
+        EntityField(
+            name="first_name",
+            field_type=FieldType.STRING,
+            max_length=None,
+            is_required=True,
+            is_primary_key=False,
+            type_ref=None,
+            format=None,
+            is_enum=False,
+            enum_values=[]
+        ),
+        EntityField(
+            name="last_name",
+            field_type=FieldType.STRING,
+            max_length=None,
+            is_required=True,
+            is_primary_key=False,
+            type_ref=None,
+            format=None,
+            is_enum=False,
+            enum_values=[]
+        )
+    ],
+    ref_fields=[
+        RefEntityField(
+            name="shipping_address",
+            ref_entity=ADDRESS_ENTITY,
+            is_required=True
+        ),
+        RefEntityField(
+            name="billing_address",
+            ref_entity=ADDRESS_ENTITY,
+            is_required=True
+        )
+    ],
+    pk_fields=[],
+    is_enum=False,
+    enum_values=None
+)
+
 
 class TestPostgreSqlGenerator(unittest.TestCase):
     @parameterized.expand([
@@ -220,6 +263,14 @@ class TestPostgreSqlGenerator(unittest.TestCase):
             "entity_with_enum_and_no_pk",
             ADDRESS_ENTITY,
             "SELECT street_address, city, state FROM address;",
+        ),
+        (
+            "entity_with_sub_entity",
+            CUSTOMER_ENTITY,
+            "SELECT first_name, last_name, shipping_address_street_address, "
+            "shipping_address_city, shipping_address_state, "
+            "billing_address_street_address, billing_address_city, "
+            "billing_address_state FROM customer;"
         )
     ])
     def test_gen_list_sql_statement(
@@ -250,7 +301,15 @@ class TestPostgreSqlGenerator(unittest.TestCase):
         (
             "entity_with_enum_and_no_pk",
             ADDRESS_ENTITY,
-            "SELECT street_address, city, state FROM address;",
+            "SELECT street_address, city, state FROM address;"
+        ),
+        (
+            "entity_with_sub_entity",
+            CUSTOMER_ENTITY,
+            "SELECT first_name, last_name, shipping_address_street_address, "
+            "shipping_address_city, shipping_address_state, "
+            "billing_address_street_address, billing_address_city, "
+            "billing_address_state FROM customer;"
         )
     ])
     def test_gen_get_sql_statement(
@@ -286,6 +345,18 @@ class TestPostgreSqlGenerator(unittest.TestCase):
                 "INSERT INTO address (street_address, city, state) "
                 "VALUES(@street_address, @city, @state);"
             )
+        ),
+        (
+            "entity_with_sub_entity",
+            CUSTOMER_ENTITY,
+            "INSERT INTO customer (first_name, last_name, "
+            "shipping_address_street_address, shipping_address_city, "
+            "shipping_address_state, billing_address_street_address, "
+            "billing_address_city, billing_address_state) "
+            "VALUES(@first_name, @last_name, "
+            "@shipping_address_street_address, @shipping_address_city, "
+            "@shipping_address_state, @billing_address_street_address, "
+            "@billing_address_city, @billing_address_state);"
         )
     ])
     def test_gen_create_sql_statement(
@@ -320,6 +391,13 @@ class TestPostgreSqlGenerator(unittest.TestCase):
                 "UPDATE address  SET street_address = @street_address, "
                 "city = @city, state = @state;"
             )
+        ),
+        (
+            "entity_with_sub_entity",
+            CUSTOMER_ENTITY,
+            "UPDATE customer  SET first_name = @first_name, "
+            "last_name = @last_name, shipping_address = @shipping_address, "
+            "billing_address = @billing_address;"
         )
     ])
     def test_gen_update_sql_statement(
@@ -344,6 +422,11 @@ class TestPostgreSqlGenerator(unittest.TestCase):
             "entity_with_enum_and_no_pk",
             ADDRESS_ENTITY,
             "DELETE FROM address;"
+        ),
+        (
+            "entity_with_sub_entity",
+            CUSTOMER_ENTITY,
+            "DELETE FROM customer;"
         )
     ])
     def test_gen_delete_sql_statement(
