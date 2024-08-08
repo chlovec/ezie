@@ -196,6 +196,7 @@ ADDRESS_ENTITY = Entity(
 class TestPostgreSqlGenerator(unittest.TestCase):
     @parameterized.expand([
         (
+            "entity_with_no_ref",
             ENTITY_WITH_NO_REF,
             (
                 "SELECT brand_id, name, description FROM Brand "
@@ -204,6 +205,7 @@ class TestPostgreSqlGenerator(unittest.TestCase):
             )
         ),
         (
+            "entity_with_ref",
             ENTITY_WITH_REF,
             (
                 "SELECT productid, name, description, price, quantity, "
@@ -213,10 +215,15 @@ class TestPostgreSqlGenerator(unittest.TestCase):
                 "AND (@category_ids = {} OR category_ids = ANY(@category_ids))"
                 " ORDER BY productid ASC LIMIT @limit OFFSET @offset;"
             )
+        ),
+        (
+            "entity_with_enum_and_no_pk",
+            ADDRESS_ENTITY,
+            "SELECT street_address, city, state FROM address;",
         )
     ])
     def test_gen_list_sql_statement(
-        self, entity: Entity, expected_sql: str
+        self, name: str, entity: Entity, expected_sql: str
     ):
         sql_gen = PgsqlCommandGenerator(entity)
         actual_sql = sql_gen.gen_list_sql_statement()
@@ -224,6 +231,7 @@ class TestPostgreSqlGenerator(unittest.TestCase):
 
     @parameterized.expand([
         (
+            "entity_with_no_ref",
             ENTITY_WITH_NO_REF,
             (
                 "SELECT brand_id, name, description FROM Brand "
@@ -231,16 +239,22 @@ class TestPostgreSqlGenerator(unittest.TestCase):
             )
         ),
         (
+            "entity_with_ref",
             ENTITY_WITH_REF,
             (
                 "SELECT productid, name, description, price, quantity, "
                 "brand_id, category_id FROM product "
                 "WHERE productid = @productid;"
             )
+        ),
+        (
+            "entity_with_enum_and_no_pk",
+            ADDRESS_ENTITY,
+            "SELECT street_address, city, state FROM address;",
         )
     ])
     def test_gen_get_sql_statement(
-        self, entity: Entity, expected_sql: str
+        self, name: str, entity: Entity, expected_sql: str
     ):
         sql_gen = PgsqlCommandGenerator(entity)
         actual_sql = sql_gen.gen_get_sql_statement()
@@ -248,6 +262,7 @@ class TestPostgreSqlGenerator(unittest.TestCase):
 
     @parameterized.expand([
         (
+            "entity_with_no_ref",
             ENTITY_WITH_NO_REF,
             (
                 "INSERT INTO Brand (brand_id, name, description) "
@@ -255,6 +270,7 @@ class TestPostgreSqlGenerator(unittest.TestCase):
             )
         ),
         (
+            "entity_with_ref",
             ENTITY_WITH_REF,
             (
                 "INSERT INTO product (productid, name, description, price, "
@@ -262,10 +278,18 @@ class TestPostgreSqlGenerator(unittest.TestCase):
                 "VALUES(@productid, @name, @description, @price, @quantity, "
                 "@brand_id, @category_id);"
             )
+        ),
+        (
+            "entity_with_enum_and_no_pk",
+            ADDRESS_ENTITY,
+            (
+                "INSERT INTO address (street_address, city, state) "
+                "VALUES(@street_address, @city, @state);"
+            )
         )
     ])
     def test_gen_create_sql_statement(
-        self, entity: Entity, expected_sql: str
+        self, name: str, entity: Entity, expected_sql: str
     ):
         sql_gen = PgsqlCommandGenerator(entity)
         actual_sql = sql_gen.gen_create_sql_statement()
@@ -273,6 +297,7 @@ class TestPostgreSqlGenerator(unittest.TestCase):
 
     @parameterized.expand([
         (
+            "entity_with_no_ref",
             ENTITY_WITH_NO_REF,
             (
                 "UPDATE Brand  SET name = @name, description = @description "
@@ -280,16 +305,25 @@ class TestPostgreSqlGenerator(unittest.TestCase):
             )
         ),
         (
+            "entity_with_ref",
             ENTITY_WITH_REF,
             (
                 "UPDATE product  SET name = @name, description = @description,"
                 " price = @price, quantity = @quantity, brand = @brand, "
                 "category = @category WHERE productid = @productid;"
             )
+        ),
+        (
+            "entity_with_enum_and_no_pk",
+            ADDRESS_ENTITY,
+            (
+                "UPDATE address  SET street_address = @street_address, "
+                "city = @city, state = @state;"
+            )
         )
     ])
     def test_gen_update_sql_statement(
-        self, entity: Entity, expected_sql: str
+        self, name: str, entity: Entity, expected_sql: str
     ):
         sql_gen = PgsqlCommandGenerator(entity)
         actual_sql = sql_gen.gen_update_sql_statement()
@@ -297,25 +331,24 @@ class TestPostgreSqlGenerator(unittest.TestCase):
 
     @parameterized.expand([
         (
+            "entity_with_no_ref",
             ENTITY_WITH_NO_REF,
             "DELETE FROM Brand WHERE brand_id = @brand_id;"
         ),
         (
+            "entity_with_ref",
             ENTITY_WITH_REF,
             "DELETE FROM product WHERE productid = @productid;"
+        ),
+        (
+            "entity_with_enum_and_no_pk",
+            ADDRESS_ENTITY,
+            "DELETE FROM address;"
         )
     ])
     def test_gen_delete_sql_statement(
-        self, entity: Entity, expected_sql: str
+        self, name: str, entity: Entity, expected_sql: str
     ):
         sql_gen = PgsqlCommandGenerator(entity)
         actual_sql = sql_gen.gen_delete_sql_statement()
         self.assertEqual(expected_sql, actual_sql)
-
-    def test_gen_sql_statement(self):
-        sql_gen = PgsqlCommandGenerator(ADDRESS_ENTITY)
-        actual_sql = sql_gen.gen_get_sql_statement()
-        self.assertEqual(
-            "SELECT street_address, city, state FROM address ;",
-            actual_sql
-        )

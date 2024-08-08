@@ -50,22 +50,28 @@ class SqlCommandGenerator(ABC):
         return f"WHERE {self._get_matched_fields(pk_fields, [], " AND ")}"
 
     def gen_get_sql_statement(self) -> str:
-        return (
-            f"SELECT {self._get_joined_fields()} "
-            f"FROM {self.entity.name} {self._get_where_clause()};"
+        select_part = (
+            f"SELECT {self._get_joined_fields()} FROM {self.entity.name}"
         )
+        if (where_part := self._get_where_clause()):
+            return f"{select_part} {where_part};"
+        else:
+            return select_part + ";"
 
     def gen_list_sql_statement(self) -> str:
-        matched_fields: List[str] = [
+        select_part = (
+            f"SELECT {self._get_joined_fields()} FROM {self.entity.name}"
+        )
+        where_part = self._get_list_where_clause()
+        if not where_part:
+            return select_part + ";"
+
+        order_by_fields: List[str] = [
             f"{fld.name} ASC" for fld in self.entity.pk_fields
         ]
-        joined_matched_fields: str = ", ".join(matched_fields)
-        order_by_clause: str = (
-            f"ORDER BY {joined_matched_fields} LIMIT @limit OFFSET @offset"
-        )
         return (
-            f"SELECT {self._get_joined_fields()} FROM {self.entity.name} "
-            f"{self._get_list_where_clause()} {order_by_clause};"
+            f"{select_part} {where_part} ORDER BY "
+            f"{", ".join(order_by_fields)} LIMIT @limit OFFSET @offset;"
         )
 
     def gen_create_sql_statement(self) -> str:
@@ -78,13 +84,18 @@ class SqlCommandGenerator(ABC):
         matched_fields = self._get_matched_fields(
             self.entity.non_ref_fields + self.entity.ref_fields, []
         )
-        return (
-            f"UPDATE {self.entity.name}  SET {matched_fields} "
-            f"{self._get_where_clause()};"
-        )
+        update_part = f"UPDATE {self.entity.name}  SET {matched_fields}"
+        if (where_clause := self._get_where_clause()):
+            return f"{update_part} {where_clause};"
+        else:
+            return update_part + ";"
 
     def gen_delete_sql_statement(self) -> str:
-        return f"DELETE FROM {self.entity.name} {self._get_where_clause()};"
+        delete_part = f"DELETE FROM {self.entity.name}"
+        if (where_part := self._get_where_clause()):
+            return f"{delete_part} {where_part};"
+        else:
+            return delete_part + ";"
 
 
 class PgsqlCommandGenerator(SqlCommandGenerator):
@@ -94,8 +105,14 @@ class PgsqlCommandGenerator(SqlCommandGenerator):
             field_names.append(fld.name + "s")
 
         for fld in self.entity.ref_fields:
+            if fld.ref_entity.is_enum:
+                continue
+
             for matched_name in fld.get_ref_names():
                 field_names.append(matched_name + "s")
+
+        if not field_names:
+            return ""
 
         matched_field_names: List[str] = []
         for name in field_names:
