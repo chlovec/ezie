@@ -28,14 +28,13 @@ class SqlCommandGenerator(ABC):
             field_names.append(param_marker + name_prefix + fld.name)
 
         for fld in entity.ref_fields:
-            if not fld.ref_entity.is_enum and not fld.ref_entity.pk_fields:
+            if not fld.ref_entity.is_sub_def or fld.ref_entity.is_enum:
+                for nm in fld.get_ref_names():
+                    field_names.append(param_marker + name_prefix + nm)
+            else:
                 field_names.extend(self._join_fields(
                     fld.ref_entity, param_marker, fld.name + "_"
                 ))
-                continue
-
-            for nm in fld.get_ref_names():
-                field_names.append(param_marker + name_prefix + nm)
 
         return field_names
 
