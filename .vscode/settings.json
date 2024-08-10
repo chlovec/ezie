@@ -11,5 +11,18 @@
     "python.testing.unittestEnabled": false,
     "python.testing.pytestArgs": [
         "--cov=. --cov-report=term-missing"
+    ],
+    "cSpell.words": [
+        "BIGSERIAL",
+        "daterange",
+        "lseg",
+        "macaddr",
+        "numrange",
+        "sqls",
+        "timestamptz",
+        "tsquery",
+        "tsrange",
+        "tstzrange",
+        "tsvector"
     ]
 }

@@ -8,13 +8,13 @@ class FieldFormat(Enum):
     DOUBLE = "double"
     FLOAT = "float"
     TIME = "time"
-    TIMESTAMP = "date-time"
+    DATETIME = "date-time"
     UUID = "uuid"
     IPV4 = "ipv4"
     IPV6 = "ipv6"
     MAC = "mac"
     JSON = "json"
-    BYTEA = "byte"
+    BYTE = "byte"
 
 
 class FieldType(Enum):
@@ -37,6 +37,8 @@ class EntityField:
     format: str = None
     is_enum: bool = False
     enum_values: List[Any] = field(default_factory=list)
+    minimum: int = None
+    maximum: int = None
 
     def get_ref_name(
         self, parent_field_name: str, ref_entity_name: str

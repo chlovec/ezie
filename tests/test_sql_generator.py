@@ -446,9 +446,9 @@ class TestPgsqlTableSqlGenerator(unittest.TestCase):
         actual_sql = tbl_sql_gen.gen_table_sql(ENTITY_WITH_NO_REF, type_mapper)
         expected_sql = [
             'CREATE TABLE IF NOT EXISTS Brand (',
-            'brand_id None PRIMARY KEY,',
-            'name None NOT NULL,',
-            'description None NULL',
+            '    brand_id VARCHAR(30) PRIMARY KEY,',
+            '    name VARCHAR(50) NOT NULL,',
+            '    description VARCHAR(max) NULL',
             ');'
         ]
         self.assertEqual(expected_sql, actual_sql)
@@ -459,15 +459,15 @@ class TestPgsqlTableSqlGenerator(unittest.TestCase):
         actual_sql = tbl_sql_gen.gen_table_sql(ENTITY_WITH_REF, type_mapper)
         expected_sql = [
             'CREATE TABLE IF NOT EXISTS product (',
-            'productid None PRIMARY KEY,',
-            'name None NOT NULL,',
-            'description None NULL,',
-            'price None NULL,',
-            'quantity None NULL,',
-            'brand_id None NOT NULL,',
-            'category_id None NOT NULL,',
-            'FOREIGN KEY (brand_id) REFERENCES Brand (brand_id),',
-            'FOREIGN KEY (category_id) REFERENCES Category (id)',
+            '    productid VARCHAR(30) PRIMARY KEY,',
+            '    name VARCHAR(50) NOT NULL,',
+            '    description VARCHAR(max) NULL,',
+            '    price DOUBLE NULL,',
+            '    quantity INTEGER NULL,',
+            '    brand_id VARCHAR(30) NOT NULL,',
+            '    category_id INTEGER NOT NULL,',
+            '    FOREIGN KEY (brand_id) REFERENCES Brand (brand_id),',
+            '    FOREIGN KEY (category_id) REFERENCES Category (id)',
             ');'
         ]
         print(actual_sql)
