@@ -3,6 +3,20 @@ from enum import Enum
 from typing import Any, List, Union
 
 
+class FieldFormat(Enum):
+    DATE = "date"
+    DOUBLE = "double"
+    FLOAT = "float"
+    TIME = "time"
+    TIMESTAMP = "date-time"
+    UUID = "uuid"
+    IPV4 = "ipv4"
+    IPV6 = "ipv6"
+    MAC = "mac"
+    JSON = "json"
+    BYTEA = "byte"
+
+
 class FieldType(Enum):
     STRING = "string"
     NUMBER = "number"

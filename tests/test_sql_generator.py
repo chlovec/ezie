@@ -2,7 +2,9 @@ import unittest
 from parameterized import parameterized
 
 from entity_parser.entity import Entity, EntityField, FieldType, RefEntityField
-from sql_generator.sql_generator import PgsqlCommandGenerator
+from sql_generator.sql_generator import (
+    PgsqlCommandGenerator, PgsqlTableSqlGenerator
+)
 
 THIRTY: int = 30
 FIFTY: int = 50
@@ -434,4 +436,37 @@ class TestPostgreSqlGenerator(unittest.TestCase):
     ):
         sql_gen = PgsqlCommandGenerator(entity)
         actual_sql = sql_gen.gen_delete_sql_statement()
+        self.assertEqual(expected_sql, actual_sql)
+
+
+class TestPgsqlTableSqlGenerator(unittest.TestCase):
+    def test_gen_table_sql(self):
+        tbl_sql_gen = PgsqlTableSqlGenerator()
+        actual_sql = tbl_sql_gen.gen_table_sql(ENTITY_WITH_NO_REF)
+        expected_sql = [
+            'CREATE TABLE IF NOT EXISTS Brand (',
+            'brand_id None PRIMARY KEY,',
+            'name None NOT NULL,',
+            'description None NULL',
+            ');'
+        ]
+        self.assertEqual(expected_sql, actual_sql)
+
+    def test_gen_table_sql2(self):
+        tbl_sql_gen = PgsqlTableSqlGenerator()
+        actual_sql = tbl_sql_gen.gen_table_sql(ENTITY_WITH_REF)
+        expected_sql = [
+            'CREATE TABLE IF NOT EXISTS product (',
+            'productid None PRIMARY KEY,',
+            'name None NOT NULL,',
+            'description None NULL,',
+            'price None NULL,',
+            'quantity None NULL,',
+            'brand_id None NOT NULL,',
+            'category_id None NOT NULL,',
+            'FOREIGN KEY (brand_id) REFERENCES Brand (brand_id),',
+            'FOREIGN KEY (category_id) REFERENCES Category (id)',
+            ');'
+        ]
+        print(actual_sql)
         self.assertEqual(expected_sql, actual_sql)

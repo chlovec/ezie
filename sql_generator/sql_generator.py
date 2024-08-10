@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Tuple
 
-from entity_parser.entity import Entity, EntityField
+from entity_parser.entity import Entity, EntityField, FieldFormat, FieldType
+from utils.utils import remove_last_comma
 
 
 class SqlCommandGenerator(ABC):
@@ -135,3 +136,120 @@ class PgsqlCommandGenerator(SqlCommandGenerator):
 
         joined_matched_fields: str = " AND ".join(matched_field_names)
         return f"WHERE {joined_matched_fields}"
+
+
+class TableSqlGenerator(ABC):
+    @abstractmethod
+    def _get_db_type(
+        self,
+        field_type: FieldType,
+        field_format: FieldFormat,
+        min_val: int,
+        max_val: int
+    ) -> str:
+        pass
+
+    @abstractmethod
+    def gen_table_sql(self) -> List[str]:
+        pass
+
+
+class PgsqlTableSqlGenerator(TableSqlGenerator):
+    def _get_db_type(self, entity_field: EntityField) -> str:
+        return None
+
+    def _get_enum_db_type(self, entity: Entity) -> str:
+        return "VARCHAR(50)"
+
+    def _get_nullable_part(self, field: EntityField) -> str:
+        return "NOT NULL" if field.is_required else "NULL"
+
+    def _get_pk_field_sql(
+        self, pk_fields: List[EntityField]
+    ) -> Tuple[List[str], str]:
+        # Handle the case where there is only one primary key field
+        if len(pk_fields) == 1:
+            fld = pk_fields[0]
+            field_sql = f"{fld.name} {self._get_db_type(fld)} PRIMARY KEY,"
+            return [field_sql], ""
+
+        # Handle the case where there are multiple primary key fields
+        field_sql = [
+            f"{fld.name} {self._get_db_type(fld)}," for fld in pk_fields
+        ]
+        pk_field_names = [fld.name for fld in pk_fields]
+        pk_statement = f"PRIMARY KEY ({', '.join(pk_field_names)}),"
+        return field_sql, pk_statement
+
+    def _get_fk_field_sql(
+        self,
+        entity_fields: List[EntityField],
+        parent_field_name: str,
+        ref_entity_name: str
+    ) -> Tuple[List[str], List[str]]:
+        fk_sql, fk_stmts = [], []
+        for fld in entity_fields:
+            fld_name = fld.get_ref_name(parent_field_name, ref_entity_name)
+            fk_sql.append(
+                f"{fld_name} {self._get_db_type(fld)} "
+                f"{self._get_nullable_part(fld)},"
+            )
+            fk_stmts.append(
+                f"FOREIGN KEY ({fld_name}) REFERENCES "
+                f"{ref_entity_name} ({fld.name}),"
+            )
+
+        return fk_sql, fk_stmts
+
+    def _get_field_sqls(self, entity: Entity) -> List[str]:
+        # Get sql field statement for pk fields
+        sql_strs, pk_statement = self._get_pk_field_sql(entity.pk_fields)
+
+        # Add non ref fields
+        for fld in entity.non_ref_fields:
+            nullable = self._get_nullable_part(fld)
+            sql_strs.append(f"{fld.name} {self._get_db_type(fld)} {nullable},")
+
+        # Add ref fields
+        fk_stmts = []
+        for fld in entity.ref_fields:
+            # Handle enum type
+            if fld.ref_entity.is_enum:
+                sql_strs.append(
+                    f"{fld.name} {self._get_enum_db_type(fld.ref_entity)} "
+                    f"{self._get_nullable_part(fld)},"
+                )
+
+            # Handle sub def entities
+            elif fld.ref_entity.is_sub_def:
+                sql_strs.extend(self._get_field_sqls(fld.ref_entity))
+
+            # Handle foreign key
+            else:
+                fk_sqls, curr_fk_stmts = self._get_fk_field_sql(
+                    fld.ref_entity.pk_fields, fld.name, fld.ref_entity.name
+                )
+                fk_stmts.extend(curr_fk_stmts)
+                sql_strs.extend(fk_sqls)
+
+        # Add pk statement
+        if pk_statement:
+            sql_strs.extend(pk_statement)
+
+        # Add foreign key statement and field sql statements
+        sql_strs.extend(fk_stmts)
+        return sql_strs
+
+    def gen_table_sql(self, entity: Entity) -> List[str]:
+        # create table statement
+        sql_strs = [f"CREATE TABLE IF NOT EXISTS {entity.name} ("]
+
+        # Add field statements
+        sql_strs.extend(self._get_field_sqls(entity))
+
+        # trim off last comma
+        sql_strs[-1] = remove_last_comma(sql_strs[-1])
+
+        # Close and return create table statement
+        sql_strs.append(");")
+        return sql_strs
