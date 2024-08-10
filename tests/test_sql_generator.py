@@ -3,7 +3,7 @@ from parameterized import parameterized
 
 from entity_parser.entity import Entity, EntityField, FieldType, RefEntityField
 from sql_generator.sql_generator import (
-    PgsqlCommandGenerator, PgsqlTableSqlGenerator
+    PgsqlCommandGenerator, PgsqlTableSqlGenerator, PgsqlTypeMapper
 )
 
 THIRTY: int = 30
@@ -442,7 +442,8 @@ class TestPostgreSqlGenerator(unittest.TestCase):
 class TestPgsqlTableSqlGenerator(unittest.TestCase):
     def test_gen_table_sql(self):
         tbl_sql_gen = PgsqlTableSqlGenerator()
-        actual_sql = tbl_sql_gen.gen_table_sql(ENTITY_WITH_NO_REF)
+        type_mapper = PgsqlTypeMapper()
+        actual_sql = tbl_sql_gen.gen_table_sql(ENTITY_WITH_NO_REF, type_mapper)
         expected_sql = [
             'CREATE TABLE IF NOT EXISTS Brand (',
             'brand_id None PRIMARY KEY,',
@@ -454,7 +455,8 @@ class TestPgsqlTableSqlGenerator(unittest.TestCase):
 
     def test_gen_table_sql2(self):
         tbl_sql_gen = PgsqlTableSqlGenerator()
-        actual_sql = tbl_sql_gen.gen_table_sql(ENTITY_WITH_REF)
+        type_mapper = PgsqlTypeMapper()
+        actual_sql = tbl_sql_gen.gen_table_sql(ENTITY_WITH_REF, type_mapper)
         expected_sql = [
             'CREATE TABLE IF NOT EXISTS product (',
             'productid None PRIMARY KEY,',
