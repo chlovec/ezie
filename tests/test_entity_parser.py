@@ -435,6 +435,38 @@ INVALID_JSON_TYPE: str = '''
 }
 '''
 
+COMPOSITE_PRIMARY_KEY_SCHEMA: str = '''
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "product_order",
+  "type": "object",
+  "properties": {
+    "order_id": {
+      "type": "integer",
+      "primaryKey": true,
+      "description": "The unique identifier for the order."
+    },
+    "product_id": {
+      "type": "integer",
+      "primaryKey": true,
+      "description": "The unique identifier for the product."
+    },
+    "quantity": {
+      "type": "integer",
+      "description": "The quantity of the product ordered."
+    },
+    "price": {
+      "type": "number",
+      "format": "float",
+      "description": "The price of the product."
+    }
+  },
+  "required": ["order_id", "product_id", "quantity", "price"],
+  "additionalProperties": false,
+  "uniqueItems": true
+}
+'''
+
 ENTITY_NON_REF_FIELDS = [
     EntityField(
         name=NAME,
@@ -816,6 +848,70 @@ NO_REF_SCHEMA_ENTITIES = [
     )
 ]
 
+COMPOSITE_PRIMARY_KEY_ENTITY = Entity(
+    name='product_order',
+    non_ref_fields=[
+        EntityField(
+            name='quantity',
+            field_type=FieldType.INTEGER,
+            max_length=None,
+            is_required=True,
+            is_primary_key=False,
+            type_ref=None,
+            format=None,
+            is_enum=False,
+            enum_values=[],
+            minimum=None,
+            maximum=None
+        ),
+        EntityField(
+            name='price',
+            field_type=FieldType.NUMBER,
+            max_length=None,
+            is_required=True,
+            is_primary_key=False,
+            type_ref=None,
+            format='float',
+            is_enum=False,
+            enum_values=[],
+            minimum=None,
+            maximum=None
+        )
+    ],
+    ref_fields=[],
+    pk_fields=[
+        EntityField(
+            name='order_id',
+            field_type=FieldType.INTEGER,
+            max_length=None,
+            is_required=True,
+            is_primary_key=True,
+            type_ref=None,
+            format=None,
+            is_enum=False,
+            enum_values=[],
+            minimum=None,
+            maximum=None
+        ),
+        EntityField(
+            name='product_id',
+            field_type=FieldType.INTEGER,
+            max_length=None,
+            is_required=True,
+            is_primary_key=True,
+            type_ref=None,
+            format=None,
+            is_enum=False,
+            enum_values=[],
+            minimum=None,
+            maximum=None
+        )
+    ],
+    is_enum=False,
+    enum_values=None,
+    is_sub_def=False
+)
+
 
 class TestJsonSchemaParser(unittest.TestCase):
     def setUp(self):
@@ -946,7 +1042,8 @@ class TestJsonSchemaParser(unittest.TestCase):
             FILE_PATH,
             TITLE_SCHEMA_WITH_NESTED_OBJECT_ENTITIES
         ),
-        (NO_REF_SCHEMA, FILE_PATH, NO_REF_SCHEMA_ENTITIES)
+        (NO_REF_SCHEMA, FILE_PATH, NO_REF_SCHEMA_ENTITIES),
+        (COMPOSITE_PRIMARY_KEY_SCHEMA, None, [COMPOSITE_PRIMARY_KEY_ENTITY])
     ])
     def test_parser_file_content(
         self,
