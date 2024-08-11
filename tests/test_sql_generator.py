@@ -472,6 +472,33 @@ class TestPgsqlTableSqlGenerator(unittest.TestCase):
                 '    FOREIGN KEY (category_id) REFERENCES Category (id)',
                 ');'
             ]
+        ),
+        (
+            "entity_with_enum_and_no_pk",
+            ADDRESS_ENTITY,
+            [
+                'CREATE TABLE IF NOT EXISTS address (',
+                '    street_address TEXT NOT NULL,',
+                '    city TEXT NOT NULL,',
+                '    state VARCHAR(50) NOT NULL',
+                ');'
+            ]
+        ),
+        (
+            "entity_with_sub_entity",
+            CUSTOMER_ENTITY,
+            [
+                'CREATE TABLE IF NOT EXISTS customer (',
+                '    first_name TEXT NOT NULL,',
+                '    last_name TEXT NOT NULL,',
+                '    shipping_address_street_address TEXT NOT NULL,',
+                '    shipping_address_city TEXT NOT NULL,',
+                '    shipping_address_state VARCHAR(50) NOT NULL,',
+                '    billing_address_street_address TEXT NOT NULL,',
+                '    billing_address_city TEXT NOT NULL,',
+                '    billing_address_state VARCHAR(50) NOT NULL',
+                ');'
+            ]
         )
     ])
     def test_gen_table_sql(
@@ -481,25 +508,4 @@ class TestPgsqlTableSqlGenerator(unittest.TestCase):
         actual_sql = tbl_sql_gen.gen_table_sql(
             entity, self.type_mapper
         )
-        self.assertEqual(expected_sql, actual_sql)
-
-    def test_gen_table_sql2(self):
-        tbl_sql_gen = PgsqlTableSqlGenerator()
-        actual_sql = tbl_sql_gen.gen_table_sql(
-            ENTITY_WITH_REF, self.type_mapper
-        )
-        expected_sql = [
-            'CREATE TABLE IF NOT EXISTS product (',
-            '    productid VARCHAR(30) PRIMARY KEY,',
-            '    name VARCHAR(50) NOT NULL,',
-            '    description VARCHAR(max) NULL,',
-            '    price DOUBLE NULL,',
-            '    quantity INTEGER NULL,',
-            '    brand_id VARCHAR(30) NOT NULL,',
-            '    category_id INTEGER NOT NULL,',
-            '    FOREIGN KEY (brand_id) REFERENCES Brand (brand_id),',
-            '    FOREIGN KEY (category_id) REFERENCES Category (id)',
-            ');'
-        ]
-        print(actual_sql)
         self.assertEqual(expected_sql, actual_sql)

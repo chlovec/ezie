@@ -239,7 +239,11 @@ class PgsqlTableSqlGenerator(TableSqlGenerator):
         self, pk_fields: List[EntityField], type_mapper: TypeMapper
     ) -> Tuple[List[str], str]:
         # Handle the case where there is only one primary key field
-        if len(pk_fields) == 1:
+        if not pk_fields:
+            return [], ""
+
+        # Handle the case where there is only one primary key field
+        elif len(pk_fields) == 1:
             fld = pk_fields[0]
             field_sql = (
                 f"{TAB_4}{fld.name} {type_mapper.get_field_type(fld)} "
@@ -278,7 +282,8 @@ class PgsqlTableSqlGenerator(TableSqlGenerator):
         return fk_sql, fk_stmts
 
     def _get_field_sqls(
-        self, entity: Entity, type_mapper: TypeMapper
+        self, entity: Entity, type_mapper: TypeMapper,
+        parent_field_name: str = ""
     ) -> List[str]:
         # Get sql field statement for pk fields
         sql_strs, pk_statement = self._get_pk_field_sql(
@@ -287,19 +292,33 @@ class PgsqlTableSqlGenerator(TableSqlGenerator):
 
         # Add non ref fields
         for fld in entity.non_ref_fields:
+            prefix_name = ""
+            if (
+                parent_field_name and
+                not fld.name.startswith(parent_field_name)
+            ):
+                prefix_name = f"{parent_field_name}_"
+
             nullable = self._get_nullable_part(fld)
             sql_strs.append(
-                f"{TAB_4}{fld.name} {type_mapper.get_field_type(fld)} "
-                f"{nullable},"
+                f"{TAB_4}{prefix_name}{fld.name} "
+                f"{type_mapper.get_field_type(fld)} {nullable},"
             )
 
         # Add ref fields
         fk_stmts = []
         for fld in entity.ref_fields:
+            prefix_name = ""
+            if (
+                parent_field_name and
+                not fld.name.startswith(parent_field_name)
+            ):
+                prefix_name = f"{parent_field_name}_"
+
             # Handle enum type
             if fld.ref_entity.is_enum:
                 sql_strs.append(
-                    f"{TAB_4}{fld.name} "
+                    f"{TAB_4}{prefix_name}{fld.name} "
                     f"{type_mapper.get_enum_field_type(fld.ref_entity)} "
                     f"{self._get_nullable_part(fld)},"
                 )
@@ -307,7 +326,7 @@ class PgsqlTableSqlGenerator(TableSqlGenerator):
             # Handle sub def entities
             elif fld.ref_entity.is_sub_def:
                 sql_strs.extend(self._get_field_sqls(
-                    fld.ref_entity, type_mapper
+                    fld.ref_entity, type_mapper, fld.name
                 ))
 
             # Handle foreign key
@@ -316,14 +335,14 @@ class PgsqlTableSqlGenerator(TableSqlGenerator):
                     fld.ref_entity.pk_fields,
                     fld.name,
                     fld.ref_entity.name,
-                    type_mapper
+                    type_mapper,
                 )
                 fk_stmts.extend(curr_fk_stmts)
                 sql_strs.extend(fk_sqls)
 
         # Add pk statement
         if pk_statement:
-            sql_strs.extend(pk_statement)
+            sql_strs.append(pk_statement)
 
         # Add foreign key statement and field sql statements
         sql_strs.extend(fk_stmts)
@@ -407,7 +426,7 @@ class PgsqlTypeMapper(TypeMapper):
             return PgSQLDataType.UUID.name
         elif max_length:
             return f"{PgSQLDataType.VARCHAR.name}({max_length})"
-        return PgSQLDataType.TEXT
+        return PgSQLDataType.TEXT.name
 
     def get_field_type(self, entity_field: EntityField) -> str:
         if entity_field.field_type == FieldType.STRING:
