@@ -485,8 +485,9 @@ class TestPgsqlTableSqlGenerator(unittest.TestCase):
 
     def test_gen_table_sql2(self):
         tbl_sql_gen = PgsqlTableSqlGenerator()
-        type_mapper = PgsqlTypeMapper()
-        actual_sql = tbl_sql_gen.gen_table_sql(ENTITY_WITH_REF, type_mapper)
+        actual_sql = tbl_sql_gen.gen_table_sql(
+            ENTITY_WITH_REF, self.type_mapper
+        )
         expected_sql = [
             'CREATE TABLE IF NOT EXISTS product (',
             '    productid VARCHAR(30) PRIMARY KEY,',
