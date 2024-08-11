@@ -338,6 +338,15 @@ class TestPostgreSqlGenerator(unittest.TestCase):
             "shipping_address_city, shipping_address_state, "
             "billing_address_street_address, billing_address_city, "
             "billing_address_state FROM customer;"
+        ),
+        (
+            "entity_with_composite_pk",
+            COMPOSITE_PRIMARY_KEY_ENTITY,
+            "SELECT order_id, product_id, quantity, price FROM product_order "
+            "WHERE (@order_ids = {} OR order_ids = ANY(@order_ids)) "
+            "AND (@product_ids = {} OR product_ids = ANY(@product_ids)) "
+            "ORDER BY order_id ASC, product_id ASC "
+            "LIMIT @limit OFFSET @offset;"
         )
     ])
     def test_gen_list_sql_statement(
@@ -377,6 +386,12 @@ class TestPostgreSqlGenerator(unittest.TestCase):
             "shipping_address_city, shipping_address_state, "
             "billing_address_street_address, billing_address_city, "
             "billing_address_state FROM customer;"
+        ),
+        (
+            "entity_with_composite_pk",
+            COMPOSITE_PRIMARY_KEY_ENTITY,
+            "SELECT order_id, product_id, quantity, price FROM product_order "
+            "WHERE order_id = @order_id AND product_id = @product_id;"
         )
     ])
     def test_gen_get_sql_statement(
@@ -424,6 +439,12 @@ class TestPostgreSqlGenerator(unittest.TestCase):
             "@shipping_address_street_address, @shipping_address_city, "
             "@shipping_address_state, @billing_address_street_address, "
             "@billing_address_city, @billing_address_state);"
+        ),
+        (
+            "entity_with_composite_pk",
+            COMPOSITE_PRIMARY_KEY_ENTITY,
+            "INSERT INTO product_order (order_id, product_id, quantity, price)"
+            " VALUES(@order_id, @product_id, @quantity, @price);"
         )
     ])
     def test_gen_create_sql_statement(
@@ -465,6 +486,12 @@ class TestPostgreSqlGenerator(unittest.TestCase):
             "UPDATE customer  SET first_name = @first_name, "
             "last_name = @last_name, shipping_address = @shipping_address, "
             "billing_address = @billing_address;"
+        ),
+        (
+            "entity_with_composite_pk",
+            COMPOSITE_PRIMARY_KEY_ENTITY,
+            "UPDATE product_order  SET quantity = @quantity, price = @price "
+            "WHERE order_id = @order_id AND product_id = @product_id;"
         )
     ])
     def test_gen_update_sql_statement(
@@ -494,6 +521,12 @@ class TestPostgreSqlGenerator(unittest.TestCase):
             "entity_with_sub_entity",
             CUSTOMER_ENTITY,
             "DELETE FROM customer;"
+        ),
+        (
+            "entity_with_composite_pk",
+            COMPOSITE_PRIMARY_KEY_ENTITY,
+            "DELETE FROM product_order "
+            "WHERE order_id = @order_id AND product_id = @product_id;"
         )
     ])
     def test_gen_delete_sql_statement(
