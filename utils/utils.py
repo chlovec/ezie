@@ -22,7 +22,8 @@ def get_field_data(
             name=fld.get_field_name(parent_field_name),
             ref_entity_name=ref_entity_name,
             data_type=type_mapper.get_field_type(fld) if type_mapper else None,
-            is_required=fld.is_required
+            is_required=fld.is_required,
+            ref_field_name=fld.name
         )
         for fld in non_ref_fields
     ]

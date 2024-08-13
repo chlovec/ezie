@@ -18,6 +18,7 @@ class FieldData:
     ref_entity_name: str
     data_type: str
     is_required: bool
+    ref_field_name: str = None
 
 
 @dataclass

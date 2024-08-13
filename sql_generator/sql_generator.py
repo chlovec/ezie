@@ -11,9 +11,10 @@ from utils.constants import TAB_4
 from utils.utils import TypeMapper, EntityFieldData, remove_last_comma
 
 
-SELECT: str = "SELECT"
 END_TOKEN: str = ";"
 FROM: str = "FROM"
+PRIMARY_KEY: str = "PRIMARY KEY"
+SELECT: str = "SELECT"
 WHERE: str = "WHERE"
 
 
@@ -135,16 +136,16 @@ class PgsqlCommandGenerator(SqlCommandGenerator):
 
 class TableSqlGenerator(ABC):
     @abstractmethod
-    def gen_table_sql(self) -> List[str]:
+    def gen_table_sql(self, entity: EntityFieldData) -> List[str]:
         pass
 
 
 class PgsqlTableSqlGenerator(TableSqlGenerator):
-    def _get_nullable_part(self, field: EntityField) -> str:
+    def _get_nullable_part(self, field: FieldData) -> str:
         return "NOT NULL" if field.is_required else "NULL"
 
     def _get_pk_field_sql(
-        self, pk_fields: List[EntityField], type_mapper: TypeMapper
+        self, pk_fields: List[FieldData]
     ) -> Tuple[List[str], str]:
         # Handle the case where there is only one primary key field
         if not pk_fields:
@@ -153,102 +154,54 @@ class PgsqlTableSqlGenerator(TableSqlGenerator):
         # Handle the case where there is only one primary key field
         elif len(pk_fields) == 1:
             fld = pk_fields[0]
-            field_sql = (
-                f"{TAB_4}{fld.name} {type_mapper.get_field_type(fld)} "
-                "PRIMARY KEY,"
-            )
+            field_sql = f"{TAB_4}{fld.name} {fld.data_type} {PRIMARY_KEY},"
             return [field_sql], ""
 
         # Handle the case where there are multiple primary key fields
         field_sql = [
-            f"{TAB_4}{fld.name} {type_mapper.get_field_type(fld)},"
+            f"{TAB_4}{fld.name} {fld.data_type},"
             for fld in pk_fields
         ]
         pk_field_names = [fld.name for fld in pk_fields]
-        pk_statement = f"{TAB_4}PRIMARY KEY ({', '.join(pk_field_names)}),"
+        pk_statement = f"{TAB_4}{PRIMARY_KEY} ({', '.join(pk_field_names)}),"
         return field_sql, pk_statement
 
     def _get_fk_field_sql(
-        self,
-        entity_fields: List[EntityField],
-        parent_field_name: str,
-        ref_entity_name: str,
-        type_mapper: TypeMapper
+        self, fk_fields: List[FieldData]
     ) -> Tuple[List[str], List[str]]:
         fk_sql, fk_stmts = [], []
-        for fld in entity_fields:
-            fld_name = fld.get_ref_name(parent_field_name, ref_entity_name)
+        for fld in fk_fields:
             fk_sql.append(
-                f"{TAB_4}{fld_name} {type_mapper.get_field_type(fld)} "
+                f"{TAB_4}{fld.name} {fld.data_type} "
                 f"{self._get_nullable_part(fld)},"
             )
             fk_stmts.append(
-                f"{TAB_4}FOREIGN KEY ({fld_name}) REFERENCES "
-                f"{ref_entity_name} ({fld.name}),"
+                f"{TAB_4}FOREIGN KEY ({fld.name}) REFERENCES "
+                f"{fld.ref_entity_name} ({fld.ref_field_name}),"
             )
 
         return fk_sql, fk_stmts
 
     def _get_field_sqls(
-        self, entity: Entity, type_mapper: TypeMapper,
-        parent_field_name: str = ""
+        self, entity: EntityFieldData
     ) -> List[str]:
-        # Get sql field statement for pk fields
-        sql_strs, pk_statement = self._get_pk_field_sql(
-            entity.pk_fields, type_mapper
-        )
+        # Get sql field statement for primary key fields
+        sql_strs, pk_statement = self._get_pk_field_sql(entity.pk_field_data)
 
         # Add non ref fields
-        for fld in entity.non_ref_fields:
-            prefix_name = ""
-            if (
-                parent_field_name and
-                not fld.name.startswith(parent_field_name)
-            ):
-                prefix_name = f"{parent_field_name}_"
-
-            nullable = self._get_nullable_part(fld)
-            sql_strs.append(
-                f"{TAB_4}{prefix_name}{fld.name} "
-                f"{type_mapper.get_field_type(fld)} {nullable},"
+        sql_strs.extend([
+            (
+                f"{TAB_4}{fld.name} "
+                f"{fld.data_type} {self._get_nullable_part(fld)},"
             )
+            for fld in entity.other_field_data
+        ])
 
-        # Add ref fields
-        fk_stmts = []
-        for fld in entity.ref_fields:
-            prefix_name = ""
-            if (
-                parent_field_name and
-                not fld.name.startswith(parent_field_name)
-            ):
-                prefix_name = f"{parent_field_name}_"
+        # Add foreign key fields
+        fk_sqls, fk_stmts = self._get_fk_field_sql(entity.fk_field_data)
+        sql_strs.extend(fk_sqls)
 
-            # Handle enum type
-            if fld.ref_entity.is_enum:
-                sql_strs.append(
-                    f"{TAB_4}{prefix_name}{fld.name} "
-                    f"{type_mapper.get_enum_field_type(fld.ref_entity)} "
-                    f"{self._get_nullable_part(fld)},"
-                )
-
-            # Handle sub def entities
-            elif fld.ref_entity.is_sub_def:
-                sql_strs.extend(self._get_field_sqls(
-                    fld.ref_entity, type_mapper, fld.name
-                ))
-
-            # Handle foreign key
-            else:
-                fk_sqls, curr_fk_stmts = self._get_fk_field_sql(
-                    fld.ref_entity.pk_fields,
-                    fld.name,
-                    fld.ref_entity.name,
-                    type_mapper,
-                )
-                fk_stmts.extend(curr_fk_stmts)
-                sql_strs.extend(fk_sqls)
-
-        # Add pk statement
+        # Add primary key statement
         if pk_statement:
             sql_strs.append(pk_statement)
 
@@ -257,13 +210,13 @@ class PgsqlTableSqlGenerator(TableSqlGenerator):
         return sql_strs
 
     def gen_table_sql(
-        self, entity: Entity, type_mapper: TypeMapper
+        self, entity: EntityFieldData
     ) -> List[str]:
         # create table statement
-        sql_strs = [f"CREATE TABLE IF NOT EXISTS {entity.name} ("]
+        sql_strs = [f"CREATE TABLE IF NOT EXISTS {entity.entity_name} ("]
 
         # Add field statements
-        sql_strs.extend(self._get_field_sqls(entity, type_mapper))
+        sql_strs.extend(self._get_field_sqls(entity))
 
         # trim off last comma
         sql_strs[-1] = remove_last_comma(sql_strs[-1])

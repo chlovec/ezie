@@ -6,6 +6,7 @@ from entity_parser.entity import Entity, EntityField, FieldType, RefEntityField
 from sql_generator.sql_generator import (
     PgsqlCommandGenerator, PgsqlTableSqlGenerator, PgsqlTypeMapper
 )
+from utils.utils import EntityFieldData
 
 THIRTY: int = 30
 FIFTY: int = 50
@@ -620,7 +621,6 @@ class TestPgsqlTableSqlGenerator(unittest.TestCase):
         self, name: str, entity: Entity, expected_sql: List[str]
     ):
         tbl_sql_gen = PgsqlTableSqlGenerator()
-        actual_sql = tbl_sql_gen.gen_table_sql(
-            entity, self.type_mapper
-        )
+        entity_data = EntityFieldData.from_entity(entity, self.type_mapper)
+        actual_sql = tbl_sql_gen.gen_table_sql(entity_data)
         self.assertEqual(expected_sql, actual_sql)
