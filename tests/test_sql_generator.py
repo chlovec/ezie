@@ -2,9 +2,10 @@ from typing import List
 import unittest
 from parameterized import parameterized
 
+from data_type_mapper.sql_type_mapper import PgsqlTypeMapper
 from entity_parser.entity import Entity, EntityField, FieldType, RefEntityField
 from sql_generator.sql_generator import (
-    PgsqlCommandGenerator, PgsqlTableSqlGenerator, PgsqlTypeMapper
+    PgsqlCommandGenerator, PgsqlTableSqlGenerator
 )
 from utils.utils import EntityFieldData
 
@@ -353,7 +354,7 @@ class TestPostgreSqlGenerator(unittest.TestCase):
     def test_gen_list_sql_statement(
         self, name: str, entity: Entity, expected_sql: str
     ):
-        sql_gen = PgsqlCommandGenerator(entity)
+        sql_gen = PgsqlCommandGenerator(EntityFieldData.from_entity(entity))
         actual_sql = sql_gen.gen_list_sql_statement()
         self.assertEqual(expected_sql, actual_sql)
 
@@ -398,7 +399,7 @@ class TestPostgreSqlGenerator(unittest.TestCase):
     def test_gen_get_sql_statement(
         self, name: str, entity: Entity, expected_sql: str
     ):
-        sql_gen = PgsqlCommandGenerator(entity)
+        sql_gen = PgsqlCommandGenerator(EntityFieldData.from_entity(entity))
         actual_sql = sql_gen.gen_get_sql_statement()
         self.assertEqual(expected_sql, actual_sql)
 
@@ -451,7 +452,7 @@ class TestPostgreSqlGenerator(unittest.TestCase):
     def test_gen_create_sql_statement(
         self, name: str, entity: Entity, expected_sql: str
     ):
-        sql_gen = PgsqlCommandGenerator(entity)
+        sql_gen = PgsqlCommandGenerator(EntityFieldData.from_entity(entity))
         actual_sql = sql_gen.gen_create_sql_statement()
         self.assertEqual(expected_sql, actual_sql)
 
@@ -503,7 +504,7 @@ class TestPostgreSqlGenerator(unittest.TestCase):
     def test_gen_update_sql_statement(
         self, name: str, entity: Entity, expected_sql: str
     ):
-        sql_gen = PgsqlCommandGenerator(entity)
+        sql_gen = PgsqlCommandGenerator(EntityFieldData.from_entity(entity))
         actual_sql = sql_gen.gen_update_sql_statement()
         self.assertEqual(expected_sql, actual_sql)
 
@@ -538,7 +539,7 @@ class TestPostgreSqlGenerator(unittest.TestCase):
     def test_gen_delete_sql_statement(
         self, name: str, entity: Entity, expected_sql: str
     ):
-        sql_gen = PgsqlCommandGenerator(entity)
+        sql_gen = PgsqlCommandGenerator(EntityFieldData.from_entity(entity))
         actual_sql = sql_gen.gen_delete_sql_statement()
         self.assertEqual(expected_sql, actual_sql)
 

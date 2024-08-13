@@ -1,14 +1,9 @@
 from abc import ABC, abstractmethod
 from typing import List, Tuple
 
-from data_type_mapper.data_type_mapper import (
-    NEG_BIGINT, NEG_INTEGER, NEG_SMALLINT, POS_BIGINT, POS_INTEGER,
-    POS_SMALLINT, FieldFormat
-)
-from data_type_mapper.sql_type_mapper import PgSQLDataType
-from entity_parser.entity import Entity, EntityField, FieldData, FieldType
+from entity_parser.entity import FieldData
 from utils.constants import TAB_4
-from utils.utils import TypeMapper, EntityFieldData, remove_last_comma
+from utils.utils import EntityFieldData, remove_last_comma
 
 
 END_TOKEN: str = ";"
@@ -21,15 +16,11 @@ WHERE: str = "WHERE"
 class SqlCommandGenerator(ABC):
     def __init__(
         self,
-        entity: Entity,
-        type_mapper: TypeMapper = None,
+        entity: EntityFieldData,
         param_marker: str = "@"
     ):
-        self.entity: Entity = entity
         self.param_marker: str = param_marker
-        self.entity_field_data: EntityFieldData = EntityFieldData.from_entity(
-            entity=entity, type_mapper=type_mapper
-        )
+        self.entity_field_data: EntityFieldData = entity
 
     @abstractmethod
     def _get_list_where_clause(self) -> str:
@@ -45,9 +36,6 @@ class SqlCommandGenerator(ABC):
     def _get_matched_fields(
         self, field_data: List[FieldData], separator: str = ", "
     ) -> str:
-        if not field_data:
-            return ""
-
         matched_fields = (
             f"{fld.name} = {self.param_marker}{fld.name}"
             for fld in field_data
@@ -81,7 +69,7 @@ class SqlCommandGenerator(ABC):
             return select_part + END_TOKEN
 
         order_by_fields: List[str] = [
-            f"{fld.name} ASC" for fld in self.entity.pk_fields
+            f"{fld.name} ASC" for fld in self.entity_field_data.pk_field_data
         ]
         return (
             f"{select_part} {where_part} ORDER BY {", ".join(order_by_fields)}"
@@ -224,85 +212,3 @@ class PgsqlTableSqlGenerator(TableSqlGenerator):
         # Close and return create table statement
         sql_strs.append(");")
         return sql_strs
-
-
-class PgsqlTypeMapper(TypeMapper):
-    """_summary_
-    Class for mapping data from json type to pgsql data type
-    """
-
-    def get_array_type(self, entity_field: EntityField) -> str:
-        return PgSQLDataType.ARRAY
-
-    def _get_int_type(self, minimum: int, maximum: int) -> str:
-        if maximum and minimum:
-            if minimum >= NEG_SMALLINT and maximum <= POS_SMALLINT:
-                return PgSQLDataType.SMALLINT.name
-            elif minimum >= NEG_INTEGER and maximum <= POS_INTEGER:
-                return PgSQLDataType.INTEGER.name
-            elif minimum >= NEG_BIGINT and maximum <= POS_BIGINT:
-                return PgSQLDataType.BIGINT.name
-        elif minimum:
-            if minimum >= NEG_SMALLINT:
-                return PgSQLDataType.SMALLINT.name
-            elif minimum >= NEG_INTEGER:
-                return PgSQLDataType.INTEGER.name
-            elif minimum >= NEG_BIGINT:
-                return PgSQLDataType.BIGINT.name
-        elif maximum:
-            if maximum <= POS_SMALLINT:
-                return PgSQLDataType.SMALLINT.name
-            elif maximum <= POS_INTEGER:
-                return PgSQLDataType.INTEGER
-            elif maximum <= POS_BIGINT:
-                return PgSQLDataType.BIGINT
-
-        return PgSQLDataType.INTEGER.name
-
-    def _get_num_type(self, format: FieldFormat) -> str:
-        if format == FieldFormat.DOUBLE:
-            return PgSQLDataType.DOUBLE.name
-        elif format == FieldFormat.FLOAT:
-            return PgSQLDataType.REAL
-        return PgSQLDataType.DOUBLE.name
-
-    def _get_string_type(self, format: FieldFormat, max_length: int) -> str:
-        if format == FieldFormat.BYTE:
-            return PgSQLDataType.BYTEA.name
-        elif format == FieldFormat.DATE:
-            return PgSQLDataType.DATE.name
-        elif format == FieldFormat.DATETIME:
-            return PgSQLDataType.TIMESTAMPTZ.name
-        elif format == FieldFormat.TIME:
-            return PgSQLDataType.TIME.name
-        elif format == FieldFormat.IPV4:
-            return PgSQLDataType.CIDR.name
-        elif format == FieldFormat.IPV6:
-            return PgSQLDataType.CIDR.name
-        elif format == FieldFormat.JSON:
-            return PgSQLDataType.JSON.name
-        elif format == FieldFormat.MAC:
-            return PgSQLDataType.MACADDR.name
-        elif format == FieldFormat.UUID:
-            return PgSQLDataType.UUID.name
-        elif max_length:
-            return f"{PgSQLDataType.VARCHAR.name}({max_length})"
-        return PgSQLDataType.TEXT.name
-
-    def get_field_type(self, entity_field: EntityField) -> str:
-        if entity_field.field_type == FieldType.STRING:
-            return self._get_string_type(
-                entity_field.format, entity_field.max_length
-            )
-        elif entity_field.field_type == FieldType.INTEGER:
-            return self._get_int_type(
-                entity_field.minimum, entity_field.maximum
-            )
-        elif entity_field.field_type == FieldType.NUMBER:
-            return self._get_num_type(entity_field.format)
-        elif entity_field.field_type == FieldType.BOOLEAN:
-            return PgSQLDataType.BOOLEAN.name
-        return None
-
-    def get_enum_field_type(self, entity: Entity) -> str:
-        return "VARCHAR(50)"

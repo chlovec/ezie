@@ -44,26 +44,10 @@ class EntityField(BaseEntityField):
     minimum: int = None
     maximum: int = None
 
-    def get_ref_name(
-        self, parent_field_name: str, ref_entity_name: str
-    ) -> str:
-        if self.name.startswith((parent_field_name, ref_entity_name)):
-            return self.name
-        return f"{parent_field_name}_{self.name}"
-
 
 @dataclass
 class RefEntityField(BaseEntityField):
     ref_entity: "Entity" = None
-
-    def get_ref_names(self) -> List[str]:
-        if self.ref_entity.is_enum:
-            return [self.name]
-
-        return [
-            fld.get_ref_name(self.name, self.ref_entity.name)
-            for fld in self.ref_entity.pk_fields
-        ]
 
 
 @dataclass
