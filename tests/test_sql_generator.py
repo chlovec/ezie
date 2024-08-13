@@ -467,9 +467,9 @@ class TestPostgreSqlGenerator(unittest.TestCase):
             "entity_with_ref",
             ENTITY_WITH_REF,
             (
-                "UPDATE product  SET name = @name, description = @description,"
-                " price = @price, quantity = @quantity, brand = @brand, "
-                "category = @category WHERE productid = @productid;"
+                "UPDATE product  SET name = @name, description = @description"
+                ", price = @price, quantity = @quantity, brand_id = @brand_id"
+                ", category_id = @category_id WHERE productid = @productid;"
             )
         ),
         (
@@ -484,8 +484,13 @@ class TestPostgreSqlGenerator(unittest.TestCase):
             "entity_with_sub_entity",
             CUSTOMER_ENTITY,
             "UPDATE customer  SET first_name = @first_name, "
-            "last_name = @last_name, shipping_address = @shipping_address, "
-            "billing_address = @billing_address;"
+            "last_name = @last_name, shipping_address_street_address = "
+            "@shipping_address_street_address, shipping_address_city = "
+            "@shipping_address_city, shipping_address_state = "
+            "@shipping_address_state, billing_address_street_address = "
+            "@billing_address_street_address, billing_address_city = "
+            "@billing_address_city, billing_address_state = "
+            "@billing_address_state;"
         ),
         (
             "entity_with_composite_pk",

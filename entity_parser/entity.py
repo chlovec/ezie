@@ -3,20 +3,6 @@ from enum import Enum
 from typing import Any, List, Union
 
 
-class FieldFormat(Enum):
-    DATE = "date"
-    DOUBLE = "double"
-    FLOAT = "float"
-    TIME = "time"
-    DATETIME = "date-time"
-    UUID = "uuid"
-    IPV4 = "ipv4"
-    IPV6 = "ipv6"
-    MAC = "mac"
-    JSON = "json"
-    BYTE = "byte"
-
-
 class FieldType(Enum):
     STRING = "string"
     NUMBER = "number"
@@ -27,11 +13,28 @@ class FieldType(Enum):
 
 
 @dataclass
-class EntityField:
+class FieldData:
     name: str
-    field_type: FieldType
-    max_length: Union[int, str]
+    ref_entity_name: str
+    data_type: str
+    is_required: bool
+
+
+@dataclass
+class BaseEntityField:
+    name: str
     is_required: bool = False
+
+    def get_field_name(self, parent_field_name: str) -> str:
+        if self.name.startswith(parent_field_name):
+            return self.name
+        return f"{parent_field_name}_{self.name}"
+
+
+@dataclass
+class EntityField(BaseEntityField):
+    field_type: FieldType = None
+    max_length: Union[int, str] = None
     is_primary_key: bool = False
     type_ref: str = None
     format: str = None
@@ -49,10 +52,8 @@ class EntityField:
 
 
 @dataclass
-class RefEntityField:
-    name: str
-    ref_entity: "Entity"
-    is_required: bool = False
+class RefEntityField(BaseEntityField):
+    ref_entity: "Entity" = None
 
     def get_ref_names(self) -> List[str]:
         if self.ref_entity.is_enum:

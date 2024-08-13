@@ -1,228 +1,136 @@
 from abc import ABC, abstractmethod
-from enum import Enum
 from typing import List, Tuple
 
-from entity_parser.entity import Entity, EntityField, FieldFormat, FieldType
-from utils.constants import (
-    NEG_BIGINT, NEG_INTEGER, NEG_SMALLINT, POS_BIGINT,
-    POS_INTEGER, POS_SMALLINT, TAB_4
+from data_type_mapper.data_type_mapper import (
+    NEG_BIGINT, NEG_INTEGER, NEG_SMALLINT, POS_BIGINT, POS_INTEGER,
+    POS_SMALLINT, FieldFormat
 )
-from utils.utils import TypeMapper, remove_last_comma
+from data_type_mapper.sql_type_mapper import PgSQLDataType
+from entity_parser.entity import Entity, EntityField, FieldData, FieldType
+from utils.constants import TAB_4
+from utils.utils import TypeMapper, EntityFieldData, remove_last_comma
 
 
-class PgSQLDataType(Enum):
-    # Numeric Types
-    SMALLINT = "smallint"
-    INTEGER = "integer"
-    BIGINT = "bigint"
-    DECIMAL = "decimal"
-    NUMERIC = "numeric"
-    REAL = "real"
-    DOUBLE = "double precision"
-    SMALLSERIAL = "smallserial"
-    SERIAL = "serial"
-    BIGSERIAL = "bigserial"
-
-    # Monetary Types
-    MONEY = "money"
-
-    # Character Types
-    CHAR = "char"
-    VARCHAR = "varchar"
-    TEXT = "text"
-
-    # Binary Data Types
-    BYTEA = "bytea"
-
-    # Date/Time Types
-    TIMESTAMP = "timestamp"
-    TIMESTAMPTZ = "timestamptz"
-    DATE = "date"
-    TIME = "time"
-    TIMETZ = "timetz"
-    INTERVAL = "interval"
-
-    # Boolean Type
-    BOOLEAN = "boolean"
-
-    # Enumerated Types
-    ENUM = "enum"
-
-    # Geometric Types
-    POINT = "point"
-    LINE = "line"
-    LSEG = "lseg"
-    BOX = "box"
-    PATH = "path"
-    POLYGON = "polygon"
-    CIRCLE = "circle"
-
-    # Network Address Types
-    CIDR = "cidr"
-    INET = "inet"
-    MACADDR = "macaddr"
-
-    # JSON Types
-    JSON = "json"
-    JSONB = "jsonb"
-
-    # XML Type
-    XML = "xml"
-
-    # UUID Type
-    UUID = "uuid"
-
-    # Array Type
-    ARRAY = "array"
-
-    # Composite Types
-    COMPOSITE = "composite"
-
-    # Range Types
-    INT4RANGE = "int4range"
-    INT8RANGE = "int8range"
-    NUMRANGE = "numrange"
-    TSRANGE = "tsrange"
-    TSTZRANGE = "tstzrange"
-    DATERANGE = "daterange"
-
-    # Other Types
-    TSQUERY = "tsquery"
-    TSVECTOR = "tsvector"
-    UNKNOWN = "unknown"
+SELECT: str = "SELECT"
+END_TOKEN: str = ";"
+FROM: str = "FROM"
+WHERE: str = "WHERE"
 
 
 class SqlCommandGenerator(ABC):
-    def __init__(self, entity: Entity, param_marker: str = "@"):
+    def __init__(
+        self,
+        entity: Entity,
+        type_mapper: TypeMapper = None,
+        param_marker: str = "@"
+    ):
         self.entity: Entity = entity
-        self.param_marker = param_marker
+        self.param_marker: str = param_marker
+        self.entity_field_data: EntityFieldData = EntityFieldData.from_entity(
+            entity=entity, type_mapper=type_mapper
+        )
 
     @abstractmethod
     def _get_list_where_clause(self) -> str:
         pass
 
     def _get_joined_fields(self, param_marker: str = "") -> str:
-        field_names = self._join_fields(self.entity, param_marker)
+        field_names = [
+            f"{param_marker}{fld.name}"
+            for fld in self.entity_field_data.get_field_data()
+        ]
         return ", ".join(field_names)
 
-    def _join_fields(
-        self, entity: Entity, param_marker: str, name_prefix: str = ""
-    ) -> List[str]:
-        field_names: List[str] = []
-        for fld in entity.pk_fields:
-            field_names.append(param_marker + name_prefix + fld.name)
-
-        for fld in entity.non_ref_fields:
-            field_names.append(param_marker + name_prefix + fld.name)
-
-        for fld in entity.ref_fields:
-            if fld.ref_entity.is_sub_def:
-                field_names.extend(self._join_fields(
-                    fld.ref_entity, param_marker, fld.name + "_"
-                ))
-            else:
-                for nm in fld.get_ref_names():
-                    field_names.append(param_marker + name_prefix + nm)
-
-        return field_names
-
     def _get_matched_fields(
-        self,
-        entity_fields: List[EntityField],
-        field_names: List[str],
-        separator: str = ", "
+        self, field_data: List[FieldData], separator: str = ", "
     ) -> str:
-        matched_field_names = [
-            f"{fld.name} = {self.param_marker}{fld.name}"
-            for fld in entity_fields
-        ]
-        matched_field_names += [
-            f"{name} = {self.param_marker}{name}" for name in field_names
-        ]
-        return separator.join(matched_field_names)
-
-    def _get_where_clause(self) -> str:
-        if not self.entity.pk_fields:
+        if not field_data:
             return ""
 
-        pk_fields = self.entity.pk_fields
-        return f"WHERE {self._get_matched_fields(pk_fields, [], " AND ")}"
+        matched_fields = (
+            f"{fld.name} = {self.param_marker}{fld.name}"
+            for fld in field_data
+        )
+        return separator.join(matched_fields)
+
+    def _get_where_clause(self) -> str:
+        if not self.entity_field_data.pk_field_data:
+            return ""
+
+        pk_fields = self.entity_field_data.pk_field_data
+        return f"{WHERE} {self._get_matched_fields(pk_fields, " AND ")}"
 
     def gen_get_sql_statement(self) -> str:
         select_part = (
-            f"SELECT {self._get_joined_fields()} FROM {self.entity.name}"
+            f"{SELECT} {self._get_joined_fields()} {FROM} "
+            f"{self.entity_field_data.entity_name}"
         )
         if (where_part := self._get_where_clause()):
-            return f"{select_part} {where_part};"
+            return f"{select_part} {where_part}{END_TOKEN}"
         else:
-            return select_part + ";"
+            return select_part + END_TOKEN
 
     def gen_list_sql_statement(self) -> str:
         select_part = (
-            f"SELECT {self._get_joined_fields()} FROM {self.entity.name}"
+            f"{SELECT} {self._get_joined_fields()} {FROM} "
+            f"{self.entity_field_data.entity_name}"
         )
         where_part = self._get_list_where_clause()
         if not where_part:
-            return select_part + ";"
+            return select_part + END_TOKEN
 
         order_by_fields: List[str] = [
             f"{fld.name} ASC" for fld in self.entity.pk_fields
         ]
         return (
-            f"{select_part} {where_part} ORDER BY "
-            f"{", ".join(order_by_fields)} LIMIT @limit OFFSET @offset;"
+            f"{select_part} {where_part} ORDER BY {", ".join(order_by_fields)}"
+            f" LIMIT @limit OFFSET @offset{END_TOKEN}"
         )
 
     def gen_create_sql_statement(self) -> str:
         return (
-            f"INSERT INTO {self.entity.name} ({self._get_joined_fields()}) "
-            f"VALUES({self._get_joined_fields(self.param_marker)});"
+            f"INSERT INTO {self.entity_field_data.entity_name} "
+            f"({self._get_joined_fields()}) "
+            f"VALUES({self._get_joined_fields(self.param_marker)}){END_TOKEN}"
         )
 
     def gen_update_sql_statement(self) -> str:
         matched_fields = self._get_matched_fields(
-            self.entity.non_ref_fields + self.entity.ref_fields, []
+            self.entity_field_data.get_non_pk_field_data()
         )
-        update_part = f"UPDATE {self.entity.name}  SET {matched_fields}"
+        update_part = (
+            f"UPDATE {self.entity_field_data.entity_name}  "
+            f"SET {matched_fields}"
+        )
         if (where_clause := self._get_where_clause()):
-            return f"{update_part} {where_clause};"
+            return f"{update_part} {where_clause}{END_TOKEN}"
         else:
-            return update_part + ";"
+            return update_part + END_TOKEN
 
     def gen_delete_sql_statement(self) -> str:
-        delete_part = f"DELETE FROM {self.entity.name}"
+        delete_part = f"DELETE {FROM} {self.entity_field_data.entity_name}"
+
         if (where_part := self._get_where_clause()):
-            return f"{delete_part} {where_part};"
+            return f"{delete_part} {where_part}{END_TOKEN}"
         else:
-            return delete_part + ";"
+            return delete_part + END_TOKEN
 
 
 class PgsqlCommandGenerator(SqlCommandGenerator):
     def _get_list_where_clause(self) -> str:
-        field_names: List[str] = []
-        for fld in self.entity.pk_fields:
-            field_names.append(fld.name + "s")
+        matched_field_names: List[str] = [
+            (
+                f"({self.param_marker}{fld.name}s = {{}} OR "
+                f"{fld.name}s = ANY({self.param_marker}{fld.name}s))"
+            )
+            for fld in self.entity_field_data.get_pk_and_fk_field_data()
+        ]
 
-        for fld in self.entity.ref_fields:
-            if fld.ref_entity.is_enum:
-                continue
-
-            for matched_name in fld.get_ref_names():
-                field_names.append(matched_name + "s")
-
-        if not field_names:
+        if not matched_field_names:
             return ""
 
-        matched_field_names: List[str] = []
-        for name in field_names:
-            matched_name = (
-                f"({self.param_marker}{name} = {{}} OR "
-                f"{name} = ANY({self.param_marker}{name}))"
-            )
-            matched_field_names.append(matched_name)
-
         joined_matched_fields: str = " AND ".join(matched_field_names)
-        return f"WHERE {joined_matched_fields}"
+        return f"{WHERE} {joined_matched_fields}"
 
 
 class TableSqlGenerator(ABC):

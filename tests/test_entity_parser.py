@@ -467,6 +467,132 @@ COMPOSITE_PRIMARY_KEY_SCHEMA: str = '''
 }
 '''
 
+DOTNET_DATA_TYPES_JSON_SCHEMA: str = '''
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DotNetDataTypes",
+  "type": "object",
+  "properties": {
+    "BooleanField": {
+      "type": "boolean"
+    },
+    "ByteField": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 255
+    },
+    "SByteField": {
+      "type": "integer",
+      "minimum": -128,
+      "maximum": 127
+    },
+    "CharField": {
+      "type": "string",
+      "maxLength": 1
+    },
+    "ShortField": {
+      "type": "integer",
+      "minimum": -32768,
+      "maximum": 32767
+    },
+    "UShortField": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 65535
+    },
+    "IntField": {
+      "type": "integer",
+      "minimum": -2147483648,
+      "maximum": 2147483647
+    },
+    "UIntField": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4294967295
+    },
+    "LongField": {
+      "type": "integer",
+      "minimum": -9223372036854775808,
+      "maximum": 9223372036854775807
+    },
+    "ULongField": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 18446744073709551615
+    },
+    "FloatField": {
+      "type": "number",
+      "format": "float"
+    },
+    "DoubleField": {
+      "type": "number",
+      "format": "double"
+    },
+    "DecimalField": {
+      "type": "number"
+    },
+    "StringField": {
+      "type": "string"
+    },
+    "DateTimeField": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "DateTimeOffField": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "EnumField": {
+      "type": "string",
+      "enum": [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday"
+      ]
+    },
+    "GuidField": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "NullableGuidField": {
+      "type": "string",
+      "format": "uuid"
+    }
+  },
+  "required": [
+    "BooleanField",
+    "ByteField",
+    "SByteField",
+    "CharField",
+    "ShortField",
+    "UShortField",
+    "IntField",
+    "UIntField",
+    "LongField",
+    "ULongField",
+    "FloatField",
+    "DoubleField",
+    "DecimalField",
+    "StringField",
+    "DynamicField",
+    "DateTimeField",
+    "TimeSpanField",
+    "DateTimeOffField",
+    "EnumField",
+    "IntArrayField",
+    "StringListField",
+    "TupleField",
+    "ValueTupleField",
+    "GuidField"
+  ]
+}
+'''
+
+
 ENTITY_NON_REF_FIELDS = [
     EntityField(
         name=NAME,
@@ -912,6 +1038,264 @@ COMPOSITE_PRIMARY_KEY_ENTITY = Entity(
     is_sub_def=False
 )
 
+DOT_NET_TYPE_ENTITY = Entity(
+    name='DotNetDataTypes',
+    non_ref_fields=[
+        EntityField(
+            name='BooleanField',
+            is_required=True,
+            field_type=FieldType.BOOLEAN,
+            max_length=None,
+            is_primary_key=False,
+            type_ref=None,
+            format=None,
+            is_enum=False,
+            enum_values=[],
+            minimum=None,
+            maximum=None
+        ),
+        EntityField(
+            name='ByteField',
+            is_required=True,
+            field_type=FieldType.INTEGER,
+            max_length=None,
+            is_primary_key=False,
+            type_ref=None,
+            format=None,
+            is_enum=False,
+            enum_values=[],
+            minimum=0,
+            maximum=255
+        ),
+        EntityField(
+            name='SByteField',
+            is_required=True,
+            field_type=FieldType.INTEGER,
+            max_length=None,
+            is_primary_key=False,
+            type_ref=None,
+            format=None,
+            is_enum=False,
+            enum_values=[],
+            minimum=-128,
+            maximum=127
+        ),
+        EntityField(
+            name='CharField',
+            is_required=True,
+            field_type=FieldType.STRING,
+            max_length=1,
+            is_primary_key=False,
+            type_ref=None,
+            format=None,
+            is_enum=False,
+            enum_values=[],
+            minimum=None,
+            maximum=None
+        ),
+        EntityField(
+            name='ShortField',
+            is_required=True,
+            field_type=FieldType.INTEGER,
+            max_length=None,
+            is_primary_key=False,
+            type_ref=None,
+            format=None,
+            is_enum=False,
+            enum_values=[],
+            minimum=-32768,
+            maximum=32767
+        ),
+        EntityField(
+            name='UShortField',
+            is_required=True,
+            field_type=FieldType.INTEGER,
+            max_length=None,
+            is_primary_key=False,
+            type_ref=None,
+            format=None,
+            is_enum=False,
+            enum_values=[],
+            minimum=0,
+            maximum=65535
+        ),
+        EntityField(
+            name='IntField',
+            is_required=True,
+            field_type=FieldType.INTEGER,
+            max_length=None,
+            is_primary_key=False,
+            type_ref=None,
+            format=None,
+            is_enum=False,
+            enum_values=[],
+            minimum=-2147483648,
+            maximum=2147483647
+        ),
+        EntityField(
+            name='UIntField',
+            is_required=True,
+            field_type=FieldType.INTEGER,
+            max_length=None,
+            is_primary_key=False,
+            type_ref=None,
+            format=None,
+            is_enum=False,
+            enum_values=[],
+            minimum=0,
+            maximum=4294967295
+        ),
+        EntityField(
+            name='LongField',
+            is_required=True,
+            field_type=FieldType.INTEGER,
+            max_length=None,
+            is_primary_key=False,
+            type_ref=None,
+            format=None,
+            is_enum=False,
+            enum_values=[],
+            minimum=-9223372036854775808,
+            maximum=9223372036854775807
+        ),
+        EntityField(
+            name='ULongField',
+            is_required=True,
+            field_type=FieldType.INTEGER,
+            max_length=None,
+            is_primary_key=False,
+            type_ref=None,
+            format=None,
+            is_enum=False,
+            enum_values=[],
+            minimum=0,
+            maximum=18446744073709551615
+        ),
+        EntityField(
+            name='FloatField',
+            is_required=True,
+            field_type=FieldType.NUMBER,
+            max_length=None,
+            is_primary_key=False,
+            type_ref=None,
+            format='float',
+            is_enum=False,
+            enum_values=[],
+            minimum=None,
+            maximum=None
+        ),
+        EntityField(
+            name='DoubleField',
+            is_required=True,
+            field_type=FieldType.NUMBER,
+            max_length=None,
+            is_primary_key=False,
+            type_ref=None,
+            format='double',
+            is_enum=False,
+            enum_values=[],
+            minimum=None,
+            maximum=None
+        ),
+        EntityField(
+            name='DecimalField',
+            is_required=True,
+            field_type=FieldType.NUMBER,
+            max_length=None,
+            is_primary_key=False,
+            type_ref=None,
+            format=None,
+            is_enum=False,
+            enum_values=[],
+            minimum=None,
+            maximum=None
+        ),
+        EntityField(
+            name='StringField',
+            is_required=True,
+            field_type=FieldType.STRING,
+            max_length=None,
+            is_primary_key=False,
+            type_ref=None,
+            format=None,
+            is_enum=False,
+            enum_values=[],
+            minimum=None,
+            maximum=None
+        ),
+        EntityField(
+            name='DateTimeField',
+            is_required=True,
+            field_type=FieldType.STRING,
+            max_length=None,
+            is_primary_key=False,
+            type_ref=None,
+            format='date-time',
+            is_enum=False,
+            enum_values=[],
+            minimum=None,
+            maximum=None
+        ),
+        EntityField(
+            name='DateTimeOffField',
+            is_required=True,
+            field_type=FieldType.STRING,
+            max_length=None,
+            is_primary_key=False,
+            type_ref=None,
+            format='date-time',
+            is_enum=False,
+            enum_values=[],
+            minimum=None,
+            maximum=None
+        ),
+        EntityField(
+            name='EnumField',
+            is_required=True,
+            field_type=FieldType.STRING,
+            max_length=None,
+            is_primary_key=False,
+            type_ref=None,
+            format=None,
+            is_enum=False,
+            enum_values=[],
+            minimum=None,
+            maximum=None
+        ),
+        EntityField(
+            name='GuidField',
+            is_required=True,
+            field_type=FieldType.STRING,
+            max_length=None,
+            is_primary_key=False,
+            type_ref=None,
+            format='uuid',
+            is_enum=False,
+            enum_values=[],
+            minimum=None,
+            maximum=None
+        ),
+        EntityField(
+            name='NullableGuidField',
+            is_required=False,
+            field_type=FieldType.STRING,
+            max_length=None,
+            is_primary_key=False,
+            type_ref=None,
+            format='uuid',
+            is_enum=False,
+            enum_values=[],
+            minimum=None,
+            maximum=None
+        ),
+    ],
+    ref_fields=[],
+    pk_fields=[],
+    is_enum=False,
+    enum_values=None,
+    is_sub_def=False
+)
+
 
 class TestJsonSchemaParser(unittest.TestCase):
     def setUp(self):
@@ -1043,7 +1427,8 @@ class TestJsonSchemaParser(unittest.TestCase):
             TITLE_SCHEMA_WITH_NESTED_OBJECT_ENTITIES
         ),
         (NO_REF_SCHEMA, FILE_PATH, NO_REF_SCHEMA_ENTITIES),
-        (COMPOSITE_PRIMARY_KEY_SCHEMA, None, [COMPOSITE_PRIMARY_KEY_ENTITY])
+        (COMPOSITE_PRIMARY_KEY_SCHEMA, None, [COMPOSITE_PRIMARY_KEY_ENTITY]),
+        (DOTNET_DATA_TYPES_JSON_SCHEMA, None, [DOT_NET_TYPE_ENTITY])
     ])
     def test_parser_file_content(
         self,

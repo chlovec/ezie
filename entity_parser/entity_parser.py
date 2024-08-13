@@ -208,7 +208,9 @@ class JsonSchemaParser(EntityParser):
                     is_required=(prop_name in required_props),
                     is_primary_key=prop_def.get("primaryKey", False),
                     type_ref=type_ref,
-                    format=prop_def.get("format", None)
+                    format=prop_def.get("format", None),
+                    minimum=prop_def.get("minimum", None),
+                    maximum=prop_def.get("maximum", None)
                 ))
 
         self.obj_attributes[obj_name] = attributes
