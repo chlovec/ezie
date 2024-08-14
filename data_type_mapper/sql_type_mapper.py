@@ -115,9 +115,9 @@ class PgsqlTypeMapper(TypeMapper):
             if maximum <= POS_SMALLINT:
                 return PgSQLDataType.SMALLINT.name
             elif maximum <= POS_INTEGER:
-                return PgSQLDataType.INTEGER
+                return PgSQLDataType.INTEGER.name
             elif maximum <= POS_BIGINT:
-                return PgSQLDataType.BIGINT
+                return PgSQLDataType.BIGINT.name
 
         return PgSQLDataType.INTEGER.name
 
@@ -125,7 +125,7 @@ class PgsqlTypeMapper(TypeMapper):
         if format == FieldFormat.DOUBLE:
             return PgSQLDataType.DOUBLE.name
         elif format == FieldFormat.FLOAT:
-            return PgSQLDataType.REAL
+            return PgSQLDataType.REAL.name
         return PgSQLDataType.DOUBLE.name
 
     def _get_string_type(self, format: FieldFormat, max_length: int) -> str:
