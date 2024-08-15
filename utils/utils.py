@@ -133,4 +133,5 @@ class EntityFieldData:
 @dataclass
 class FileData:
     file_path: str
+    file_name: str
     file_content: List[str]

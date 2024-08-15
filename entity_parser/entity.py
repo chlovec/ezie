@@ -19,6 +19,7 @@ class FieldData:
     data_type: str
     is_required: bool
     ref_field_name: str = None
+    pl_data_type: str = None
 
 
 @dataclass
