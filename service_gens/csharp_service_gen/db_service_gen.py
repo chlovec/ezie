@@ -53,7 +53,9 @@ class DbServiceGenerator(ServiceGenerator):
             self.output_path, self.sln_name, self.service_name
         )
         for entity in self.entities:
-            entity_file_data = EntityFieldData.from_entity(entity)
+            entity_file_data = EntityFieldData.from_entity(
+                entity, self.pl_type_mapper
+            )
             yield self._gen_entity_service(entity_file_data, svc_dir)
 
     @abstractmethod

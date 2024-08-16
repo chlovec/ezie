@@ -15,6 +15,7 @@
     "cSpell.words": [
         "BIGSERIAL",
         "daterange",
+        "DATETIMEOFFSET",
         "Ecommerce",
         "Getproduct",
         "Listproduct",
@@ -22,6 +23,7 @@
         "macaddr",
         "numrange",
         "sqls",
+        "TIMESPAN",
         "timestamptz",
         "tsquery",
         "tsrange",

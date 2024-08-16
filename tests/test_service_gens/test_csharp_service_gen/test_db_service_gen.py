@@ -6,6 +6,7 @@ from entity_parser.entity import Entity, EntityField, FieldType, RefEntityField
 from service_gens.csharp_service_gen.db_service_gen import (
     DbServiceModelGenerator
 )
+from service_gens.service_gen import CSharpTypeMapper
 from utils.utils import FileData
 
 THIRTY: int = 30
@@ -158,7 +159,7 @@ BRAND_FILE_DATA = [
             "{",
             "    public class ListBrandParam",
             "    {",
-            "        public IEnumerable<None> brand_ids { get; set; }",
+            "        public IEnumerable<string> brand_ids { get; set; }",
             "        public int Limit { get; set; } = 1000;",
             "        public int OffSet { get; set; } = 0;",
             "    }",
@@ -173,7 +174,7 @@ BRAND_FILE_DATA = [
             "{",
             "    public class GetBrandParam",
             "    {",
-            "        public None brand_id { get; set; }",
+            "        public string brand_id { get; set; }",
             "    }",
             "}"
         ]),
@@ -185,9 +186,9 @@ BRAND_FILE_DATA = [
             "{",
             "    public class Brand",
             "    {",
-            "        public None brand_id { get; set; }",
-            "        public None name { get; set; }",
-            "        public None description { get; set; }",
+            "        public string brand_id { get; set; }",
+            "        public string name { get; set; }",
+            "        public string description { get; set; }",
             "    }",
             "}"
         ]
@@ -202,7 +203,7 @@ PRODUCT_FILE_DATA = [FileData(
         '{',
         '    public class ListproductParam',
         '    {',
-        '        public IEnumerable<None> productids { get; set; }',
+        '        public IEnumerable<string> productids { get; set; }',
         '        public int Limit { get; set; } = 1000;',
         '        public int OffSet { get; set; } = 0;',
         '    }',
@@ -217,7 +218,7 @@ PRODUCT_FILE_DATA = [FileData(
         '{',
         '    public class GetproductParam',
         '    {',
-        '        public None productid { get; set; }',
+        '        public string productid { get; set; }',
         '    }',
         '}'
     ]
@@ -230,13 +231,13 @@ PRODUCT_FILE_DATA = [FileData(
         '{',
         '    public class product',
         '    {',
-        '        public None productid { get; set; }',
-        '        public None name { get; set; }',
-        '        public None description { get; set; }',
-        '        public None price { get; set; }',
-        '        public None quantity { get; set; }',
-        '        public None brand_id { get; set; }',
-        '        public None category_id { get; set; }',
+        '        public string productid { get; set; }',
+        '        public string name { get; set; }',
+        '        public string description { get; set; }',
+        '        public double price { get; set; }',
+        '        public int quantity { get; set; }',
+        '        public string brand_id { get; set; }',
+        '        public int category_id { get; set; }',
         '    }',
         '}'
     ]
@@ -259,7 +260,7 @@ class TestDbServiceModelGenerator(unittest.TestCase):
             sln_name="Ecommerce",
             service_name="ProductDal",
             entities=entities,
-            pl_type_mapper=None,
+            pl_type_mapper=CSharpTypeMapper(),
             db_type_mapper=None
         )
         actual_data = []
