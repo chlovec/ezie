@@ -12,6 +12,21 @@ class FieldType(Enum):
     BOOLEAN = "boolean"
 
 
+class FieldFormat(Enum):
+    DATE = "date"
+    DOUBLE = "double"
+    FLOAT = "float"
+    TIME = "time"
+    DATETIME = "date-time"
+    DECIMAL = "decimal"
+    UUID = "uuid"
+    IPV4 = "ipv4"
+    IPV6 = "ipv6"
+    MAC = "mac"
+    JSON = "json"
+    BYTE = "byte"
+
+
 @dataclass
 class FieldData:
     name: str
@@ -39,7 +54,7 @@ class EntityField(BaseEntityField):
     max_length: Union[int, str] = None
     is_primary_key: bool = False
     type_ref: str = None
-    format: str = None
+    format: FieldFormat = None
     is_enum: bool = False
     enum_values: List[Any] = field(default_factory=list)
     minimum: int = None

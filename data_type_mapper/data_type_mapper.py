@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from enum import Enum
 
 from entity_parser.entity import Entity, EntityField
 
@@ -10,20 +9,6 @@ NEG_INTEGER: int = -2147483648
 POS_INTEGER: int = 2147483647
 NEG_SMALLINT: int = -32768
 POS_SMALLINT: int = 32767
-
-
-class FieldFormat(Enum):
-    DATE = "date"
-    DOUBLE = "double"
-    FLOAT = "float"
-    TIME = "time"
-    DATETIME = "date-time"
-    UUID = "uuid"
-    IPV4 = "ipv4"
-    IPV6 = "ipv6"
-    MAC = "mac"
-    JSON = "json"
-    BYTE = "byte"
 
 
 class TypeMapper(ABC):

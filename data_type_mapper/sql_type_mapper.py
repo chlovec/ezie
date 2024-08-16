@@ -1,9 +1,9 @@
 from enum import Enum
 from data_type_mapper.data_type_mapper import (
     NEG_BIGINT, NEG_INTEGER, NEG_SMALLINT, POS_BIGINT, POS_INTEGER,
-    POS_SMALLINT, FieldFormat, TypeMapper
+    POS_SMALLINT, TypeMapper
 )
-from entity_parser.entity import Entity, EntityField, FieldType
+from entity_parser.entity import Entity, EntityField, FieldFormat, FieldType
 
 
 class PgSQLDataType(Enum):

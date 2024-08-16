@@ -3,7 +3,9 @@ from abc import ABC, abstractmethod
 import json
 from typing import Any, Dict, List, Set, Union
 
-from entity_parser.entity import Entity, EntityField, FieldType, RefEntityField
+from entity_parser.entity import (
+    Entity, EntityField, FieldFormat, FieldType, RefEntityField
+)
 
 
 TWO: int = 2
@@ -91,6 +93,15 @@ class JsonSchemaParser(EntityParser):
             return FieldType(field_type)
         except (KeyError, ValueError):
             raise ValueError(f"`{field_type}` is not a valid JSON type")
+
+    def _get_field_format(self, field_format: str) -> Union[FieldFormat, None]:
+        if not field_format:
+            return None
+
+        try:
+            return FieldFormat(field_format)
+        except (KeyError, ValueError):
+            raise ValueError(f"`{field_format}` is not a valid JSON format")
 
     def _get_type_ref(self, type_ref: str) -> str:
         if not type_ref:
@@ -208,7 +219,9 @@ class JsonSchemaParser(EntityParser):
                     is_required=(prop_name in required_props),
                     is_primary_key=prop_def.get("primaryKey", False),
                     type_ref=type_ref,
-                    format=prop_def.get("format", None),
+                    format=self._get_field_format(
+                        prop_def.get("format", None)
+                    ),
                     minimum=prop_def.get("minimum", None),
                     maximum=prop_def.get("maximum", None)
                 ))

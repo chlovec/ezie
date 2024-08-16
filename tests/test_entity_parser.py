@@ -4,7 +4,9 @@ import unittest
 from unittest.mock import mock_open, patch
 from parameterized import parameterized
 
-from entity_parser.entity import Entity, EntityField, FieldType, RefEntityField
+from entity_parser.entity import (
+    Entity, EntityField, FieldFormat, FieldType, RefEntityField
+)
 from entity_parser.entity_parser import JsonSchemaParser
 
 
@@ -529,7 +531,8 @@ DOTNET_DATA_TYPES_JSON_SCHEMA: str = '''
       "format": "double"
     },
     "DecimalField": {
-      "type": "number"
+      "type": "number",
+      "format": "decimal"
     },
     "StringField": {
       "type": "string"
@@ -707,7 +710,7 @@ PRODUCT_NON_REF_FIELDS = [
         is_required=False,
         is_primary_key=False,
         type_ref=None,
-        format="decimal"
+        format=FieldFormat.DECIMAL
     ),
     EntityField(
         name="quantity",
@@ -727,7 +730,7 @@ PRODUCT_PK_FIELDS = [
         is_required=True,
         is_primary_key=False,
         type_ref=None,
-        format="uuid"
+        format=FieldFormat.UUID
     )
 ]
 
@@ -997,7 +1000,7 @@ COMPOSITE_PRIMARY_KEY_ENTITY = Entity(
             is_required=True,
             is_primary_key=False,
             type_ref=None,
-            format='float',
+            format=FieldFormat.FLOAT,
             is_enum=False,
             enum_values=[],
             minimum=None,
@@ -1178,7 +1181,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             max_length=None,
             is_primary_key=False,
             type_ref=None,
-            format='float',
+            format=FieldFormat.FLOAT,
             is_enum=False,
             enum_values=[],
             minimum=None,
@@ -1191,7 +1194,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             max_length=None,
             is_primary_key=False,
             type_ref=None,
-            format='double',
+            format=FieldFormat.DOUBLE,
             is_enum=False,
             enum_values=[],
             minimum=None,
@@ -1204,7 +1207,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             max_length=None,
             is_primary_key=False,
             type_ref=None,
-            format=None,
+            format=FieldFormat.DECIMAL,
             is_enum=False,
             enum_values=[],
             minimum=None,
@@ -1230,7 +1233,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             max_length=None,
             is_primary_key=False,
             type_ref=None,
-            format='date-time',
+            format=FieldFormat.DATETIME,
             is_enum=False,
             enum_values=[],
             minimum=None,
@@ -1243,7 +1246,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             max_length=None,
             is_primary_key=False,
             type_ref=None,
-            format='date-time',
+            format=FieldFormat.DATETIME,
             is_enum=False,
             enum_values=[],
             minimum=None,
@@ -1269,7 +1272,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             max_length=None,
             is_primary_key=False,
             type_ref=None,
-            format='uuid',
+            format=FieldFormat.UUID,
             is_enum=False,
             enum_values=[],
             minimum=None,
@@ -1282,7 +1285,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             max_length=None,
             is_primary_key=False,
             type_ref=None,
-            format='uuid',
+            format=FieldFormat.UUID,
             is_enum=False,
             enum_values=[],
             minimum=None,
@@ -1299,6 +1302,7 @@ DOT_NET_TYPE_ENTITY = Entity(
 
 class TestJsonSchemaParser(unittest.TestCase):
     def setUp(self):
+        self.maxDiff = None
         self.parser = JsonSchemaParser()
 
     def _verify_self_ref_and_entity_ref_entities(

@@ -2,7 +2,9 @@ from typing import List
 import unittest
 from parameterized import parameterized
 
-from entity_parser.entity import Entity, EntityField, FieldType, RefEntityField
+from entity_parser.entity import (
+    Entity, EntityField, FieldFormat, FieldType, RefEntityField
+)
 from service_gens.csharp_service_gen.db_service_gen import (
     DbServiceModelGenerator
 )
@@ -114,7 +116,7 @@ PRODUCT_ENTITY = Entity(
             is_required=False,
             is_primary_key=False,
             type_ref=None,
-            format="decimal"
+            format=FieldFormat.DECIMAL
         ),
         EntityField(
             name="quantity",
@@ -145,7 +147,7 @@ PRODUCT_ENTITY = Entity(
             is_required=True,
             is_primary_key=False,
             type_ref=None,
-            format="uuid"
+            format=FieldFormat.UUID
         )
     ]
 )
@@ -203,7 +205,7 @@ PRODUCT_FILE_DATA = [FileData(
         '{',
         '    public class ListproductParam',
         '    {',
-        '        public IEnumerable<string> productids { get; set; }',
+        '        public IEnumerable<Guid> productids { get; set; }',
         '        public int Limit { get; set; } = 1000;',
         '        public int OffSet { get; set; } = 0;',
         '    }',
@@ -218,7 +220,7 @@ PRODUCT_FILE_DATA = [FileData(
         '{',
         '    public class GetproductParam',
         '    {',
-        '        public string productid { get; set; }',
+        '        public Guid productid { get; set; }',
         '    }',
         '}'
     ]
@@ -231,7 +233,7 @@ PRODUCT_FILE_DATA = [FileData(
         '{',
         '    public class product',
         '    {',
-        '        public string productid { get; set; }',
+        '        public Guid productid { get; set; }',
         '        public string name { get; set; }',
         '        public string description { get; set; }',
         '        public double price { get; set; }',
@@ -267,6 +269,4 @@ class TestDbServiceModelGenerator(unittest.TestCase):
         for svc in svc_gen.gen_service():
             for file_data in svc:
                 actual_data.append(file_data)
-
-        print(actual_data)
         self.assertEqual(expected_data, actual_data)
