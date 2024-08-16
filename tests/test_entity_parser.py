@@ -932,10 +932,10 @@ ID_DEFS_DEFINITIONS_ENUM_SCHEMA_ENTITIES: List[Entity] = [
 
 NO_REF_SCHEMA_ENTITIES = [
     Entity(
-        name='Brand',
+        name="Brand",
         non_ref_fields=[
             EntityField(
-                name='name',
+                name="name",
                 field_type=FieldType.STRING,
                 max_length=50,
                 is_required=True,
@@ -946,9 +946,9 @@ NO_REF_SCHEMA_ENTITIES = [
                 enum_values=[]
             ),
             EntityField(
-                name='description',
+                name="description",
                 field_type=FieldType.STRING,
-                max_length='max',
+                max_length="max",
                 is_required=False,
                 is_primary_key=False,
                 type_ref=None,
@@ -960,7 +960,7 @@ NO_REF_SCHEMA_ENTITIES = [
         ref_fields=[],
         pk_fields=[
             EntityField(
-                name='id',
+                name="id",
                 field_type=FieldType.STRING,
                 max_length=30,
                 is_required=True,
@@ -978,10 +978,10 @@ NO_REF_SCHEMA_ENTITIES = [
 ]
 
 COMPOSITE_PRIMARY_KEY_ENTITY = Entity(
-    name='product_order',
+    name="product_order",
     non_ref_fields=[
         EntityField(
-            name='quantity',
+            name="quantity",
             field_type=FieldType.INTEGER,
             max_length=None,
             is_required=True,
@@ -994,7 +994,7 @@ COMPOSITE_PRIMARY_KEY_ENTITY = Entity(
             maximum=None
         ),
         EntityField(
-            name='price',
+            name="price",
             field_type=FieldType.NUMBER,
             max_length=None,
             is_required=True,
@@ -1010,7 +1010,7 @@ COMPOSITE_PRIMARY_KEY_ENTITY = Entity(
     ref_fields=[],
     pk_fields=[
         EntityField(
-            name='order_id',
+            name="order_id",
             field_type=FieldType.INTEGER,
             max_length=None,
             is_required=True,
@@ -1023,7 +1023,7 @@ COMPOSITE_PRIMARY_KEY_ENTITY = Entity(
             maximum=None
         ),
         EntityField(
-            name='product_id',
+            name="product_id",
             field_type=FieldType.INTEGER,
             max_length=None,
             is_required=True,
@@ -1042,10 +1042,10 @@ COMPOSITE_PRIMARY_KEY_ENTITY = Entity(
 )
 
 DOT_NET_TYPE_ENTITY = Entity(
-    name='DotNetDataTypes',
+    name="DotNetDataTypes",
     non_ref_fields=[
         EntityField(
-            name='BooleanField',
+            name="BooleanField",
             is_required=True,
             field_type=FieldType.BOOLEAN,
             max_length=None,
@@ -1058,7 +1058,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=None
         ),
         EntityField(
-            name='ByteField',
+            name="ByteField",
             is_required=True,
             field_type=FieldType.INTEGER,
             max_length=None,
@@ -1071,7 +1071,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=255
         ),
         EntityField(
-            name='SByteField',
+            name="SByteField",
             is_required=True,
             field_type=FieldType.INTEGER,
             max_length=None,
@@ -1084,7 +1084,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=127
         ),
         EntityField(
-            name='CharField',
+            name="CharField",
             is_required=True,
             field_type=FieldType.STRING,
             max_length=1,
@@ -1097,7 +1097,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=None
         ),
         EntityField(
-            name='ShortField',
+            name="ShortField",
             is_required=True,
             field_type=FieldType.INTEGER,
             max_length=None,
@@ -1110,7 +1110,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=32767
         ),
         EntityField(
-            name='UShortField',
+            name="UShortField",
             is_required=True,
             field_type=FieldType.INTEGER,
             max_length=None,
@@ -1123,7 +1123,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=65535
         ),
         EntityField(
-            name='IntField',
+            name="IntField",
             is_required=True,
             field_type=FieldType.INTEGER,
             max_length=None,
@@ -1136,7 +1136,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=2147483647
         ),
         EntityField(
-            name='UIntField',
+            name="UIntField",
             is_required=True,
             field_type=FieldType.INTEGER,
             max_length=None,
@@ -1149,7 +1149,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=4294967295
         ),
         EntityField(
-            name='LongField',
+            name="LongField",
             is_required=True,
             field_type=FieldType.INTEGER,
             max_length=None,
@@ -1162,7 +1162,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=9223372036854775807
         ),
         EntityField(
-            name='ULongField',
+            name="ULongField",
             is_required=True,
             field_type=FieldType.INTEGER,
             max_length=None,
@@ -1175,7 +1175,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=18446744073709551615
         ),
         EntityField(
-            name='FloatField',
+            name="FloatField",
             is_required=True,
             field_type=FieldType.NUMBER,
             max_length=None,
@@ -1188,7 +1188,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=None
         ),
         EntityField(
-            name='DoubleField',
+            name="DoubleField",
             is_required=True,
             field_type=FieldType.NUMBER,
             max_length=None,
@@ -1201,7 +1201,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=None
         ),
         EntityField(
-            name='DecimalField',
+            name="DecimalField",
             is_required=True,
             field_type=FieldType.NUMBER,
             max_length=None,
@@ -1214,7 +1214,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=None
         ),
         EntityField(
-            name='StringField',
+            name="StringField",
             is_required=True,
             field_type=FieldType.STRING,
             max_length=None,
@@ -1227,7 +1227,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=None
         ),
         EntityField(
-            name='DateTimeField',
+            name="DateTimeField",
             is_required=True,
             field_type=FieldType.STRING,
             max_length=None,
@@ -1240,7 +1240,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=None
         ),
         EntityField(
-            name='DateTimeOffField',
+            name="DateTimeOffField",
             is_required=True,
             field_type=FieldType.STRING,
             max_length=None,
@@ -1253,7 +1253,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=None
         ),
         EntityField(
-            name='EnumField',
+            name="EnumField",
             is_required=True,
             field_type=FieldType.STRING,
             max_length=None,
@@ -1266,7 +1266,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=None
         ),
         EntityField(
-            name='GuidField',
+            name="GuidField",
             is_required=True,
             field_type=FieldType.STRING,
             max_length=None,
@@ -1279,7 +1279,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=None
         ),
         EntityField(
-            name='NullableGuidField',
+            name="NullableGuidField",
             is_required=False,
             field_type=FieldType.STRING,
             max_length=None,

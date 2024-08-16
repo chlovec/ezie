@@ -151,7 +151,7 @@ class PgsqlTableSqlGenerator(TableSqlGenerator):
             for fld in pk_fields
         ]
         pk_field_names = [fld.name for fld in pk_fields]
-        pk_statement = f"{TAB_4}{PRIMARY_KEY} ({', '.join(pk_field_names)}),"
+        pk_statement = f"{TAB_4}{PRIMARY_KEY} ({", ".join(pk_field_names)}),"
         return field_sql, pk_statement
 
     def _get_fk_field_sql(

@@ -241,10 +241,10 @@ CUSTOMER_ENTITY = Entity(
 )
 
 COMPOSITE_PRIMARY_KEY_ENTITY = Entity(
-    name='product_order',
+    name="product_order",
     non_ref_fields=[
         EntityField(
-            name='quantity',
+            name="quantity",
             field_type=FieldType.INTEGER,
             max_length=None,
             is_required=True,
@@ -257,13 +257,13 @@ COMPOSITE_PRIMARY_KEY_ENTITY = Entity(
             maximum=None
         ),
         EntityField(
-            name='price',
+            name="price",
             field_type=FieldType.NUMBER,
             max_length=None,
             is_required=True,
             is_primary_key=False,
             type_ref=None,
-            format='float',
+            format="float",
             is_enum=False,
             enum_values=[],
             minimum=None,
@@ -273,7 +273,7 @@ COMPOSITE_PRIMARY_KEY_ENTITY = Entity(
     ref_fields=[],
     pk_fields=[
         EntityField(
-            name='order_id',
+            name="order_id",
             field_type=FieldType.INTEGER,
             max_length=None,
             is_required=True,
@@ -286,7 +286,7 @@ COMPOSITE_PRIMARY_KEY_ENTITY = Entity(
             maximum=None
         ),
         EntityField(
-            name='product_id',
+            name="product_id",
             field_type=FieldType.INTEGER,
             max_length=None,
             is_required=True,
@@ -305,10 +305,10 @@ COMPOSITE_PRIMARY_KEY_ENTITY = Entity(
 )
 
 DOT_NET_TYPE_ENTITY = Entity(
-    name='DotNetDataTypes',
+    name="DotNetDataTypes",
     non_ref_fields=[
         EntityField(
-            name='BooleanField',
+            name="BooleanField",
             is_required=True,
             field_type=FieldType.BOOLEAN,
             max_length=None,
@@ -321,7 +321,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=None
         ),
         EntityField(
-            name='ByteField',
+            name="ByteField",
             is_required=True,
             field_type=FieldType.INTEGER,
             max_length=None,
@@ -334,7 +334,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=255
         ),
         EntityField(
-            name='SByteField',
+            name="SByteField",
             is_required=True,
             field_type=FieldType.INTEGER,
             max_length=None,
@@ -347,7 +347,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=127
         ),
         EntityField(
-            name='CharField',
+            name="CharField",
             is_required=True,
             field_type=FieldType.STRING,
             max_length=1,
@@ -360,7 +360,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=None
         ),
         EntityField(
-            name='ShortField',
+            name="ShortField",
             is_required=True,
             field_type=FieldType.INTEGER,
             max_length=None,
@@ -373,7 +373,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=32767
         ),
         EntityField(
-            name='UShortField',
+            name="UShortField",
             is_required=True,
             field_type=FieldType.INTEGER,
             max_length=None,
@@ -386,7 +386,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=65535
         ),
         EntityField(
-            name='IntField',
+            name="IntField",
             is_required=True,
             field_type=FieldType.INTEGER,
             max_length=None,
@@ -399,7 +399,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=2147483647
         ),
         EntityField(
-            name='UIntField',
+            name="UIntField",
             is_required=True,
             field_type=FieldType.INTEGER,
             max_length=None,
@@ -412,7 +412,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=4294967295
         ),
         EntityField(
-            name='LongField',
+            name="LongField",
             is_required=True,
             field_type=FieldType.INTEGER,
             max_length=None,
@@ -425,7 +425,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=9223372036854775807
         ),
         EntityField(
-            name='ULongField',
+            name="ULongField",
             is_required=True,
             field_type=FieldType.INTEGER,
             max_length=None,
@@ -438,33 +438,33 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=18446744073709551615
         ),
         EntityField(
-            name='FloatField',
+            name="FloatField",
             is_required=True,
             field_type=FieldType.NUMBER,
             max_length=None,
             is_primary_key=False,
             type_ref=None,
-            format='float',
+            format="float",
             is_enum=False,
             enum_values=[],
             minimum=None,
             maximum=None
         ),
         EntityField(
-            name='DoubleField',
+            name="DoubleField",
             is_required=True,
             field_type=FieldType.NUMBER,
             max_length=None,
             is_primary_key=False,
             type_ref=None,
-            format='double',
+            format="double",
             is_enum=False,
             enum_values=[],
             minimum=None,
             maximum=None
         ),
         EntityField(
-            name='DecimalField',
+            name="DecimalField",
             is_required=True,
             field_type=FieldType.NUMBER,
             max_length=None,
@@ -477,7 +477,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=None
         ),
         EntityField(
-            name='StringField',
+            name="StringField",
             is_required=True,
             field_type=FieldType.STRING,
             max_length=None,
@@ -490,33 +490,33 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=None
         ),
         EntityField(
-            name='DateTimeField',
+            name="DateTimeField",
             is_required=True,
             field_type=FieldType.STRING,
             max_length=None,
             is_primary_key=False,
             type_ref=None,
-            format='date-time',
+            format="date-time",
             is_enum=False,
             enum_values=[],
             minimum=None,
             maximum=None
         ),
         EntityField(
-            name='DateTimeOffField',
+            name="DateTimeOffField",
             is_required=True,
             field_type=FieldType.STRING,
             max_length=None,
             is_primary_key=False,
             type_ref=None,
-            format='date-time',
+            format="date-time",
             is_enum=False,
             enum_values=[],
             minimum=None,
             maximum=None
         ),
         EntityField(
-            name='EnumField',
+            name="EnumField",
             is_required=True,
             field_type=FieldType.STRING,
             max_length=None,
@@ -529,26 +529,26 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=None
         ),
         EntityField(
-            name='GuidField',
+            name="GuidField",
             is_required=True,
             field_type=FieldType.STRING,
             max_length=None,
             is_primary_key=False,
             type_ref=None,
-            format='uuid',
+            format="uuid",
             is_enum=False,
             enum_values=[],
             minimum=None,
             maximum=None
         ),
         EntityField(
-            name='NullableGuidField',
+            name="NullableGuidField",
             is_required=False,
             field_type=FieldType.STRING,
             max_length=None,
             is_primary_key=False,
             type_ref=None,
-            format='uuid',
+            format="uuid",
             is_enum=False,
             enum_values=[],
             minimum=None,
@@ -835,95 +835,95 @@ class TestPgsqlTableSqlGenerator(unittest.TestCase):
             "entity_with_no_ref",
             ENTITY_WITH_NO_REF,
             [
-                'CREATE TABLE IF NOT EXISTS Brand (',
-                '    brand_id VARCHAR(30) PRIMARY KEY,',
-                '    name VARCHAR(50) NOT NULL,',
-                '    description VARCHAR(max) NULL',
-                ');'
+                "CREATE TABLE IF NOT EXISTS Brand (",
+                "    brand_id VARCHAR(30) PRIMARY KEY,",
+                "    name VARCHAR(50) NOT NULL,",
+                "    description VARCHAR(max) NULL",
+                ");"
             ]
         ),
         (
             "entity_with_ref",
             ENTITY_WITH_REF,
             [
-                'CREATE TABLE IF NOT EXISTS product (',
-                '    productid VARCHAR(30) PRIMARY KEY,',
-                '    name VARCHAR(50) NOT NULL,',
-                '    description VARCHAR(max) NULL,',
-                '    price DOUBLE NULL,',
-                '    quantity INTEGER NULL,',
-                '    brand_id VARCHAR(30) NOT NULL,',
-                '    category_id INTEGER NOT NULL,',
-                '    FOREIGN KEY (brand_id) REFERENCES Brand (brand_id),',
-                '    FOREIGN KEY (category_id) REFERENCES Category (id)',
-                ');'
+                "CREATE TABLE IF NOT EXISTS product (",
+                "    productid VARCHAR(30) PRIMARY KEY,",
+                "    name VARCHAR(50) NOT NULL,",
+                "    description VARCHAR(max) NULL,",
+                "    price DOUBLE NULL,",
+                "    quantity INTEGER NULL,",
+                "    brand_id VARCHAR(30) NOT NULL,",
+                "    category_id INTEGER NOT NULL,",
+                "    FOREIGN KEY (brand_id) REFERENCES Brand (brand_id),",
+                "    FOREIGN KEY (category_id) REFERENCES Category (id)",
+                ");"
             ]
         ),
         (
             "entity_with_enum_and_no_pk",
             ADDRESS_ENTITY,
             [
-                'CREATE TABLE IF NOT EXISTS address (',
-                '    street_address TEXT NOT NULL,',
-                '    city TEXT NOT NULL,',
-                '    state VARCHAR(50) NOT NULL',
-                ');'
+                "CREATE TABLE IF NOT EXISTS address (",
+                "    street_address TEXT NOT NULL,",
+                "    city TEXT NOT NULL,",
+                "    state VARCHAR(50) NOT NULL",
+                ");"
             ]
         ),
         (
             "entity_with_sub_entity",
             CUSTOMER_ENTITY,
             [
-                'CREATE TABLE IF NOT EXISTS customer (',
-                '    first_name TEXT NOT NULL,',
-                '    last_name TEXT NOT NULL,',
-                '    shipping_address_street_address TEXT NOT NULL,',
-                '    shipping_address_city TEXT NOT NULL,',
-                '    shipping_address_state VARCHAR(50) NOT NULL,',
-                '    billing_address_street_address TEXT NOT NULL,',
-                '    billing_address_city TEXT NOT NULL,',
-                '    billing_address_state VARCHAR(50) NOT NULL',
-                ');'
+                "CREATE TABLE IF NOT EXISTS customer (",
+                "    first_name TEXT NOT NULL,",
+                "    last_name TEXT NOT NULL,",
+                "    shipping_address_street_address TEXT NOT NULL,",
+                "    shipping_address_city TEXT NOT NULL,",
+                "    shipping_address_state VARCHAR(50) NOT NULL,",
+                "    billing_address_street_address TEXT NOT NULL,",
+                "    billing_address_city TEXT NOT NULL,",
+                "    billing_address_state VARCHAR(50) NOT NULL",
+                ");"
             ]
         ),
         (
             "entity_with_composite_key",
             COMPOSITE_PRIMARY_KEY_ENTITY,
             [
-                'CREATE TABLE IF NOT EXISTS product_order (',
-                '    order_id INTEGER,',
-                '    product_id INTEGER,',
-                '    quantity INTEGER NOT NULL,',
-                '    price DOUBLE NOT NULL,',
-                '    PRIMARY KEY (order_id, product_id)',
-                ');'
+                "CREATE TABLE IF NOT EXISTS product_order (",
+                "    order_id INTEGER,",
+                "    product_id INTEGER,",
+                "    quantity INTEGER NOT NULL,",
+                "    price DOUBLE NOT NULL,",
+                "    PRIMARY KEY (order_id, product_id)",
+                ");"
             ]
         ),
         (
             "entity_with_dot_net_types",
             DOT_NET_TYPE_ENTITY,
             [
-                'CREATE TABLE IF NOT EXISTS DotNetDataTypes (',
-                '    BooleanField BOOLEAN NOT NULL,',
-                '    ByteField SMALLINT NOT NULL,',
-                '    SByteField SMALLINT NOT NULL,',
-                '    CharField VARCHAR(1) NOT NULL,',
-                '    ShortField SMALLINT NOT NULL,',
-                '    UShortField INTEGER NOT NULL,',
-                '    IntField INTEGER NOT NULL,',
-                '    UIntField BIGINT NOT NULL,',
-                '    LongField BIGINT NOT NULL,',
-                '    ULongField INTEGER NOT NULL,',
-                '    FloatField DOUBLE NOT NULL,',
-                '    DoubleField DOUBLE NOT NULL,',
-                '    DecimalField DOUBLE NOT NULL,',
-                '    StringField TEXT NOT NULL,',
-                '    DateTimeField TEXT NOT NULL,',
-                '    DateTimeOffField TEXT NOT NULL,',
-                '    EnumField TEXT NOT NULL,',
-                '    GuidField TEXT NOT NULL,',
-                '    NullableGuidField TEXT NULL',
-                ');'
+                "CREATE TABLE IF NOT EXISTS DotNetDataTypes (",
+                "    BooleanField BOOLEAN NOT NULL,",
+                "    ByteField SMALLINT NOT NULL,",
+                "    SByteField SMALLINT NOT NULL,",
+                "    CharField VARCHAR(1) NOT NULL,",
+                "    ShortField SMALLINT NOT NULL,",
+                "    UShortField INTEGER NOT NULL,",
+                "    IntField INTEGER NOT NULL,",
+                "    UIntField BIGINT NOT NULL,",
+                "    LongField BIGINT NOT NULL,",
+                "    ULongField INTEGER NOT NULL,",
+                "    FloatField DOUBLE NOT NULL,",
+                "    DoubleField DOUBLE NOT NULL,",
+                "    DecimalField DOUBLE NOT NULL,",
+                "    StringField TEXT NOT NULL,",
+                "    DateTimeField TEXT NOT NULL,",
+                "    DateTimeOffField TEXT NOT NULL,",
+                "    EnumField TEXT NOT NULL,",
+                "    GuidField TEXT NOT NULL,",
+                "    NullableGuidField TEXT NULL",
+                ");"
             ]
         )
     ])

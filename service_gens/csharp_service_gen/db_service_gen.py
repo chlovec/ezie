@@ -2,7 +2,7 @@ from abc import abstractmethod
 from os import path
 from typing import Generator, List
 
-from entity_parser.entity import FieldData
+from entity_parser.entity import FieldData, FieldType
 from service_gens.service_gen import ServiceGenerator
 from utils.constants import TAB_4, TAB_8
 from utils.utils import EntityFieldData, FileData
@@ -114,7 +114,8 @@ class DbServiceModelGenerator(DbServiceGenerator):
 
         # Add class properties
         for fld in field_data:
-            default_clause = ""
+            null_type = "" if fld.is_required else "?"
+            default_clause = self._get_default_clause(fld)
             prop_type = fld.data_type
             fld_name = fld.name
 
@@ -124,7 +125,7 @@ class DbServiceModelGenerator(DbServiceGenerator):
                 fld_name = f"{fld_name}s"
 
             file_content.append(
-                f"{TAB_8}public {prop_type} {fld_name} "
+                f"{TAB_8}public {prop_type}{null_type} {fld_name} "
                 f"{{ get; set; }}{default_clause}"
             )
 
@@ -146,3 +147,8 @@ class DbServiceModelGenerator(DbServiceGenerator):
             f"{TAB_8}public int Limit {{ get; set; }} = 1000;",
             f"{TAB_8}public int OffSet {{ get; set; }} = 0;"
         ]
+
+    def _get_default_clause(self, field: FieldData) -> str:
+        if field.is_required and field.data_type == FieldType.STRING.value:
+            return " = default!;"
+        return ""

@@ -154,10 +154,10 @@ PRODUCT_ENTITY = Entity(
 
 
 DOT_NET_TYPE_ENTITY = Entity(
-    name='DotNetDataTypes',
+    name="DotNetDataTypes",
     non_ref_fields=[
         EntityField(
-            name='BooleanField',
+            name="BooleanField",
             is_required=True,
             field_type=FieldType.BOOLEAN,
             max_length=None,
@@ -170,7 +170,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=None
         ),
         EntityField(
-            name='ByteField',
+            name="ByteField",
             is_required=True,
             field_type=FieldType.INTEGER,
             max_length=None,
@@ -183,7 +183,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=255
         ),
         EntityField(
-            name='SByteField',
+            name="SByteField",
             is_required=True,
             field_type=FieldType.INTEGER,
             max_length=None,
@@ -196,7 +196,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=127
         ),
         EntityField(
-            name='CharField',
+            name="CharField",
             is_required=True,
             field_type=FieldType.STRING,
             max_length=1,
@@ -209,7 +209,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=None
         ),
         EntityField(
-            name='ShortField',
+            name="ShortField",
             is_required=True,
             field_type=FieldType.INTEGER,
             max_length=None,
@@ -222,7 +222,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=32767
         ),
         EntityField(
-            name='UShortField',
+            name="UShortField",
             is_required=True,
             field_type=FieldType.INTEGER,
             max_length=None,
@@ -235,7 +235,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=65535
         ),
         EntityField(
-            name='IntField',
+            name="IntField",
             is_required=True,
             field_type=FieldType.INTEGER,
             max_length=None,
@@ -248,7 +248,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=2147483647
         ),
         EntityField(
-            name='UIntField',
+            name="UIntField",
             is_required=True,
             field_type=FieldType.INTEGER,
             max_length=None,
@@ -261,7 +261,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=4294967295
         ),
         EntityField(
-            name='LongField',
+            name="LongField",
             is_required=True,
             field_type=FieldType.INTEGER,
             max_length=None,
@@ -274,7 +274,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=9223372036854775807
         ),
         EntityField(
-            name='ULongField',
+            name="ULongField",
             is_required=True,
             field_type=FieldType.INTEGER,
             max_length=None,
@@ -287,7 +287,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=18446744073709551615
         ),
         EntityField(
-            name='FloatField',
+            name="FloatField",
             is_required=True,
             field_type=FieldType.NUMBER,
             max_length=None,
@@ -300,7 +300,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=None
         ),
         EntityField(
-            name='DoubleField',
+            name="DoubleField",
             is_required=True,
             field_type=FieldType.NUMBER,
             max_length=None,
@@ -313,7 +313,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=None
         ),
         EntityField(
-            name='DecimalField',
+            name="DecimalField",
             is_required=True,
             field_type=FieldType.NUMBER,
             max_length=None,
@@ -326,7 +326,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=None
         ),
         EntityField(
-            name='StringField',
+            name="StringField",
             is_required=True,
             field_type=FieldType.STRING,
             max_length=None,
@@ -339,7 +339,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=None
         ),
         EntityField(
-            name='DateTimeField',
+            name="DateTimeField",
             is_required=True,
             field_type=FieldType.STRING,
             max_length=None,
@@ -352,7 +352,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=None
         ),
         EntityField(
-            name='DateTimeOffField',
+            name="DateTimeOffField",
             is_required=True,
             field_type=FieldType.STRING,
             max_length=None,
@@ -365,7 +365,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=None
         ),
         EntityField(
-            name='EnumField',
+            name="EnumField",
             is_required=True,
             field_type=FieldType.STRING,
             max_length=None,
@@ -378,7 +378,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=None
         ),
         EntityField(
-            name='GuidField',
+            name="GuidField",
             is_required=True,
             field_type=FieldType.STRING,
             max_length=None,
@@ -391,7 +391,7 @@ DOT_NET_TYPE_ENTITY = Entity(
             maximum=None
         ),
         EntityField(
-            name='NullableGuidField',
+            name="NullableGuidField",
             is_required=False,
             field_type=FieldType.STRING,
             max_length=None,
@@ -420,7 +420,8 @@ BRAND_FILE_DATA = [
             "{",
             "    public class ListBrandParam",
             "    {",
-            "        public IEnumerable<string> brand_ids { get; set; }",
+            "        public IEnumerable<string> brand_ids { get; set; } "
+            "= default!;",
             "        public int Limit { get; set; } = 1000;",
             "        public int OffSet { get; set; } = 0;",
             "    }",
@@ -435,10 +436,11 @@ BRAND_FILE_DATA = [
             "{",
             "    public class GetBrandParam",
             "    {",
-            "        public string brand_id { get; set; }",
+            "        public string brand_id { get; set; } = default!;",
             "    }",
             "}"
-        ]),
+        ]
+    ),
     FileData(
         file_path="output/path/Ecommerce/src/ProductDal/Models",
         file_name="Brand.cs",
@@ -447,103 +449,105 @@ BRAND_FILE_DATA = [
             "{",
             "    public class Brand",
             "    {",
-            "        public string brand_id { get; set; }",
-            "        public string name { get; set; }",
-            "        public string description { get; set; }",
+            "        public string brand_id { get; set; } = default!;",
+            "        public string name { get; set; } = default!;",
+            "        public string? description { get; set; }",
             "    }",
             "}"
         ]
     )
 ]
 
-PRODUCT_FILE_DATA = [FileData(
-    file_path='output/path/Ecommerce/src/ProductDal/Models',
-    file_name='ListproductParam.cs',
-    file_content=[
-        'namespace ProductDal.Models',
-        '{',
-        '    public class ListproductParam',
-        '    {',
-        '        public IEnumerable<Guid> productids { get; set; }',
-        '        public int Limit { get; set; } = 1000;',
-        '        public int OffSet { get; set; } = 0;',
-        '    }',
-        '}'
-    ]
-),
+PRODUCT_FILE_DATA = [
     FileData(
-    file_path='output/path/Ecommerce/src/ProductDal/Models',
-    file_name='GetproductParam.cs',
-    file_content=[
-        'namespace ProductDal.Models',
-        '{',
-        '    public class GetproductParam',
-        '    {',
-        '        public Guid productid { get; set; }',
-        '    }',
-        '}'
-    ]
-),
+        file_path="output/path/Ecommerce/src/ProductDal/Models",
+        file_name="ListproductParam.cs",
+        file_content=[
+            "namespace ProductDal.Models",
+            "{",
+            "    public class ListproductParam",
+            "    {",
+            "        public IEnumerable<Guid> productids { get; set; }",
+            "        public int Limit { get; set; } = 1000;",
+            "        public int OffSet { get; set; } = 0;",
+            "    }",
+            "}"
+        ]
+    ),
     FileData(
-    file_path='output/path/Ecommerce/src/ProductDal/Models',
-    file_name='product.cs',
-    file_content=[
-        'namespace ProductDal.Models',
-        '{',
-        '    public class product',
-        '    {',
-        '        public Guid productid { get; set; }',
-        '        public string name { get; set; }',
-        '        public string description { get; set; }',
-        '        public decimal price { get; set; }',
-        '        public int quantity { get; set; }',
-        '        public string brand_id { get; set; }',
-        '        public int category_id { get; set; }',
-        '    }',
-        '}'
-    ]
-)]
+        file_path="output/path/Ecommerce/src/ProductDal/Models",
+        file_name="GetproductParam.cs",
+        file_content=[
+            "namespace ProductDal.Models",
+            "{",
+            "    public class GetproductParam",
+            "    {",
+            "        public Guid productid { get; set; }",
+            "    }",
+            "}"
+        ]
+    ),
+    FileData(
+        file_path="output/path/Ecommerce/src/ProductDal/Models",
+        file_name="product.cs",
+        file_content=[
+            "namespace ProductDal.Models",
+            "{",
+            "    public class product",
+            "    {",
+            "        public Guid productid { get; set; }",
+            "        public string name { get; set; } = default!;",
+            "        public string? description { get; set; }",
+            "        public decimal? price { get; set; }",
+            "        public int? quantity { get; set; }",
+            "        public string brand_id { get; set; } = default!;",
+            "        public int category_id { get; set; }",
+            "    }",
+            "}"
+        ]
+    )
+]
 
 DOT_NET_ENTITY_TYPE_FILE_DATA = [
     FileData(
-        file_path='',
-        file_name='',
+        file_path="",
+        file_name="",
         file_content=[]
     ),
     FileData(
-        file_path='',
-        file_name='',
+        file_path="",
+        file_name="",
         file_content=[]
     ),
     FileData(
-        file_path='output/path/Ecommerce/src/ProductDal/Models',
-        file_name='DotNetDataTypes.cs',
+        file_path="output/path/Ecommerce/src/ProductDal/Models",
+        file_name="DotNetDataTypes.cs",
         file_content=[
-            'namespace ProductDal.Models',
-            '{',
-            '    public class DotNetDataTypes',
-            '    {',
-            '        public bool BooleanField { get; set; }',
-            '        public byte ByteField { get; set; }',
-            '        public sbyte SByteField { get; set; }',
-            '        public string CharField { get; set; }',
-            '        public short ShortField { get; set; }',
-            '        public ushort UShortField { get; set; }',
-            '        public int IntField { get; set; }',
-            '        public uint UIntField { get; set; }',
-            '        public long LongField { get; set; }',
-            '        public ulong ULongField { get; set; }',
-            '        public float FloatField { get; set; }',
-            '        public double DoubleField { get; set; }',
-            '        public decimal DecimalField { get; set; }',
-            '        public string StringField { get; set; }',
-            '        public DateTimeOffset DateTimeField { get; set; }',
-            '        public DateTimeOffset DateTimeOffField { get; set; }',
-            '        public string EnumField { get; set; }',
-            '        public Guid GuidField { get; set; }',
-            '        public Guid NullableGuidField { get; set; }',
-            '    }',
-            '}'
+            "namespace ProductDal.Models",
+            "{",
+            "    public class DotNetDataTypes",
+            "    {",
+            "        public bool BooleanField { get; set; }",
+            "        public byte ByteField { get; set; }",
+            "        public sbyte SByteField { get; set; }",
+            "        public string CharField { get; set; } = default!;",
+            "        public short ShortField { get; set; }",
+            "        public ushort UShortField { get; set; }",
+            "        public int IntField { get; set; }",
+            "        public uint UIntField { get; set; }",
+            "        public long LongField { get; set; }",
+            "        public ulong ULongField { get; set; }",
+            "        public float FloatField { get; set; }",
+            "        public double DoubleField { get; set; }",
+            "        public decimal DecimalField { get; set; }",
+            "        public string StringField { get; set; } = default!;",
+            "        public DateTimeOffset DateTimeField { get; set; }",
+            "        public DateTimeOffset DateTimeOffField { get; set; }",
+            "        public string EnumField { get; set; } = default!;",
+            "        public Guid GuidField { get; set; }",
+            "        public Guid? NullableGuidField { get; set; }",
+            "    }",
+            "}"
         ]
     )
 ]
@@ -573,9 +577,27 @@ class TestDbServiceModelGenerator(unittest.TestCase):
             pl_type_mapper=CSharpTypeMapper(),
             db_type_mapper=None
         )
-        actual_data = []
-        for svc in svc_gen.gen_service():
-            for file_data in svc:
-                actual_data.append(file_data)
+        actual_data = [
+            file_data
+            for svc in svc_gen.gen_service()
+            for file_data in svc
+        ]
         print(actual_data)
         self.assertEqual(expected_data, actual_data)
+
+    def test_gen_service(self):
+        svc_gen = DbServiceModelGenerator(
+            output_path=OUTPUT_PATH,
+            sln_name="Ecommerce",
+            service_name="ProductDal",
+            entities=[PRODUCT_ENTITY],
+            pl_type_mapper=CSharpTypeMapper(),
+            db_type_mapper=None
+        )
+        actual_data = [
+            file_data
+            for svc in svc_gen.gen_service()
+            for file_data in svc
+        ]
+        print(actual_data)
+        self.assertEqual(PRODUCT_FILE_DATA, actual_data)

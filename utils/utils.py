@@ -6,7 +6,7 @@ from entity_parser.entity import Entity, EntityField, FieldData, RefEntityField
 
 
 def remove_last_comma(s: str) -> str:
-    if s.endswith(','):
+    if s.endswith(","):
         return s[:-1]
     return s
 

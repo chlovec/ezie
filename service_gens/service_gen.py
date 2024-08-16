@@ -82,7 +82,9 @@ class CSharpTypeMapper(TypeMapper):
             return CSharpDataType.DECIMAL.value
         return CSharpDataType.DOUBLE.value
 
-    def _get_string_type(self, format: FieldFormat, max_length: int) -> str:
+    def _get_string_type(
+        self, format: FieldFormat, min_len: int, max_len: int
+    ) -> str:
         if format == FieldFormat.BYTE:
             return CSharpDataType.BYTE.value
         elif format == FieldFormat.DATE:
@@ -93,13 +95,17 @@ class CSharpTypeMapper(TypeMapper):
             return CSharpDataType.TIMESPAN.value
         elif format == FieldFormat.UUID:
             return CSharpDataType.GUID.value
+        elif min_len and min_len == max_len:
+            return f"{CSharpDataType.CHAR.value}[{min_len}]"
 
         return CSharpDataType.STRING.value
 
     def get_field_type(self, entity_field: EntityField) -> str:
         if entity_field.field_type == FieldType.STRING:
             return self._get_string_type(
-                entity_field.format, entity_field.max_length
+                entity_field.format,
+                entity_field.minimum,
+                entity_field.maximum
             )
         elif entity_field.field_type == FieldType.INTEGER:
             return self._get_int_type(
