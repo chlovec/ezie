@@ -3,23 +3,28 @@ from enum import Enum
 from typing import Generator, List
 
 from data_type_mapper.data_type_mapper import (
-    NEG_BIGINT, NEG_INTEGER, NEG_SMALLINT, POS_BIGINT, POS_INTEGER,
-    POS_SMALLINT, TypeMapper
+    LOWER_LIMIT_SBYTE, NEG_BIGINT, NEG_INTEGER, NEG_SMALLINT, POS_BIGINT,
+    POS_INTEGER, POS_SMALLINT, UPPER_LIMIT_BYTE, UPPER_LIMIT_SBYTE,
+    UPPER_LIMIT_UINT, UPPER_LIMIT_ULONG, UPPER_LIMIT_USHORT, TypeMapper
 )
 from entity_parser.entity import Entity, EntityField, FieldFormat, FieldType
 from utils.utils import FileData
 
 
 class CSharpDataType(Enum):
-    BOOLEAN = "boolean"
+    BOOLEAN = "bool"
     BYTE = "byte"
+    SBYTE = "sbyte"
     CHAR = "char"
     DECIMAL = "decimal"
     DOUBLE = "double"
     FLOAT = "float"
     INT = "int"
+    UINT = "uint"
     LONG = "long"
+    ULONG = "ulong"
     SHORT = "short"
+    USHORT = "ushort"
     STRING = "string"
     DATETIME = "dateTime"
     DATETIMEOFFSET = "DateTimeOffset"
@@ -31,9 +36,21 @@ class CSharpTypeMapper(TypeMapper):
     """_summary_
     Class for mapping data from json type to C# data type
     """
+
     def _get_int_type(self, minimum: int, maximum: int) -> str:
-        if maximum and minimum:
-            if minimum >= NEG_SMALLINT and maximum <= POS_SMALLINT:
+        if maximum and not minimum:
+            if maximum <= UPPER_LIMIT_BYTE:
+                return CSharpDataType.BYTE.value
+            elif maximum <= UPPER_LIMIT_USHORT:
+                return CSharpDataType.USHORT.value
+            elif maximum <= UPPER_LIMIT_UINT:
+                return CSharpDataType.UINT.value
+            elif maximum <= UPPER_LIMIT_ULONG:
+                return CSharpDataType.ULONG.value
+        elif maximum and minimum:
+            if minimum >= LOWER_LIMIT_SBYTE and maximum <= UPPER_LIMIT_SBYTE:
+                return CSharpDataType.SBYTE.value
+            elif minimum >= NEG_SMALLINT and maximum <= POS_SMALLINT:
                 return CSharpDataType.SHORT.value
             elif minimum >= NEG_INTEGER and maximum <= POS_INTEGER:
                 return CSharpDataType.INT.value
@@ -61,6 +78,8 @@ class CSharpTypeMapper(TypeMapper):
             return CSharpDataType.DOUBLE.value
         elif format == FieldFormat.FLOAT:
             return CSharpDataType.FLOAT.value
+        elif format == FieldFormat.DECIMAL:
+            return CSharpDataType.DECIMAL.value
         return CSharpDataType.DOUBLE.value
 
     def _get_string_type(self, format: FieldFormat, max_length: int) -> str:

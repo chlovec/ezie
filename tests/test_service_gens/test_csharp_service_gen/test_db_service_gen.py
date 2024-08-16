@@ -152,6 +152,265 @@ PRODUCT_ENTITY = Entity(
     ]
 )
 
+
+DOT_NET_TYPE_ENTITY = Entity(
+    name='DotNetDataTypes',
+    non_ref_fields=[
+        EntityField(
+            name='BooleanField',
+            is_required=True,
+            field_type=FieldType.BOOLEAN,
+            max_length=None,
+            is_primary_key=False,
+            type_ref=None,
+            format=None,
+            is_enum=False,
+            enum_values=[],
+            minimum=None,
+            maximum=None
+        ),
+        EntityField(
+            name='ByteField',
+            is_required=True,
+            field_type=FieldType.INTEGER,
+            max_length=None,
+            is_primary_key=False,
+            type_ref=None,
+            format=None,
+            is_enum=False,
+            enum_values=[],
+            minimum=0,
+            maximum=255
+        ),
+        EntityField(
+            name='SByteField',
+            is_required=True,
+            field_type=FieldType.INTEGER,
+            max_length=None,
+            is_primary_key=False,
+            type_ref=None,
+            format=None,
+            is_enum=False,
+            enum_values=[],
+            minimum=-128,
+            maximum=127
+        ),
+        EntityField(
+            name='CharField',
+            is_required=True,
+            field_type=FieldType.STRING,
+            max_length=1,
+            is_primary_key=False,
+            type_ref=None,
+            format=None,
+            is_enum=False,
+            enum_values=[],
+            minimum=None,
+            maximum=None
+        ),
+        EntityField(
+            name='ShortField',
+            is_required=True,
+            field_type=FieldType.INTEGER,
+            max_length=None,
+            is_primary_key=False,
+            type_ref=None,
+            format=None,
+            is_enum=False,
+            enum_values=[],
+            minimum=-32768,
+            maximum=32767
+        ),
+        EntityField(
+            name='UShortField',
+            is_required=True,
+            field_type=FieldType.INTEGER,
+            max_length=None,
+            is_primary_key=False,
+            type_ref=None,
+            format=None,
+            is_enum=False,
+            enum_values=[],
+            minimum=0,
+            maximum=65535
+        ),
+        EntityField(
+            name='IntField',
+            is_required=True,
+            field_type=FieldType.INTEGER,
+            max_length=None,
+            is_primary_key=False,
+            type_ref=None,
+            format=None,
+            is_enum=False,
+            enum_values=[],
+            minimum=-2147483648,
+            maximum=2147483647
+        ),
+        EntityField(
+            name='UIntField',
+            is_required=True,
+            field_type=FieldType.INTEGER,
+            max_length=None,
+            is_primary_key=False,
+            type_ref=None,
+            format=None,
+            is_enum=False,
+            enum_values=[],
+            minimum=0,
+            maximum=4294967295
+        ),
+        EntityField(
+            name='LongField',
+            is_required=True,
+            field_type=FieldType.INTEGER,
+            max_length=None,
+            is_primary_key=False,
+            type_ref=None,
+            format=None,
+            is_enum=False,
+            enum_values=[],
+            minimum=-9223372036854775808,
+            maximum=9223372036854775807
+        ),
+        EntityField(
+            name='ULongField',
+            is_required=True,
+            field_type=FieldType.INTEGER,
+            max_length=None,
+            is_primary_key=False,
+            type_ref=None,
+            format=None,
+            is_enum=False,
+            enum_values=[],
+            minimum=0,
+            maximum=18446744073709551615
+        ),
+        EntityField(
+            name='FloatField',
+            is_required=True,
+            field_type=FieldType.NUMBER,
+            max_length=None,
+            is_primary_key=False,
+            type_ref=None,
+            format=FieldFormat.FLOAT,
+            is_enum=False,
+            enum_values=[],
+            minimum=None,
+            maximum=None
+        ),
+        EntityField(
+            name='DoubleField',
+            is_required=True,
+            field_type=FieldType.NUMBER,
+            max_length=None,
+            is_primary_key=False,
+            type_ref=None,
+            format=FieldFormat.DOUBLE,
+            is_enum=False,
+            enum_values=[],
+            minimum=None,
+            maximum=None
+        ),
+        EntityField(
+            name='DecimalField',
+            is_required=True,
+            field_type=FieldType.NUMBER,
+            max_length=None,
+            is_primary_key=False,
+            type_ref=None,
+            format=FieldFormat.DECIMAL,
+            is_enum=False,
+            enum_values=[],
+            minimum=None,
+            maximum=None
+        ),
+        EntityField(
+            name='StringField',
+            is_required=True,
+            field_type=FieldType.STRING,
+            max_length=None,
+            is_primary_key=False,
+            type_ref=None,
+            format=None,
+            is_enum=False,
+            enum_values=[],
+            minimum=None,
+            maximum=None
+        ),
+        EntityField(
+            name='DateTimeField',
+            is_required=True,
+            field_type=FieldType.STRING,
+            max_length=None,
+            is_primary_key=False,
+            type_ref=None,
+            format=FieldFormat.DATETIME,
+            is_enum=False,
+            enum_values=[],
+            minimum=None,
+            maximum=None
+        ),
+        EntityField(
+            name='DateTimeOffField',
+            is_required=True,
+            field_type=FieldType.STRING,
+            max_length=None,
+            is_primary_key=False,
+            type_ref=None,
+            format=FieldFormat.DATETIME,
+            is_enum=False,
+            enum_values=[],
+            minimum=None,
+            maximum=None
+        ),
+        EntityField(
+            name='EnumField',
+            is_required=True,
+            field_type=FieldType.STRING,
+            max_length=None,
+            is_primary_key=False,
+            type_ref=None,
+            format=None,
+            is_enum=False,
+            enum_values=[],
+            minimum=None,
+            maximum=None
+        ),
+        EntityField(
+            name='GuidField',
+            is_required=True,
+            field_type=FieldType.STRING,
+            max_length=None,
+            is_primary_key=False,
+            type_ref=None,
+            format=FieldFormat.UUID,
+            is_enum=False,
+            enum_values=[],
+            minimum=None,
+            maximum=None
+        ),
+        EntityField(
+            name='NullableGuidField',
+            is_required=False,
+            field_type=FieldType.STRING,
+            max_length=None,
+            is_primary_key=False,
+            type_ref=None,
+            format=FieldFormat.UUID,
+            is_enum=False,
+            enum_values=[],
+            minimum=None,
+            maximum=None
+        ),
+    ],
+    ref_fields=[],
+    pk_fields=[],
+    is_enum=False,
+    enum_values=None,
+    is_sub_def=False
+)
+
 BRAND_FILE_DATA = [
     FileData(
         file_path="output/path/Ecommerce/src/ProductDal/Models",
@@ -236,7 +495,7 @@ PRODUCT_FILE_DATA = [FileData(
         '        public Guid productid { get; set; }',
         '        public string name { get; set; }',
         '        public string description { get; set; }',
-        '        public double price { get; set; }',
+        '        public decimal price { get; set; }',
         '        public int quantity { get; set; }',
         '        public string brand_id { get; set; }',
         '        public int category_id { get; set; }',
@@ -245,14 +504,63 @@ PRODUCT_FILE_DATA = [FileData(
     ]
 )]
 
+DOT_NET_ENTITY_TYPE_FILE_DATA = [
+    FileData(
+        file_path='',
+        file_name='',
+        file_content=[]
+    ),
+    FileData(
+        file_path='',
+        file_name='',
+        file_content=[]
+    ),
+    FileData(
+        file_path='output/path/Ecommerce/src/ProductDal/Models',
+        file_name='DotNetDataTypes.cs',
+        file_content=[
+            'namespace ProductDal.Models',
+            '{',
+            '    public class DotNetDataTypes',
+            '    {',
+            '        public bool BooleanField { get; set; }',
+            '        public byte ByteField { get; set; }',
+            '        public sbyte SByteField { get; set; }',
+            '        public string CharField { get; set; }',
+            '        public short ShortField { get; set; }',
+            '        public ushort UShortField { get; set; }',
+            '        public int IntField { get; set; }',
+            '        public uint UIntField { get; set; }',
+            '        public long LongField { get; set; }',
+            '        public ulong ULongField { get; set; }',
+            '        public float FloatField { get; set; }',
+            '        public double DoubleField { get; set; }',
+            '        public decimal DecimalField { get; set; }',
+            '        public string StringField { get; set; }',
+            '        public DateTimeOffset DateTimeField { get; set; }',
+            '        public DateTimeOffset DateTimeOffField { get; set; }',
+            '        public string EnumField { get; set; }',
+            '        public Guid GuidField { get; set; }',
+            '        public Guid NullableGuidField { get; set; }',
+            '    }',
+            '}'
+        ]
+    )
+]
+
 
 class TestDbServiceModelGenerator(unittest.TestCase):
     def setUp(self) -> None:
         self.maxDiff = None
 
-    @parameterized.expand([
+    @ parameterized.expand([
         ("entity_with_pk", [BRAND_ENTITY], BRAND_FILE_DATA),
-        ("entity_with_ref", [PRODUCT_ENTITY], PRODUCT_FILE_DATA)
+        ("entity_with_ref", [PRODUCT_ENTITY], PRODUCT_FILE_DATA),
+        (
+            "entity_with_dotnet_types",
+            [DOT_NET_TYPE_ENTITY],
+            DOT_NET_ENTITY_TYPE_FILE_DATA
+        )
     ])
     def test_entity_with_pk(
         self, name: str, entities: List[Entity], expected_data: FileData
@@ -269,4 +577,5 @@ class TestDbServiceModelGenerator(unittest.TestCase):
         for svc in svc_gen.gen_service():
             for file_data in svc:
                 actual_data.append(file_data)
+        print(actual_data)
         self.assertEqual(expected_data, actual_data)
