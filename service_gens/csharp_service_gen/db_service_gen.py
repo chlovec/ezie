@@ -2,8 +2,9 @@ from abc import abstractmethod
 from os import path
 from typing import Generator, List
 
-from entity_parser.entity import FieldData, FieldType
-from service_gens.service_gen import ServiceGenerator
+from data_type_mapper.data_type_mapper import TypeMapper
+from entity_parser.entity import Entity, FieldData, FieldType
+from service_gens.service_gen import ServiceGenerator, ServiceUtil
 from utils.constants import TAB_4, TAB_8
 from utils.utils import EntityFieldData, FileData
 
@@ -18,13 +19,7 @@ SRC: str = "src"
 CS_EXT: str = ".cs"
 
 
-class DbServiceUtil:
-    def __init__(self, output_path: str, sln_name: str, service_name: str):
-        self.output_path = path.join(
-            output_path, sln_name, SRC, service_name
-        )
-        self.service_name = service_name
-
+class DbServiceUtil(ServiceUtil):
     # file paths
     @property
     def interfaces_dir_path(self) -> str:
@@ -98,28 +93,46 @@ class DbServiceUtil:
 
 
 class DbServiceGenerator(ServiceGenerator):
-    def gen_service(self) -> Generator[FileData, None, None]:
-        svc_dir = DbServiceUtil(
-            self.output_path, self.sln_name, self.service_name
+    def __init__(
+        self,
+        output_path: str,
+        sln_name: str,
+        service_name: str,
+        entities: List[Entity],
+        pl_type_mapper: TypeMapper,
+        db_type_mapper: TypeMapper = None
+    ):
+        super().__init__(
+            output_path=output_path,
+            sln_name=sln_name,
+            service_name=service_name,
+            entities=entities,
+            pl_type_mapper=pl_type_mapper,
+            db_type_mapper=db_type_mapper
         )
+        self.svc_dir = DbServiceUtil(
+            self.output_path, self.sln_name, self.service_name, SRC
+        )
+
+    def gen_service(self) -> Generator[FileData, None, None]:
         for entity in self.entities:
             entity_file_data = EntityFieldData.from_entity(
                 entity, self.pl_type_mapper
             )
-            yield self._gen_entity_service(entity_file_data, svc_dir)
+            yield self._gen_entity_service(entity_file_data)
 
     @abstractmethod
     def _gen_entity_service(
-        self, entity: EntityFieldData, svc_dir: DbServiceUtil
+        self, entity: EntityFieldData
     ) -> Generator[FileData, None, None]:
         pass
 
 
 class DbServiceModelGenerator(DbServiceGenerator):
     def _gen_entity_service(
-        self, entity: EntityFieldData, svc_dir: DbServiceUtil
+        self, entity: EntityFieldData
     ) -> Generator[FileData, None, None]:
-        file_path: str = svc_dir.models_dir_path
+        file_path: str = self.svc_dir.models_dir_path
         yield self._create_entity(
             field_data=entity.pk_field_data,
             class_name=f"List{entity.entity_name}Param",
@@ -206,24 +219,22 @@ class DbServiceModelGenerator(DbServiceGenerator):
 
 class DbServiceInterfaceGenerator(DbServiceGenerator):
     def _gen_entity_service(
-        self, entity: EntityFieldData, svc_dir: DbServiceUtil
+        self, entity: EntityFieldData
     ) -> Generator[FileData, None, None]:
-        ent_name = svc_dir.normalize_name(entity.entity_name)
-        yield self._create_interface(ent_name, svc_dir)
+        ent_name = self.svc_dir.normalize_name(entity.entity_name)
+        yield self._create_interface(ent_name)
 
-    def _create_interface(
-        self, ent_name: str, svc_dir: DbServiceUtil
-    ) -> FileData:
-        get_param: str = svc_dir.get_get_param_name(ent_name)
-        get_param_var: str = svc_dir.get_var_name(get_param)
-        list_param: str = svc_dir.get_list_param_name(ent_name)
-        list_param_var: str = svc_dir.get_var_name(list_param)
-        interface_name: str = svc_dir.get_interface_name(ent_name)
-        ent_var_name: str = svc_dir.get_var_name(ent_name)
+    def _create_interface(self, ent_name: str) -> FileData:
+        get_param: str = self.svc_dir.get_get_param_name(ent_name)
+        get_param_var: str = self.svc_dir.get_var_name(get_param)
+        list_param: str = self.svc_dir.get_list_param_name(ent_name)
+        list_param_var: str = self.svc_dir.get_var_name(list_param)
+        interface_name: str = self.svc_dir.get_interface_name(ent_name)
+        ent_var_name: str = self.svc_dir.get_var_name(ent_name)
         file_content = [
-            f"using {svc_dir.model_ns};",
+            f"using {self.svc_dir.model_ns};",
             "",
-            f"namespace {svc_dir.interfaces_ns}",
+            f"namespace {self.svc_dir.interfaces_ns}",
             "{",
             f"{TAB_4}public interface {interface_name}",
             f"{TAB_4}{{",
@@ -237,18 +248,15 @@ class DbServiceInterfaceGenerator(DbServiceGenerator):
             "}"
         ]
         return FileData(
-            file_path=svc_dir.interfaces_dir_path,
-            file_name=svc_dir.get_file_name(interface_name),
+            file_path=self.svc_dir.interfaces_dir_path,
+            file_name=self.svc_dir.get_file_name(interface_name),
             file_content=file_content
         )
 
     def gen_sql_command_interface(self) -> List[FileData]:
-        svc_dir = DbServiceUtil(
-            self.output_path, self.sln_name, self.service_name
-        )
-        ent_name: str = svc_dir.sql_cmd_interface_name
+        ent_name: str = self.svc_dir.sql_cmd_interface_name
         file_content = [
-            f"namespace {svc_dir.interfaces_ns}",
+            f"namespace {self.svc_dir.interfaces_ns}",
             "{",
             f"{TAB_4}public interface {ent_name}",
             f"{TAB_4}{{",
@@ -261,7 +269,7 @@ class DbServiceInterfaceGenerator(DbServiceGenerator):
             "}"
         ]
         return FileData(
-            file_path=svc_dir.interfaces_dir_path,
-            file_name=svc_dir.get_file_name(ent_name),
+            file_path=self.svc_dir.interfaces_dir_path,
+            file_name=self.svc_dir.get_file_name(ent_name),
             file_content=file_content
         )

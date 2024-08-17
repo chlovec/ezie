@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from enum import Enum
+from os import path
 from typing import Generator, List
 
 from data_type_mapper.data_type_mapper import (
@@ -119,6 +120,48 @@ class CSharpTypeMapper(TypeMapper):
 
     def get_enum_field_type(self, entity: Entity) -> str:
         return CSharpDataType.STRING
+
+
+class ServiceUtil(ABC):
+    def __init__(
+        self, output_path: str, sln_name: str, service_name: str, src: str
+    ):
+        self.output_path = path.join(
+            output_path, sln_name, src, service_name
+        )
+        self.service_name = service_name
+
+    @abstractmethod
+    def get_file_name(self, cls_name: str) -> str:
+        pass
+
+    @abstractmethod
+    def get_get_param_name(self, cls_name: str) -> str:
+        pass
+
+    @abstractmethod
+    def get_list_param_name(self, cls_name: str) -> str:
+        pass
+
+    @abstractmethod
+    def get_interface_name(self, cls_name: str) -> str:
+        pass
+
+    @abstractmethod
+    def get_name_space(self, dir: str) -> str:
+        pass
+
+    @abstractmethod
+    def get_path(self, dir: str) -> str:
+        pass
+
+    @abstractmethod
+    def get_var_name(self, cls_name: str) -> str:
+        pass
+
+    @abstractmethod
+    def normalize_name(self, cls_name: str) -> str:
+        pass
 
 
 class ServiceGenerator(ABC):
