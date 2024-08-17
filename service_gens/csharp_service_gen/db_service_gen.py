@@ -1,4 +1,3 @@
-from abc import abstractmethod
 from os import path
 from typing import Generator, List
 
@@ -84,6 +83,9 @@ class DbServiceUtil(ServiceUtil):
     def get_path(self, dir: str) -> str:
         return path.join(self.output_path, dir)
 
+    def get_repo_interface_name(self, cls_name: str) -> str:
+        return f"I{cls_name}Repo"
+
     def get_var_name(self, cls_name: str) -> str:
         return cls_name[ZERO].lower() + cls_name[ONE:]
 
@@ -109,48 +111,49 @@ class DbServiceGenerator(ServiceGenerator):
         self.svc_dir = svc_dir
 
     def gen_service(self) -> Generator[FileData, None, None]:
+        # Generate sql command interface
+        yield self._gen_sql_command_interface()
+
+        # Generate files for each entity
         for entity in self.entities:
+            ent_name: str = self.svc_dir.normalize_name(entity.name)
+
+            # Generate repo interfaces
+            yield self._gen_repo_interface(ent_name)
+
             entity_file_data = EntityFieldData.from_entity(
                 entity, self.pl_type_mapper
             )
-            yield self._gen_entity_service(entity_file_data)
 
-    @abstractmethod
-    def _gen_entity_service(
-        self, entity: EntityFieldData
-    ) -> Generator[FileData, None, None]:
-        pass
+            # Generate Db Models
+            for model in self._gen_db_models(entity_file_data, ent_name):
+                yield model
 
-
-class DbServiceModelGenerator(DbServiceGenerator):
-    def _gen_entity_service(
-        self, entity: EntityFieldData
+    # Db models section
+    def _gen_db_models(
+        self, entity: EntityFieldData, ent_name: str
     ) -> Generator[FileData, None, None]:
         file_path: str = self.svc_dir.models_dir_path
-        yield self._create_entity(
+        yield self._gen_db_model(
             field_data=entity.pk_field_data,
-            class_name=f"List{entity.entity_name}Param",
+            class_name=self.svc_dir.get_list_param_name(ent_name),
             file_path=file_path,
             is_list=True
         )
 
-        yield self._create_entity(
+        yield self._gen_db_model(
             field_data=entity.pk_field_data,
-            class_name=f"Get{entity.entity_name}Param",
+            class_name=self.svc_dir.get_get_param_name(ent_name),
             file_path=file_path
         )
 
-        yield self._create_entity(
+        yield self._gen_db_model(
             field_data=entity.get_field_data(),
-            class_name=entity.entity_name,
+            class_name=ent_name,
             file_path=file_path
         )
 
-    @property
-    def _name_space(self) -> str:
-        return f"{self.service_name}.{MODELS}"
-
-    def _create_entity(
+    def _gen_db_model(
         self,
         field_data: List[FieldData],
         class_name: str,
@@ -163,7 +166,7 @@ class DbServiceModelGenerator(DbServiceGenerator):
 
         # Open class definition with namespace
         file_content: List[str] = [
-            f"namespace {self._name_space}",
+            f"namespace {self.svc_dir.model_ns}",
             "{",
             f"{TAB_4}public class {class_name}",
             f"{TAB_4}{{"
@@ -210,20 +213,13 @@ class DbServiceModelGenerator(DbServiceGenerator):
             return " = default!;"
         return ""
 
-
-class DbServiceInterfaceGenerator(DbServiceGenerator):
-    def _gen_entity_service(
-        self, entity: EntityFieldData
-    ) -> Generator[FileData, None, None]:
-        ent_name = self.svc_dir.normalize_name(entity.entity_name)
-        yield self._create_interface(ent_name)
-
-    def _create_interface(self, ent_name: str) -> FileData:
+    # Interfaces section
+    def _gen_repo_interface(self, ent_name: str) -> FileData:
         get_param: str = self.svc_dir.get_get_param_name(ent_name)
         get_param_var: str = self.svc_dir.get_var_name(get_param)
         list_param: str = self.svc_dir.get_list_param_name(ent_name)
         list_param_var: str = self.svc_dir.get_var_name(list_param)
-        interface_name: str = self.svc_dir.get_interface_name(ent_name)
+        interface_name: str = self.svc_dir.get_repo_interface_name(ent_name)
         ent_var_name: str = self.svc_dir.get_var_name(ent_name)
         file_content = [
             f"using {self.svc_dir.model_ns};",
@@ -247,7 +243,7 @@ class DbServiceInterfaceGenerator(DbServiceGenerator):
             file_content=file_content
         )
 
-    def gen_sql_command_interface(self) -> List[FileData]:
+    def _gen_sql_command_interface(self) -> List[FileData]:
         ent_name: str = self.svc_dir.sql_cmd_interface_name
         file_content = [
             f"namespace {self.svc_dir.interfaces_ns}",

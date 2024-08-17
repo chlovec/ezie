@@ -1,17 +1,14 @@
-from typing import List
 import unittest
-from parameterized import parameterized
 
 from entity_parser.entity import (
     Entity, EntityField, FieldFormat, FieldType, RefEntityField
 )
 from service_gens.csharp_service_gen.db_service_gen import (
-    DbServiceInterfaceGenerator,
-    DbServiceModelGenerator,
-    DbServiceUtil
+    DbServiceGenerator, DbServiceUtil
 )
 from service_gens.service_gen import CSharpTypeMapper
 from utils.utils import FileData
+
 
 THIRTY: int = 30
 FIFTY: int = 50
@@ -28,6 +25,7 @@ STREET: str = "street"
 ECOMMERCE: str = "Ecommerce"
 PRODUCT_DAL: str = "ProductDal"
 SRC: str = "src"
+
 
 BRAND_ENTITY = Entity(
     name="Brand",
@@ -157,473 +155,225 @@ PRODUCT_ENTITY = Entity(
     ]
 )
 
-DOT_NET_TYPE_ENTITY = Entity(
-    name="DotNetDataTypes",
-    non_ref_fields=[
-        EntityField(
-            name="BooleanField",
-            is_required=True,
-            field_type=FieldType.BOOLEAN,
-            max_length=None,
-            is_primary_key=False,
-            type_ref=None,
-            format=None,
-            is_enum=False,
-            enum_values=[],
-            minimum=None,
-            maximum=None
-        ),
-        EntityField(
-            name="ByteField",
-            is_required=True,
-            field_type=FieldType.INTEGER,
-            max_length=None,
-            is_primary_key=False,
-            type_ref=None,
-            format=None,
-            is_enum=False,
-            enum_values=[],
-            minimum=0,
-            maximum=255
-        ),
-        EntityField(
-            name="SByteField",
-            is_required=True,
-            field_type=FieldType.INTEGER,
-            max_length=None,
-            is_primary_key=False,
-            type_ref=None,
-            format=None,
-            is_enum=False,
-            enum_values=[],
-            minimum=-128,
-            maximum=127
-        ),
-        EntityField(
-            name="CharField",
-            is_required=True,
-            field_type=FieldType.STRING,
-            max_length=1,
-            is_primary_key=False,
-            type_ref=None,
-            format=None,
-            is_enum=False,
-            enum_values=[],
-            minimum=None,
-            maximum=None
-        ),
-        EntityField(
-            name="ShortField",
-            is_required=True,
-            field_type=FieldType.INTEGER,
-            max_length=None,
-            is_primary_key=False,
-            type_ref=None,
-            format=None,
-            is_enum=False,
-            enum_values=[],
-            minimum=-32768,
-            maximum=32767
-        ),
-        EntityField(
-            name="UShortField",
-            is_required=True,
-            field_type=FieldType.INTEGER,
-            max_length=None,
-            is_primary_key=False,
-            type_ref=None,
-            format=None,
-            is_enum=False,
-            enum_values=[],
-            minimum=0,
-            maximum=65535
-        ),
-        EntityField(
-            name="IntField",
-            is_required=True,
-            field_type=FieldType.INTEGER,
-            max_length=None,
-            is_primary_key=False,
-            type_ref=None,
-            format=None,
-            is_enum=False,
-            enum_values=[],
-            minimum=-2147483648,
-            maximum=2147483647
-        ),
-        EntityField(
-            name="UIntField",
-            is_required=True,
-            field_type=FieldType.INTEGER,
-            max_length=None,
-            is_primary_key=False,
-            type_ref=None,
-            format=None,
-            is_enum=False,
-            enum_values=[],
-            minimum=0,
-            maximum=4294967295
-        ),
-        EntityField(
-            name="LongField",
-            is_required=True,
-            field_type=FieldType.INTEGER,
-            max_length=None,
-            is_primary_key=False,
-            type_ref=None,
-            format=None,
-            is_enum=False,
-            enum_values=[],
-            minimum=-9223372036854775808,
-            maximum=9223372036854775807
-        ),
-        EntityField(
-            name="ULongField",
-            is_required=True,
-            field_type=FieldType.INTEGER,
-            max_length=None,
-            is_primary_key=False,
-            type_ref=None,
-            format=None,
-            is_enum=False,
-            enum_values=[],
-            minimum=0,
-            maximum=18446744073709551615
-        ),
-        EntityField(
-            name="FloatField",
-            is_required=True,
-            field_type=FieldType.NUMBER,
-            max_length=None,
-            is_primary_key=False,
-            type_ref=None,
-            format=FieldFormat.FLOAT,
-            is_enum=False,
-            enum_values=[],
-            minimum=None,
-            maximum=None
-        ),
-        EntityField(
-            name="DoubleField",
-            is_required=True,
-            field_type=FieldType.NUMBER,
-            max_length=None,
-            is_primary_key=False,
-            type_ref=None,
-            format=FieldFormat.DOUBLE,
-            is_enum=False,
-            enum_values=[],
-            minimum=None,
-            maximum=None
-        ),
-        EntityField(
-            name="DecimalField",
-            is_required=True,
-            field_type=FieldType.NUMBER,
-            max_length=None,
-            is_primary_key=False,
-            type_ref=None,
-            format=FieldFormat.DECIMAL,
-            is_enum=False,
-            enum_values=[],
-            minimum=None,
-            maximum=None
-        ),
-        EntityField(
-            name="StringField",
-            is_required=True,
-            field_type=FieldType.STRING,
-            max_length=None,
-            is_primary_key=False,
-            type_ref=None,
-            format=None,
-            is_enum=False,
-            enum_values=[],
-            minimum=None,
-            maximum=None
-        ),
-        EntityField(
-            name="DateTimeField",
-            is_required=True,
-            field_type=FieldType.STRING,
-            max_length=None,
-            is_primary_key=False,
-            type_ref=None,
-            format=FieldFormat.DATETIME,
-            is_enum=False,
-            enum_values=[],
-            minimum=None,
-            maximum=None
-        ),
-        EntityField(
-            name="DateTimeOffField",
-            is_required=True,
-            field_type=FieldType.STRING,
-            max_length=None,
-            is_primary_key=False,
-            type_ref=None,
-            format=FieldFormat.DATETIME,
-            is_enum=False,
-            enum_values=[],
-            minimum=None,
-            maximum=None
-        ),
-        EntityField(
-            name="EnumField",
-            is_required=True,
-            field_type=FieldType.STRING,
-            max_length=None,
-            is_primary_key=False,
-            type_ref=None,
-            format=None,
-            is_enum=False,
-            enum_values=[],
-            minimum=None,
-            maximum=None
-        ),
-        EntityField(
-            name="GuidField",
-            is_required=True,
-            field_type=FieldType.STRING,
-            max_length=None,
-            is_primary_key=False,
-            type_ref=None,
-            format=FieldFormat.UUID,
-            is_enum=False,
-            enum_values=[],
-            minimum=None,
-            maximum=None
-        ),
-        EntityField(
-            name="NullableGuidField",
-            is_required=False,
-            field_type=FieldType.STRING,
-            max_length=None,
-            is_primary_key=False,
-            type_ref=None,
-            format=FieldFormat.UUID,
-            is_enum=False,
-            enum_values=[],
-            minimum=None,
-            maximum=None
-        ),
-    ],
-    ref_fields=[],
-    pk_fields=[],
-    is_enum=False,
-    enum_values=None,
-    is_sub_def=False
-)
-
-BRAND_FILE_DATA = [
-    FileData(
-        file_path="output/path/Ecommerce/src/ProductDal/Models",
-        file_name="ListBrandParam.cs",
-        file_content=[
-            "namespace ProductDal.Models",
-            "{",
-            "    public class ListBrandParam",
-            "    {",
-            "        public IEnumerable<string> brand_ids { get; set; } "
-            "= default!;",
-            "        public int Limit { get; set; } = 1000;",
-            "        public int OffSet { get; set; } = 0;",
-            "    }",
-            "}"
-        ]
-    ),
-    FileData(
-        file_path="output/path/Ecommerce/src/ProductDal/Models",
-        file_name="GetBrandParam.cs",
-        file_content=[
-            "namespace ProductDal.Models",
-            "{",
-            "    public class GetBrandParam",
-            "    {",
-            "        public string brand_id { get; set; } = default!;",
-            "    }",
-            "}"
-        ]
-    ),
-    FileData(
-        file_path="output/path/Ecommerce/src/ProductDal/Models",
-        file_name="Brand.cs",
-        file_content=[
-            "namespace ProductDal.Models",
-            "{",
-            "    public class Brand",
-            "    {",
-            "        public string brand_id { get; set; } = default!;",
-            "        public string name { get; set; } = default!;",
-            "        public string? description { get; set; }",
-            "    }",
-            "}"
-        ]
-    )
-]
-
-PRODUCT_FILE_DATA = [
-    FileData(
-        file_path="output/path/Ecommerce/src/ProductDal/Models",
-        file_name="ListproductParam.cs",
-        file_content=[
-            "namespace ProductDal.Models",
-            "{",
-            "    public class ListproductParam",
-            "    {",
-            "        public IEnumerable<Guid> productids { get; set; }",
-            "        public int Limit { get; set; } = 1000;",
-            "        public int OffSet { get; set; } = 0;",
-            "    }",
-            "}"
-        ]
-    ),
-    FileData(
-        file_path="output/path/Ecommerce/src/ProductDal/Models",
-        file_name="GetproductParam.cs",
-        file_content=[
-            "namespace ProductDal.Models",
-            "{",
-            "    public class GetproductParam",
-            "    {",
-            "        public Guid productid { get; set; }",
-            "    }",
-            "}"
-        ]
-    ),
-    FileData(
-        file_path="output/path/Ecommerce/src/ProductDal/Models",
-        file_name="product.cs",
-        file_content=[
-            "namespace ProductDal.Models",
-            "{",
-            "    public class product",
-            "    {",
-            "        public Guid productid { get; set; }",
-            "        public string name { get; set; } = default!;",
-            "        public string? description { get; set; }",
-            "        public decimal? price { get; set; }",
-            "        public int? quantity { get; set; }",
-            "        public string brand_id { get; set; } = default!;",
-            "        public int category_id { get; set; }",
-            "    }",
-            "}"
-        ]
-    )
-]
-
-DOT_NET_ENTITY_TYPE_FILE_DATA = [
-    FileData(
-        file_path="",
-        file_name="",
-        file_content=[]
-    ),
-    FileData(
-        file_path="",
-        file_name="",
-        file_content=[]
-    ),
-    FileData(
-        file_path="output/path/Ecommerce/src/ProductDal/Models",
-        file_name="DotNetDataTypes.cs",
-        file_content=[
-            "namespace ProductDal.Models",
-            "{",
-            "    public class DotNetDataTypes",
-            "    {",
-            "        public bool BooleanField { get; set; }",
-            "        public byte ByteField { get; set; }",
-            "        public sbyte SByteField { get; set; }",
-            "        public string CharField { get; set; } = default!;",
-            "        public short ShortField { get; set; }",
-            "        public ushort UShortField { get; set; }",
-            "        public int IntField { get; set; }",
-            "        public uint UIntField { get; set; }",
-            "        public long LongField { get; set; }",
-            "        public ulong ULongField { get; set; }",
-            "        public float FloatField { get; set; }",
-            "        public double DoubleField { get; set; }",
-            "        public decimal DecimalField { get; set; }",
-            "        public string StringField { get; set; } = default!;",
-            "        public DateTimeOffset DateTimeField { get; set; }",
-            "        public DateTimeOffset DateTimeOffField { get; set; }",
-            "        public string EnumField { get; set; } = default!;",
-            "        public Guid GuidField { get; set; }",
-            "        public Guid? NullableGuidField { get; set; }",
-            "    }",
-            "}"
-        ]
-    )
-]
-
 ECOMMERCE_FILE_DATA = [
     FileData(
-        file_path="output/path/Ecommerce/src/ProductDal/Interfaces",
-        file_name="IBrand.cs",
+        file_path='output/path/Ecommerce/src/ProductDal/Interfaces',
+        file_name='ISqlCommand.cs',
         file_content=[
-            "using ProductDal.Models;",
-            "",
-            "namespace ProductDal.Interfaces",
-            "{",
-            "    public interface IBrand",
-            "    {",
-            "        Task<Brand?> GetAsync(BrandGetParam brandGetParam);",
-            "        Task<IEnumerable<Brand>> ListAsync(BrandListParam "
-            "brandListParam);",
-            "        Task<int> CreateAsync(Brand brand);",
-            "        Task<int> UpdateAsync(Brand brand);",
-            "        Task<int> DeleteAsync(BrandGetParam brandGetParam);",
-            "    }",
-            "}"
+            'namespace ProductDal.Interfaces',
+            '{',
+            '    public interface ISqlCommand',
+            '    {',
+            '        string GetCommand { get; }',
+            '        string ListCommand { get; }',
+            '        string CreateCommand { get; }',
+            '        string UpdateCommand { get; }',
+            '        string DeleteCommand { get; }',
+            '    }',
+            '}'
         ]
     ),
     FileData(
-        file_path="output/path/Ecommerce/src/ProductDal/Interfaces",
-        file_name="ICategory.cs",
+        file_path='output/path/Ecommerce/src/ProductDal/Interfaces',
+        file_name='IBrandRepo.cs',
         file_content=[
-            "using ProductDal.Models;",
-            "",
-            "namespace ProductDal.Interfaces",
-            "{",
-            "    public interface ICategory",
-            "    {",
-            "        Task<Category?> GetAsync(CategoryGetParam "
-            "categoryGetParam);",
-            "        Task<IEnumerable<Category>> ListAsync(CategoryListParam "
-            "categoryListParam);",
-            "        Task<int> CreateAsync(Category category);",
-            "        Task<int> UpdateAsync(Category category);",
-            "        Task<int> DeleteAsync(CategoryGetParam "
-            "categoryGetParam);",
-            "    }",
-            "}"
+            'using ProductDal.Models;',
+            '',
+            'namespace ProductDal.Interfaces',
+            '{',
+            '    public interface IBrandRepo',
+            '    {',
+            '        Task<Brand?> GetAsync(BrandGetParam brandGetParam);',
+            '        Task<IEnumerable<Brand>> ListAsync(BrandListParam '
+            'brandListParam);',
+            '        Task<int> CreateAsync(Brand brand);',
+            '        Task<int> UpdateAsync(Brand brand);',
+            '        Task<int> DeleteAsync(BrandGetParam brandGetParam);',
+            '    }',
+            '}'
         ]
     ),
     FileData(
-        file_path="output/path/Ecommerce/src/ProductDal/Interfaces",
-        file_name="IProduct.cs",
+        file_path='output/path/Ecommerce/src/ProductDal/Models',
+        file_name='BrandListParam.cs',
         file_content=[
-            "using ProductDal.Models;",
-            "",
-            "namespace ProductDal.Interfaces",
-            "{",
-            "    public interface IProduct",
-            "    {",
-            "        Task<Product?> GetAsync(ProductGetParam "
-            "productGetParam);",
-            "        Task<IEnumerable<Product>> ListAsync(ProductListParam "
-            "productListParam);",
-            "        Task<int> CreateAsync(Product product);",
-            "        Task<int> UpdateAsync(Product product);",
-            "        Task<int> DeleteAsync(ProductGetParam productGetParam);",
-            "    }",
-            "}"
+            'namespace ProductDal.Models',
+            '{',
+            '    public class BrandListParam',
+            '    {',
+            '        public IEnumerable<string> brand_ids { get; set; } '
+            '= default!;',
+            '        public int Limit { get; set; } = 1000;',
+            '        public int OffSet { get; set; } = 0;',
+            '    }',
+            '}'
+        ]
+    ),
+    FileData(
+        file_path='output/path/Ecommerce/src/ProductDal/Models',
+        file_name='BrandGetParam.cs',
+        file_content=[
+            'namespace ProductDal.Models',
+            '{',
+            '    public class BrandGetParam',
+            '    {',
+            '        public string brand_id { get; set; } = default!;',
+            '    }',
+            '}'
+        ]
+    ),
+    FileData(
+        file_path='output/path/Ecommerce/src/ProductDal/Models',
+        file_name='Brand.cs',
+        file_content=[
+            'namespace ProductDal.Models',
+            '{',
+            '    public class Brand',
+            '    {',
+            '        public string brand_id { get; set; } = default!;',
+            '        public string name { get; set; } = default!;',
+            '        public string? description { get; set; }',
+            '    }',
+            '}'
+        ]
+    ),
+    FileData(
+        file_path='output/path/Ecommerce/src/ProductDal/Interfaces',
+        file_name='ICategoryRepo.cs',
+        file_content=[
+            'using ProductDal.Models;',
+            '',
+            'namespace ProductDal.Interfaces',
+            '{',
+            '    public interface ICategoryRepo',
+            '    {',
+            '        Task<Category?> GetAsync(CategoryGetParam '
+            'categoryGetParam);',
+            '        Task<IEnumerable<Category>> ListAsync(CategoryListParam '
+            'categoryListParam);',
+            '        Task<int> CreateAsync(Category category);',
+            '        Task<int> UpdateAsync(Category category);',
+            '        Task<int> DeleteAsync(CategoryGetParam '
+            'categoryGetParam);',
+            '    }',
+            '}'
+        ]
+    ),
+    FileData(
+        file_path='output/path/Ecommerce/src/ProductDal/Models',
+        file_name='CategoryListParam.cs',
+        file_content=[
+            'namespace ProductDal.Models',
+            '{',
+            '    public class CategoryListParam',
+            '    {',
+            '        public IEnumerable<int> ids { get; set; }',
+            '        public int Limit { get; set; } = 1000;',
+            '        public int OffSet { get; set; } = 0;',
+            '    }',
+            '}'
+        ]
+    ),
+    FileData(
+        file_path='output/path/Ecommerce/src/ProductDal/Models',
+        file_name='CategoryGetParam.cs',
+        file_content=[
+            'namespace ProductDal.Models',
+            '{',
+            '    public class CategoryGetParam',
+            '    {',
+            '        public int id { get; set; }',
+            '    }',
+            '}'
+        ]
+    ),
+    FileData(
+        file_path='output/path/Ecommerce/src/ProductDal/Models',
+        file_name='Category.cs',
+        file_content=[
+            'namespace ProductDal.Models',
+            '{',
+            '    public class Category',
+            '    {',
+            '        public int id { get; set; }',
+            '        public string name { get; set; } = default!;',
+            '        public string? description { get; set; }',
+            '    }',
+            '}'
+        ]
+    ),
+    FileData(
+        file_path='output/path/Ecommerce/src/ProductDal/Interfaces',
+        file_name='IProductRepo.cs',
+        file_content=[
+            'using ProductDal.Models;',
+            '',
+            'namespace ProductDal.Interfaces',
+            '{',
+            '    public interface IProductRepo',
+            '    {',
+            '        Task<Product?> GetAsync(ProductGetParam '
+            'productGetParam);',
+            '        Task<IEnumerable<Product>> ListAsync(ProductListParam '
+            'productListParam);',
+            '        Task<int> CreateAsync(Product product);',
+            '        Task<int> UpdateAsync(Product product);',
+            '        Task<int> DeleteAsync(ProductGetParam productGetParam);',
+            '    }',
+            '}'
+        ]
+    ),
+    FileData(
+        file_path='output/path/Ecommerce/src/ProductDal/Models',
+        file_name='ProductListParam.cs',
+        file_content=[
+            'namespace ProductDal.Models',
+            '{',
+            '    public class ProductListParam',
+            '    {',
+            '        public IEnumerable<Guid> productids { get; set; }',
+            '        public int Limit { get; set; } = 1000;',
+            '        public int OffSet { get; set; } = 0;',
+            '    }',
+            '}'
+        ]
+    ),
+    FileData(
+        file_path='output/path/Ecommerce/src/ProductDal/Models',
+        file_name='ProductGetParam.cs',
+        file_content=[
+            'namespace ProductDal.Models',
+            '{',
+            '    public class ProductGetParam',
+            '    {',
+            '        public Guid productid { get; set; }',
+            '    }',
+            '}'
+        ]
+    ),
+    FileData(
+        file_path='output/path/Ecommerce/src/ProductDal/Models',
+        file_name='Product.cs',
+        file_content=[
+            'namespace ProductDal.Models',
+            '{',
+            '    public class Product',
+            '    {',
+            '        public Guid productid { get; set; }',
+            '        public string name { get; set; } = default!;',
+            '        public string? description { get; set; }',
+            '        public decimal? price { get; set; }',
+            '        public int? quantity { get; set; }',
+            '        public string brand_id { get; set; } = default!;',
+            '        public int category_id { get; set; }',
+            '    }',
+            '}'
         ]
     )
 ]
 
 
-class TestDbServiceModelGenerator(unittest.TestCase):
+class TestDbServiceGenerator(unittest.TestCase):
     def setUp(self) -> None:
         self.svc_dir = DbServiceUtil(
             output_path=OUTPUT_PATH,
@@ -631,101 +381,15 @@ class TestDbServiceModelGenerator(unittest.TestCase):
             service_name=PRODUCT_DAL,
             src=SRC
         )
-        self.maxDiff = None
-
-    @ parameterized.expand([
-        ("entity_with_pk", [BRAND_ENTITY], BRAND_FILE_DATA),
-        ("entity_with_ref", [PRODUCT_ENTITY], PRODUCT_FILE_DATA),
-        (
-            "entity_with_dotnet_types",
-            [DOT_NET_TYPE_ENTITY],
-            DOT_NET_ENTITY_TYPE_FILE_DATA
-        )
-    ])
-    def test_entity_with_pk(
-        self, name: str, entities: List[Entity], expected_data: FileData
-    ):
-        svc_gen = DbServiceModelGenerator(
-            service_name=PRODUCT_DAL,
-            svc_dir=self.svc_dir,
-            entities=entities,
-            pl_type_mapper=CSharpTypeMapper(),
-            db_type_mapper=None
-        )
-        actual_data = [
-            file_data
-            for svc in svc_gen.gen_service()
-            for file_data in svc
-        ]
-        print(actual_data)
-        self.assertEqual(expected_data, actual_data)
 
     def test_gen_service(self):
-        svc_gen = DbServiceModelGenerator(
-            service_name=PRODUCT_DAL,
-            svc_dir=self.svc_dir,
-            entities=[PRODUCT_ENTITY],
-            pl_type_mapper=CSharpTypeMapper(),
-            db_type_mapper=None
-        )
-        actual_data = [
-            file_data
-            for svc in svc_gen.gen_service()
-            for file_data in svc
-        ]
-        self.assertEqual(PRODUCT_FILE_DATA, actual_data)
-
-
-class TestDbServiceInterfaceGenerator(unittest.TestCase):
-    def setUp(self) -> None:
-        self.svc_dir = DbServiceUtil(
-            output_path=OUTPUT_PATH,
-            sln_name=ECOMMERCE,
-            service_name=PRODUCT_DAL,
-            src=SRC
-        )
-        self.maxDiff = None
-
-    def test_gen_sql_command_interface(self):
-        svc_gen = DbServiceInterfaceGenerator(
-            service_name=PRODUCT_DAL,
-            svc_dir=self.svc_dir,
-            entities=[PRODUCT_ENTITY],
-            pl_type_mapper=CSharpTypeMapper(),
-            db_type_mapper=None
-        )
-        expected_interface = FileData(
-            file_path='output/path/Ecommerce/src/ProductDal/Interfaces',
-            file_name='ISqlCommand.cs',
-            file_content=[
-                'namespace ProductDal.Interfaces',
-                '{',
-                '    public interface ISqlCommand',
-                '    {',
-                '        string GetCommand { get; }',
-                '        string ListCommand { get; }',
-                '        string CreateCommand { get; }',
-                '        string UpdateCommand { get; }',
-                '        string DeleteCommand { get; }',
-                '    }',
-                '}'
-            ]
-        )
-        actual_interface = svc_gen.gen_sql_command_interface()
-        self.assertEqual(expected_interface, actual_interface)
-
-    def test_gen_service(self):
-        svc_gen = DbServiceInterfaceGenerator(
+        service_gen = DbServiceGenerator(
             service_name=PRODUCT_DAL,
             svc_dir=self.svc_dir,
             entities=[BRAND_ENTITY, CATEGORY_ENTITY, PRODUCT_ENTITY],
             pl_type_mapper=CSharpTypeMapper(),
             db_type_mapper=None
         )
-        actual_data = [
-            file_data
-            for svc in svc_gen.gen_service()
-            for file_data in svc
-        ]
-        print(actual_data)
-        self.assertEqual(ECOMMERCE_FILE_DATA, actual_data)
+        actual_file_data = list(service_gen.gen_service())
+        print(actual_file_data)
+        self.assertEqual(ECOMMERCE_FILE_DATA, actual_file_data)
