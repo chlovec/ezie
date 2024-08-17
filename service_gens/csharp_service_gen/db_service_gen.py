@@ -56,6 +56,11 @@ class DbServiceUtil(ServiceUtil):
     def sql_cmd_ns(self) -> str:
         return self.get_name_space(INTERFACES)
 
+    # interfaces
+    @property
+    def db_service_interface_name(self) -> str:
+        return "IDbService"
+
     @property
     def sql_cmd_interface_name(self) -> str:
         return "ISqlCommand"
@@ -111,6 +116,9 @@ class DbServiceGenerator(ServiceGenerator):
         self.svc_dir = svc_dir
 
     def gen_service(self) -> Generator[FileData, None, None]:
+        # Generate DbService Interface
+        yield self._gen_db_service_interface()
+
         # Generate sql command interface
         yield self._gen_sql_command_interface()
 
@@ -244,11 +252,11 @@ class DbServiceGenerator(ServiceGenerator):
         )
 
     def _gen_sql_command_interface(self) -> FileData:
-        ent_name: str = self.svc_dir.sql_cmd_interface_name
+        class_name: str = self.svc_dir.sql_cmd_interface_name
         file_content = [
             f"namespace {self.svc_dir.interfaces_ns}",
             "{",
-            f"{TAB_4}public interface {ent_name}",
+            f"{TAB_4}public interface {class_name}",
             f"{TAB_4}{{",
             f"{TAB_8}string GetCommand {{ get; }}",
             f"{TAB_8}string ListCommand {{ get; }}",
@@ -260,6 +268,28 @@ class DbServiceGenerator(ServiceGenerator):
         ]
         return FileData(
             file_path=self.svc_dir.interfaces_dir_path,
-            file_name=self.svc_dir.get_file_name(ent_name),
+            file_name=self.svc_dir.get_file_name(class_name),
+            file_content=file_content
+        )
+
+    def _gen_db_service_interface(self) -> FileData:
+        class_name: str = self.svc_dir.db_service_interface_name
+        file_content = [
+            f"namespace {self.svc_dir.interfaces_ns}",
+            "",
+            "{",
+            f"{TAB_4}public interface {class_name}",
+            f"{TAB_4}{{",
+            f"{TAB_8}Task<int> ExecuteAsync(string sqlCommand, object? "
+            "param);",
+            f"{TAB_8}Task<T?> GetAsync<T>(string sqlCommand, object? param);",
+            f"{TAB_8}Task<IEnumerable<T>> ListAsync<T>(string sqlCommand, "
+            "object? param);",
+            f"{TAB_4}}}",
+            "}"
+        ]
+        return FileData(
+            file_path=self.svc_dir.interfaces_dir_path,
+            file_name=self.svc_dir.get_file_name(class_name),
             file_content=file_content
         )

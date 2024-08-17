@@ -158,6 +158,24 @@ PRODUCT_ENTITY = Entity(
 ECOMMERCE_FILE_DATA = [
     FileData(
         file_path='output/path/Ecommerce/src/ProductDal/Interfaces',
+        file_name='IDbService.cs',
+        file_content=[
+            'namespace ProductDal.Interfaces',
+            '',
+            '{',
+            '    public interface IDbService',
+            '    {',
+            '        Task<int> ExecuteAsync(string sqlCommand, '
+            'object? param);',
+            '        Task<T?> GetAsync<T>(string sqlCommand, object? param);',
+            '        Task<IEnumerable<T>> ListAsync<T>(string sqlCommand, '
+            'object? param);',
+            '    }',
+            '}'
+        ]
+    ),
+    FileData(
+        file_path='output/path/Ecommerce/src/ProductDal/Interfaces',
         file_name='ISqlCommand.cs',
         file_content=[
             'namespace ProductDal.Interfaces',
