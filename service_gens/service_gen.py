@@ -167,15 +167,13 @@ class ServiceUtil(ABC):
 class ServiceGenerator(ABC):
     def __init__(
         self,
-        output_path: str,
-        sln_name: str,
         service_name: str,
+        svc_dir: ServiceUtil,
         entities: List[Entity],
         pl_type_mapper: TypeMapper,
         db_type_mapper: TypeMapper = None
     ):
-        self.output_path = output_path
-        self.sln_name = sln_name
+        self.svc_dir = svc_dir
         self.service_name = service_name
         self.entities = entities
         self.pl_type_mapper = pl_type_mapper

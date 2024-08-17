@@ -7,7 +7,8 @@ from entity_parser.entity import (
 )
 from service_gens.csharp_service_gen.db_service_gen import (
     DbServiceInterfaceGenerator,
-    DbServiceModelGenerator
+    DbServiceModelGenerator,
+    DbServiceUtil
 )
 from service_gens.service_gen import CSharpTypeMapper
 from utils.utils import FileData
@@ -26,6 +27,7 @@ STATE: str = "state"
 STREET: str = "street"
 ECOMMERCE: str = "Ecommerce"
 PRODUCT_DAL: str = "ProductDal"
+SRC: str = "src"
 
 BRAND_ENTITY = Entity(
     name="Brand",
@@ -623,6 +625,12 @@ ECOMMERCE_FILE_DATA = [
 
 class TestDbServiceModelGenerator(unittest.TestCase):
     def setUp(self) -> None:
+        self.svc_dir = DbServiceUtil(
+            output_path=OUTPUT_PATH,
+            sln_name=ECOMMERCE,
+            service_name=PRODUCT_DAL,
+            src=SRC
+        )
         self.maxDiff = None
 
     @ parameterized.expand([
@@ -638,9 +646,8 @@ class TestDbServiceModelGenerator(unittest.TestCase):
         self, name: str, entities: List[Entity], expected_data: FileData
     ):
         svc_gen = DbServiceModelGenerator(
-            output_path=OUTPUT_PATH,
-            sln_name=ECOMMERCE,
             service_name=PRODUCT_DAL,
+            svc_dir=self.svc_dir,
             entities=entities,
             pl_type_mapper=CSharpTypeMapper(),
             db_type_mapper=None
@@ -655,9 +662,8 @@ class TestDbServiceModelGenerator(unittest.TestCase):
 
     def test_gen_service(self):
         svc_gen = DbServiceModelGenerator(
-            output_path=OUTPUT_PATH,
-            sln_name=ECOMMERCE,
             service_name=PRODUCT_DAL,
+            svc_dir=self.svc_dir,
             entities=[PRODUCT_ENTITY],
             pl_type_mapper=CSharpTypeMapper(),
             db_type_mapper=None
@@ -671,11 +677,19 @@ class TestDbServiceModelGenerator(unittest.TestCase):
 
 
 class TestDbServiceInterfaceGenerator(unittest.TestCase):
-    def test_gen_sql_command_interface(self):
-        svc_gen = DbServiceInterfaceGenerator(
+    def setUp(self) -> None:
+        self.svc_dir = DbServiceUtil(
             output_path=OUTPUT_PATH,
             sln_name=ECOMMERCE,
             service_name=PRODUCT_DAL,
+            src=SRC
+        )
+        self.maxDiff = None
+
+    def test_gen_sql_command_interface(self):
+        svc_gen = DbServiceInterfaceGenerator(
+            service_name=PRODUCT_DAL,
+            svc_dir=self.svc_dir,
             entities=[PRODUCT_ENTITY],
             pl_type_mapper=CSharpTypeMapper(),
             db_type_mapper=None
@@ -702,9 +716,8 @@ class TestDbServiceInterfaceGenerator(unittest.TestCase):
 
     def test_gen_service(self):
         svc_gen = DbServiceInterfaceGenerator(
-            output_path=OUTPUT_PATH,
-            sln_name=ECOMMERCE,
             service_name=PRODUCT_DAL,
+            svc_dir=self.svc_dir,
             entities=[BRAND_ENTITY, CATEGORY_ENTITY, PRODUCT_ENTITY],
             pl_type_mapper=CSharpTypeMapper(),
             db_type_mapper=None
