@@ -243,7 +243,7 @@ class DbServiceGenerator(ServiceGenerator):
             file_content=file_content
         )
 
-    def _gen_sql_command_interface(self) -> List[FileData]:
+    def _gen_sql_command_interface(self) -> FileData:
         ent_name: str = self.svc_dir.sql_cmd_interface_name
         file_content = [
             f"namespace {self.svc_dir.interfaces_ns}",
