@@ -2,7 +2,8 @@ from abc import abstractmethod
 from os import path
 from typing import Generator, List
 
-from entity_parser.entity import FieldData, FieldType
+from data_type_mapper.data_type_mapper import TypeMapper
+from entity_parser.entity import Entity, FieldData, FieldType
 from service_gens.service_gen import ServiceGenerator, ServiceUtil
 from utils.constants import TAB_4, TAB_8
 from utils.utils import EntityFieldData, FileData
@@ -91,6 +92,22 @@ class DbServiceUtil(ServiceUtil):
 
 
 class DbServiceGenerator(ServiceGenerator):
+    def __init__(
+        self,
+        service_name: str,
+        svc_dir: DbServiceUtil,
+        entities: List[Entity],
+        pl_type_mapper: TypeMapper,
+        db_type_mapper: TypeMapper = None
+    ):
+        super().__init__(
+            service_name=service_name,
+            entities=entities,
+            pl_type_mapper=pl_type_mapper,
+            db_type_mapper=db_type_mapper
+        )
+        self.svc_dir = svc_dir
+
     def gen_service(self) -> Generator[FileData, None, None]:
         for entity in self.entities:
             entity_file_data = EntityFieldData.from_entity(
