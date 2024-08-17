@@ -7,7 +7,8 @@ from service_gens.service_gen import ServiceGenerator
 from utils.constants import TAB_4, TAB_8
 from utils.utils import EntityFieldData, FileData
 
-
+ZERO: int = 0
+ONE: int = 1
 INTERFACES: str = "Interfaces"
 MODELS: str = "Models"
 REPOS: str = "Repos"
@@ -17,15 +18,14 @@ SRC: str = "src"
 CS_EXT: str = ".cs"
 
 
-class DbServiceDirectory:
-    def __init__(self, output_path: str, sln_name: str, db_service_name: str):
+class DbServiceUtil:
+    def __init__(self, output_path: str, sln_name: str, service_name: str):
         self.output_path = path.join(
-            output_path, sln_name, SRC, db_service_name
+            output_path, sln_name, SRC, service_name
         )
+        self.service_name = service_name
 
-    def get_path(self, dir: str) -> str:
-        return path.join(self.output_path, dir)
-
+    # file paths
     @property
     def interfaces_dir_path(self) -> str:
         return self.get_path(INTERFACES)
@@ -46,10 +46,60 @@ class DbServiceDirectory:
     def sql_cmd_dir_path(self) -> str:
         return self.get_path(SQL_COMMANDS)
 
+    # namespaces
+    @property
+    def model_ns(self) -> str:
+        return self.get_name_space(MODELS)
+
+    @property
+    def repos_ns(self) -> str:
+        return self.get_name_space(REPOS)
+
+    @property
+    def interfaces_ns(self) -> str:
+        return self.get_name_space(INTERFACES)
+
+    @property
+    def sql_cmd_ns(self) -> str:
+        return self.get_name_space(INTERFACES)
+
+    @property
+    def sql_cmd_interface_name(self) -> str:
+        return "ISqlCommand"
+
+    @property
+    def services_ns(self) -> str:
+        return self.get_name_space(SERVICES)
+
+    # utility methods
+    def get_file_name(self, cls_name: str) -> str:
+        return f"{cls_name}{CS_EXT}"
+
+    def get_get_param_name(self, cls_name: str) -> str:
+        return f"{cls_name}GetParam"
+
+    def get_list_param_name(self, cls_name: str) -> str:
+        return f"{cls_name}ListParam"
+
+    def get_interface_name(self, cls_name: str) -> str:
+        return f"I{cls_name}"
+
+    def get_name_space(self, dir: str) -> str:
+        return f"{self.service_name}.{dir}"
+
+    def get_path(self, dir: str) -> str:
+        return path.join(self.output_path, dir)
+
+    def get_var_name(self, cls_name: str) -> str:
+        return cls_name[ZERO].lower() + cls_name[ONE:]
+
+    def normalize_name(self, cls_name: str) -> str:
+        return cls_name[ZERO].upper() + cls_name[ONE:]
+
 
 class DbServiceGenerator(ServiceGenerator):
     def gen_service(self) -> Generator[FileData, None, None]:
-        svc_dir = DbServiceDirectory(
+        svc_dir = DbServiceUtil(
             self.output_path, self.sln_name, self.service_name
         )
         for entity in self.entities:
@@ -60,14 +110,14 @@ class DbServiceGenerator(ServiceGenerator):
 
     @abstractmethod
     def _gen_entity_service(
-        self, entity: EntityFieldData, svc_dir: DbServiceDirectory
+        self, entity: EntityFieldData, svc_dir: DbServiceUtil
     ) -> Generator[FileData, None, None]:
         pass
 
 
 class DbServiceModelGenerator(DbServiceGenerator):
     def _gen_entity_service(
-        self, entity: EntityFieldData, svc_dir: DbServiceDirectory
+        self, entity: EntityFieldData, svc_dir: DbServiceUtil
     ) -> Generator[FileData, None, None]:
         file_path: str = svc_dir.models_dir_path
         yield self._create_entity(
@@ -152,3 +202,66 @@ class DbServiceModelGenerator(DbServiceGenerator):
         if field.is_required and field.data_type == FieldType.STRING.value:
             return " = default!;"
         return ""
+
+
+class DbServiceInterfaceGenerator(DbServiceGenerator):
+    def _gen_entity_service(
+        self, entity: EntityFieldData, svc_dir: DbServiceUtil
+    ) -> Generator[FileData, None, None]:
+        ent_name = svc_dir.normalize_name(entity.entity_name)
+        yield self._create_interface(ent_name, svc_dir)
+
+    def _create_interface(
+        self, ent_name: str, svc_dir: DbServiceUtil
+    ) -> FileData:
+        get_param: str = svc_dir.get_get_param_name(ent_name)
+        get_param_var: str = svc_dir.get_var_name(get_param)
+        list_param: str = svc_dir.get_list_param_name(ent_name)
+        list_param_var: str = svc_dir.get_var_name(list_param)
+        interface_name: str = svc_dir.get_interface_name(ent_name)
+        ent_var_name: str = svc_dir.get_var_name(ent_name)
+        file_content = [
+            f"using {svc_dir.model_ns};",
+            "",
+            f"namespace {svc_dir.interfaces_ns}",
+            "{",
+            f"{TAB_4}public interface {interface_name}",
+            f"{TAB_4}{{",
+            f"{TAB_8}Task<{ent_name}?> GetAsync({get_param} {get_param_var});",
+            f"{TAB_8}Task<IEnumerable<{ent_name}>> ListAsync"
+            f"({list_param} {list_param_var});",
+            f"{TAB_8}Task<int> CreateAsync({ent_name} {ent_var_name});",
+            f"{TAB_8}Task<int> UpdateAsync({ent_name} {ent_var_name});",
+            f"{TAB_8}Task<int> DeleteAsync({get_param} {get_param_var});",
+            f"{TAB_4}}}",
+            "}"
+        ]
+        return FileData(
+            file_path=svc_dir.interfaces_dir_path,
+            file_name=svc_dir.get_file_name(interface_name),
+            file_content=file_content
+        )
+
+    def gen_sql_command_interface(self) -> List[FileData]:
+        svc_dir = DbServiceUtil(
+            self.output_path, self.sln_name, self.service_name
+        )
+        ent_name: str = svc_dir.sql_cmd_interface_name
+        file_content = [
+            f"namespace {svc_dir.interfaces_ns}",
+            "{",
+            f"{TAB_4}public interface {ent_name}",
+            f"{TAB_4}{{",
+            f"{TAB_8}string GetCommand {{ get; }}",
+            f"{TAB_8}string ListCommand {{ get; }}",
+            f"{TAB_8}string CreateCommand {{ get; }}",
+            f"{TAB_8}string UpdateCommand {{ get; }}",
+            f"{TAB_8}string DeleteCommand {{ get; }}",
+            f"{TAB_4}}}",
+            "}"
+        ]
+        return FileData(
+            file_path=svc_dir.interfaces_dir_path,
+            file_name=svc_dir.get_file_name(ent_name),
+            file_content=file_content
+        )

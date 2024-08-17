@@ -6,6 +6,7 @@ from entity_parser.entity import (
     Entity, EntityField, FieldFormat, FieldType, RefEntityField
 )
 from service_gens.csharp_service_gen.db_service_gen import (
+    DbServiceInterfaceGenerator,
     DbServiceModelGenerator
 )
 from service_gens.service_gen import CSharpTypeMapper
@@ -553,6 +554,72 @@ DOT_NET_ENTITY_TYPE_FILE_DATA = [
     )
 ]
 
+ECOMMERCE_FILE_DATA = [
+    FileData(
+        file_path='output/path/Ecommerce/src/ProductDal/Interfaces',
+        file_name='IBrand.cs',
+        file_content=[
+            'using ProductDal.Models;',
+            '',
+            'namespace ProductDal.Interfaces',
+            '{',
+            '    public interface IBrand',
+            '    {',
+            '        Task<Brand?> GetAsync(BrandGetParam brandGetParam);',
+            '        Task<IEnumerable<Brand>> ListAsync(BrandListParam '
+            'brandListParam);',
+            '        Task<int> CreateAsync(Brand brand);',
+            '        Task<int> UpdateAsync(Brand brand);',
+            '        Task<int> DeleteAsync(BrandGetParam brandGetParam);',
+            '    }',
+            '}'
+        ]
+    ),
+    FileData(
+        file_path='output/path/Ecommerce/src/ProductDal/Interfaces',
+        file_name='ICategory.cs',
+        file_content=[
+            'using ProductDal.Models;',
+            '',
+            'namespace ProductDal.Interfaces',
+            '{',
+            '    public interface ICategory',
+            '    {',
+            '        Task<Category?> GetAsync(CategoryGetParam '
+            'categoryGetParam);',
+            '        Task<IEnumerable<Category>> ListAsync(CategoryListParam '
+            'categoryListParam);',
+            '        Task<int> CreateAsync(Category category);',
+            '        Task<int> UpdateAsync(Category category);',
+            '        Task<int> DeleteAsync(CategoryGetParam '
+            'categoryGetParam);',
+            '    }',
+            '}'
+        ]
+    ),
+    FileData(
+        file_path='output/path/Ecommerce/src/ProductDal/Interfaces',
+        file_name='IProduct.cs',
+        file_content=[
+            'using ProductDal.Models;',
+            '',
+            'namespace ProductDal.Interfaces',
+            '{',
+            '    public interface IProduct',
+            '    {',
+            '        Task<Product?> GetAsync(ProductGetParam '
+            'productGetParam);',
+            '        Task<IEnumerable<Product>> ListAsync(ProductListParam '
+            'productListParam);',
+            '        Task<int> CreateAsync(Product product);',
+            '        Task<int> UpdateAsync(Product product);',
+            '        Task<int> DeleteAsync(ProductGetParam productGetParam);',
+            '    }',
+            '}'
+        ]
+    )
+]
+
 
 class TestDbServiceModelGenerator(unittest.TestCase):
     def setUp(self) -> None:
@@ -600,5 +667,52 @@ class TestDbServiceModelGenerator(unittest.TestCase):
             for svc in svc_gen.gen_service()
             for file_data in svc
         ]
-        print(actual_data)
         self.assertEqual(PRODUCT_FILE_DATA, actual_data)
+
+
+class TestDbServiceInterfaceGenerator(unittest.TestCase):
+    def test_gen_sql_command_interface(self):
+        svc_gen = DbServiceInterfaceGenerator(
+            output_path=OUTPUT_PATH,
+            sln_name=ECOMMERCE,
+            service_name=PRODUCT_DAL,
+            entities=[PRODUCT_ENTITY],
+            pl_type_mapper=CSharpTypeMapper(),
+            db_type_mapper=None
+        )
+        expected_interface = FileData(
+            file_path='output/path/Ecommerce/src/ProductDal/Interfaces',
+            file_name='ISqlCommand.cs',
+            file_content=[
+                'namespace ProductDal.Interfaces',
+                '{',
+                '    public interface ISqlCommand',
+                '    {',
+                '        string GetCommand { get; }',
+                '        string ListCommand { get; }',
+                '        string CreateCommand { get; }',
+                '        string UpdateCommand { get; }',
+                '        string DeleteCommand { get; }',
+                '    }',
+                '}'
+            ]
+        )
+        actual_interface = svc_gen.gen_sql_command_interface()
+        self.assertEqual(expected_interface, actual_interface)
+
+    def test_gen_service(self):
+        svc_gen = DbServiceInterfaceGenerator(
+            output_path=OUTPUT_PATH,
+            sln_name=ECOMMERCE,
+            service_name=PRODUCT_DAL,
+            entities=[BRAND_ENTITY, CATEGORY_ENTITY, PRODUCT_ENTITY],
+            pl_type_mapper=CSharpTypeMapper(),
+            db_type_mapper=None
+        )
+        actual_data = [
+            file_data
+            for svc in svc_gen.gen_service()
+            for file_data in svc
+        ]
+        print(actual_data)
+        self.assertEqual(ECOMMERCE_FILE_DATA, actual_data)
