@@ -4,17 +4,19 @@ from typing import Generator, List
 from data_type_mapper.data_type_mapper import TypeMapper
 from entity_parser.entity import Entity, FieldData, FieldType
 from service_gens.service_gen import ServiceGenerator, ServiceUtil
-from utils.constants import TAB_4, TAB_8
+from utils.constants import TAB_12, TAB_4, TAB_8
 from utils.utils import EntityFieldData, FileData
 
 ZERO: int = 0
 ONE: int = 1
+
+CS_EXT: str = ".cs"
+DB_SERVICE = "DbService"
+DB_SERVICES: str = "DbServices"
 INTERFACES: str = "Interfaces"
 MODELS: str = "Models"
 REPOS: str = "Repos"
-SERVICES: str = "Services"
 SQL_COMMANDS: str = "SqlCommands"
-CS_EXT: str = ".cs"
 
 
 class DbServiceUtil(ServiceUtil):
@@ -32,14 +34,18 @@ class DbServiceUtil(ServiceUtil):
         return self.get_path(REPOS)
 
     @property
-    def services_dir_path(self) -> str:
-        return self.get_path(SERVICES)
+    def db_services_dir_path(self) -> str:
+        return self.get_path(DB_SERVICES)
 
     @property
     def sql_cmd_dir_path(self) -> str:
         return self.get_path(SQL_COMMANDS)
 
     # namespaces
+    @property
+    def db_service_ns(self) -> str:
+        return self.get_name_space(DB_SERVICES)
+
     @property
     def model_ns(self) -> str:
         return self.get_name_space(MODELS)
@@ -65,9 +71,10 @@ class DbServiceUtil(ServiceUtil):
     def sql_cmd_interface_name(self) -> str:
         return "ISqlCommand"
 
+    # class names
     @property
-    def services_ns(self) -> str:
-        return self.get_name_space(SERVICES)
+    def db_service_class_name(self) -> str:
+        return DB_SERVICE
 
     # utility methods
     def get_file_name(self, cls_name: str) -> str:
@@ -119,6 +126,9 @@ class DbServiceGenerator(ServiceGenerator):
         # Generate DbService Interface
         yield self._gen_db_service_interface()
 
+        # Generate DbService class
+        yield self._gen_db_service()
+
         # Generate sql command interface
         yield self._gen_sql_command_interface()
 
@@ -168,10 +178,6 @@ class DbServiceGenerator(ServiceGenerator):
         file_path: str,
         is_list: bool = False
     ) -> FileData:
-        # Handle no content
-        if not field_data:
-            return FileData(file_path="", file_name="", file_content=[])
-
         # Open class definition with namespace
         file_content: List[str] = [
             f"namespace {self.svc_dir.model_ns}",
@@ -290,6 +296,46 @@ class DbServiceGenerator(ServiceGenerator):
         ]
         return FileData(
             file_path=self.svc_dir.interfaces_dir_path,
+            file_name=self.svc_dir.get_file_name(class_name),
+            file_content=file_content
+        )
+
+    def _gen_db_service(self) -> FileData:
+        interface_name: str = self.svc_dir.db_service_interface_name
+        class_name: str = self.svc_dir.db_service_class_name
+        file_content = [
+            "using System.Data;",
+            "using Dapper;",
+            f"using {self.svc_dir.interfaces_ns};",
+            "",
+            f"namespace {self.svc_dir.db_service_ns}",
+            "{",
+            f"{TAB_4}public class {class_name}(IDbConnection conn) "
+            f": {interface_name}",
+            f"{TAB_4}{{",
+            f"{TAB_8}public async Task<int> ExecuteAsync(string sqlCommand"
+            ", object? param)",
+            f"{TAB_8}{{",
+            f"{TAB_12}return await conn.ExecuteAsync(sqlCommand, param);",
+            f"{TAB_8}}}",
+            "",
+            f"{TAB_8}public async Task<T?> GetAsync<T>"
+            "(string sqlCommand, object? param)",
+            f"{TAB_8}{{",
+            f"{TAB_12}return await conn.QuerySingleOrDefaultAsync<T>"
+            "(sqlCommand, param);",
+            f"{TAB_8}}}",
+            "",
+            f"{TAB_8}public async Task<IEnumerable<T>> ListAsync<T>"
+            "(string sqlCommand, object? param)",
+            f"{TAB_8}{{",
+            f"{TAB_12}return await conn.QueryAsync<T>(sqlCommand, param);",
+            f"{TAB_8}}}",
+            f"{TAB_4}}}",
+            "}"
+        ]
+        return FileData(
+            file_path=self.svc_dir.db_services_dir_path,
             file_name=self.svc_dir.get_file_name(class_name),
             file_content=file_content
         )

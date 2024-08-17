@@ -13,6 +13,7 @@
         "--cov=. --cov-report=term-missing"
     ],
     "cSpell.words": [
+        "abstractmethod",
         "BIGSERIAL",
         "daterange",
         "DATETIMEOFFSET",

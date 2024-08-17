@@ -165,11 +165,45 @@ ECOMMERCE_FILE_DATA = [
             '{',
             '    public interface IDbService',
             '    {',
-            '        Task<int> ExecuteAsync(string sqlCommand, '
-            'object? param);',
+            '        Task<int> ExecuteAsync'
+            '(string sqlCommand, object? param);',
             '        Task<T?> GetAsync<T>(string sqlCommand, object? param);',
-            '        Task<IEnumerable<T>> ListAsync<T>(string sqlCommand, '
-            'object? param);',
+            '        Task<IEnumerable<T>> ListAsync<T>'
+            '(string sqlCommand, object? param);',
+            '    }',
+            '}'
+        ]
+    ),
+    FileData(
+        file_path='output/path/Ecommerce/src/ProductDal/DbServices',
+        file_name='DbService.cs',
+        file_content=[
+            'using System.Data;',
+            'using Dapper;',
+            'using ProductDal.Interfaces;',
+            '',
+            'namespace ProductDal.DbServices',
+            '{',
+            '    public class DbService(IDbConnection conn) : IDbService',
+            '    {',
+            '        public async Task<int> ExecuteAsync'
+            '(string sqlCommand, object? param)',
+            '        {',
+            '       return await conn.ExecuteAsync(sqlCommand, param);',
+            '        }',
+            '',
+            '        public async Task<T?> GetAsync<T>'
+            '(string sqlCommand, object? param)',
+            '        {',
+            '       return await conn.QuerySingleOrDefaultAsync<T>'
+            '(sqlCommand, param);',
+            '        }',
+            '',
+            '        public async Task<IEnumerable<T>> ListAsync<T>'
+            '(string sqlCommand, object? param)',
+            '        {',
+            '       return await conn.QueryAsync<T>(sqlCommand, param);',
+            '        }',
             '    }',
             '}'
         ]
@@ -202,8 +236,8 @@ ECOMMERCE_FILE_DATA = [
             '    public interface IBrandRepo',
             '    {',
             '        Task<Brand?> GetAsync(BrandGetParam brandGetParam);',
-            '        Task<IEnumerable<Brand>> ListAsync(BrandListParam '
-            'brandListParam);',
+            '        Task<IEnumerable<Brand>> ListAsync'
+            '(BrandListParam brandListParam);',
             '        Task<int> CreateAsync(Brand brand);',
             '        Task<int> UpdateAsync(Brand brand);',
             '        Task<int> DeleteAsync(BrandGetParam brandGetParam);',
@@ -219,8 +253,8 @@ ECOMMERCE_FILE_DATA = [
             '{',
             '    public class BrandListParam',
             '    {',
-            '        public IEnumerable<string> brand_ids { get; set; } '
-            '= default!;',
+            '        public IEnumerable<string> brand_ids { get; set; } = '
+            'default!;',
             '        public int Limit { get; set; } = 1000;',
             '        public int OffSet { get; set; } = 0;',
             '    }',
@@ -265,14 +299,14 @@ ECOMMERCE_FILE_DATA = [
             '{',
             '    public interface ICategoryRepo',
             '    {',
-            '        Task<Category?> GetAsync(CategoryGetParam '
-            'categoryGetParam);',
-            '        Task<IEnumerable<Category>> ListAsync(CategoryListParam '
-            'categoryListParam);',
+            '        Task<Category?> GetAsync'
+            '(CategoryGetParam categoryGetParam);',
+            '        Task<IEnumerable<Category>> ListAsync'
+            '(CategoryListParam categoryListParam);',
             '        Task<int> CreateAsync(Category category);',
             '        Task<int> UpdateAsync(Category category);',
-            '        Task<int> DeleteAsync(CategoryGetParam '
-            'categoryGetParam);',
+            '        Task<int> DeleteAsync'
+            '(CategoryGetParam categoryGetParam);',
             '    }',
             '}'
         ]
@@ -330,10 +364,10 @@ ECOMMERCE_FILE_DATA = [
             '{',
             '    public interface IProductRepo',
             '    {',
-            '        Task<Product?> GetAsync(ProductGetParam '
-            'productGetParam);',
-            '        Task<IEnumerable<Product>> ListAsync(ProductListParam '
-            'productListParam);',
+            '        Task<Product?> GetAsync'
+            '(ProductGetParam productGetParam);',
+            '        Task<IEnumerable<Product>> ListAsync'
+            '(ProductListParam productListParam);',
             '        Task<int> CreateAsync(Product product);',
             '        Task<int> UpdateAsync(Product product);',
             '        Task<int> DeleteAsync(ProductGetParam productGetParam);',

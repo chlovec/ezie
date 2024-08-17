@@ -7,3 +7,5 @@ omit =
     */tests/*
     */venv/*
 show_missing=true
+exclude_lines =
+    @abstractmethod
