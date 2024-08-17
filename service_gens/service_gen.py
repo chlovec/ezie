@@ -96,7 +96,7 @@ class CSharpTypeMapper(TypeMapper):
         elif format == FieldFormat.UUID:
             return CSharpDataType.GUID.value
         elif min_len and min_len == max_len:
-            return f"{CSharpDataType.CHAR.value}[{min_len}]"
+            return CSharpDataType.CHAR.value
 
         return CSharpDataType.STRING.value
 
