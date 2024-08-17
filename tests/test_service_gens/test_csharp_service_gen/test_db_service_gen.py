@@ -23,6 +23,8 @@ MAX_LEN: str = "max"
 NAME: str = "name"
 STATE: str = "state"
 STREET: str = "street"
+ECOMMERCE: str = "Ecommerce"
+PRODUCT_DAL: str = "ProductDal"
 
 BRAND_ENTITY = Entity(
     name="Brand",
@@ -151,7 +153,6 @@ PRODUCT_ENTITY = Entity(
         )
     ]
 )
-
 
 DOT_NET_TYPE_ENTITY = Entity(
     name="DotNetDataTypes",
@@ -571,8 +572,8 @@ class TestDbServiceModelGenerator(unittest.TestCase):
     ):
         svc_gen = DbServiceModelGenerator(
             output_path=OUTPUT_PATH,
-            sln_name="Ecommerce",
-            service_name="ProductDal",
+            sln_name=ECOMMERCE,
+            service_name=PRODUCT_DAL,
             entities=entities,
             pl_type_mapper=CSharpTypeMapper(),
             db_type_mapper=None
@@ -588,8 +589,8 @@ class TestDbServiceModelGenerator(unittest.TestCase):
     def test_gen_service(self):
         svc_gen = DbServiceModelGenerator(
             output_path=OUTPUT_PATH,
-            sln_name="Ecommerce",
-            service_name="ProductDal",
+            sln_name=ECOMMERCE,
+            service_name=PRODUCT_DAL,
             entities=[PRODUCT_ENTITY],
             pl_type_mapper=CSharpTypeMapper(),
             db_type_mapper=None
