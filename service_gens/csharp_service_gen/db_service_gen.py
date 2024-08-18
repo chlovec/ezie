@@ -4,6 +4,7 @@ from typing import Generator, List
 from data_type_mapper.data_type_mapper import TypeMapper
 from entity_parser.entity import Entity, FieldData, FieldType
 from service_gens.service_gen import ServiceGenerator, ServiceUtil
+from sql_generator.sql_generator import SqlCommandGenerator
 from utils.constants import TAB_12, TAB_4, TAB_8
 from utils.utils import EntityFieldData, FileData
 
@@ -98,11 +99,17 @@ class DbServiceUtil(ServiceUtil):
     def get_repo_interface_name(self, cls_name: str) -> str:
         return f"I{cls_name}Repo"
 
+    def get_repo_name(self, cls_name: str) -> str:
+        return f"{cls_name}Repo"
+
     def get_var_name(self, cls_name: str) -> str:
         return cls_name[ZERO].lower() + cls_name[ONE:]
 
     def normalize_name(self, cls_name: str) -> str:
         return cls_name[ZERO].upper() + cls_name[ONE:]
+
+    def get_sql_cmd_name(self, cls_name: str) -> str:
+        return f"{cls_name}SqlCommand"
 
 
 class DbServiceGenerator(ServiceGenerator):
@@ -112,7 +119,8 @@ class DbServiceGenerator(ServiceGenerator):
         svc_dir: DbServiceUtil,
         entities: List[Entity],
         pl_type_mapper: TypeMapper,
-        db_type_mapper: TypeMapper = None
+        db_type_mapper: TypeMapper = None,
+        sql_gen: SqlCommandGenerator = None
     ):
         super().__init__(
             service_name=service_name,
@@ -121,6 +129,7 @@ class DbServiceGenerator(ServiceGenerator):
             db_type_mapper=db_type_mapper
         )
         self.svc_dir = svc_dir
+        self.sql_gen = sql_gen
 
     def gen_service(self) -> Generator[FileData, None, None]:
         # Generate DbService Interface
@@ -136,16 +145,23 @@ class DbServiceGenerator(ServiceGenerator):
         for entity in self.entities:
             ent_name: str = self.svc_dir.normalize_name(entity.name)
 
-            # Generate repo interfaces
+            # Generate repo interface
             yield self._gen_repo_interface(ent_name)
 
             entity_file_data = EntityFieldData.from_entity(
                 entity, self.pl_type_mapper
             )
+            self.sql_gen.update_entity(entity_file_data)
 
-            # Generate Db Models
+            # Generate db models
             for model in self._gen_db_models(entity_file_data, ent_name):
                 yield model
+
+            # Generate Sql Command class
+            yield self._gen_sql_command_service(ent_name)
+
+            # Generate repo class
+            yield self._gen_repo_service(ent_name)
 
     # Db models section
     def _gen_db_models(
@@ -337,5 +353,98 @@ class DbServiceGenerator(ServiceGenerator):
         return FileData(
             file_path=self.svc_dir.db_services_dir_path,
             file_name=self.svc_dir.get_file_name(class_name),
+            file_content=file_content
+        )
+
+    # Repos
+    def _gen_repo_service(self, class_name: str) -> FileData:
+        i_db_service: str = self.svc_dir.db_service_interface_name
+        db_service: str = self.svc_dir.db_service_class_name
+        i_class_name: str = self.svc_dir.get_interface_name(class_name)
+        get_param: str = self.svc_dir.get_get_param_name(class_name)
+        get_param_var: str = self.svc_dir.get_var_name(get_param)
+        list_param: str = self.svc_dir.get_list_param_name(class_name)
+        list_param_var: str = self.svc_dir.get_var_name(class_name)
+        class_name_var: str = self.svc_dir.get_var_name(class_name)
+        repo_name: str = self.svc_dir.get_repo_name(class_name)
+        file_content = [
+            f"using {self.svc_dir.interfaces_ns}",
+            f"using {self.svc_dir.model_ns}",
+            "",
+            f"namespace {self.svc_dir.repos_ns}",
+            "{",
+            f"public class {repo_name}({i_db_service} {db_service}, "
+            f"ISqlCommand sqlCommand) : {i_class_name}",
+            f"{TAB_4}{{",
+            f"{TAB_8}public async Task<Brand?> GetAsync"
+            f"({get_param} {get_param_var})",
+            f"{TAB_8}{{",
+            f"{TAB_12}return await {db_service}.GetAsync<{class_name}>"
+            f"(sqlCommand.GetCommand, {get_param_var});",
+            f"{TAB_8}}}",
+            "",
+            f"{TAB_8} public async Task<IEnumerable<{class_name}>> "
+            f"ListAsync({list_param} {list_param_var})",
+            f"{TAB_8}{{",
+            f"{TAB_12}return await dbService.ListAsync<{class_name}>"
+            f"(sqlCommand.ListCommand, {list_param_var});",
+            f"{TAB_8}}}",
+            "",
+            f"{TAB_8}public async Task<int> CreateAsync"
+            f"({class_name} {class_name_var})",
+            f"{TAB_8}{{",
+            f"{TAB_12}return await dbService.ExecuteAsync"
+            f"(sqlCommand.CreateCommand, {class_name_var});",
+            f"{TAB_8}}}",
+            "",
+            f"{TAB_8}public async Task<int> UpdateAsync"
+            f"({class_name} {class_name_var})",
+            f"{TAB_8}{{",
+            f"{TAB_12}return await dbService.ExecuteAsync"
+            f"(sqlCommand.UpdateCommand, {class_name_var});",
+            f"{TAB_8}}}",
+            "",
+            f"{TAB_8}public async Task<int> DeleteAsync"
+            f"({get_param} {get_param_var})",
+            f"{TAB_8}{{",
+            f"{TAB_12}return await dbService.ExecuteAsync"
+            f"(sqlCommand.DeleteCommand, {get_param_var});",
+            f"{TAB_8}}}",
+            f"{TAB_4}}}",
+            "}"
+        ]
+        return FileData(
+            file_path=self.svc_dir.repos_dir_path,
+            file_name=self.svc_dir.get_file_name(repo_name),
+            file_content=file_content
+        )
+
+    # Sql command class
+    def _gen_sql_command_service(self, class_name: str) -> FileData:
+        i_sql_cmd: str = self.svc_dir.sql_cmd_interface_name
+        sql_cmd_class_name: str = self.svc_dir.get_sql_cmd_name(class_name)
+        get_sql: str = f'"{self.sql_gen.gen_get_sql_statement()}"'
+        list_sql: str = f'"{self.sql_gen.gen_list_sql_statement()}"'
+        create_sql: str = f'"{self.sql_gen.gen_create_sql_statement()}"'
+        update_sql: str = f'"{self.sql_gen.gen_update_sql_statement()}"'
+        delete_sql: str = f'"{self.sql_gen.gen_delete_sql_statement()}"'
+        file_content = [
+            f"using {self.svc_dir.interfaces_ns}",
+            "",
+            f"namespace {self.svc_dir.sql_cmd_ns}",
+            "{",
+            f"public class {sql_cmd_class_name} : {i_sql_cmd}",
+            f"{TAB_4}{{",
+            f"{TAB_8}public string GetCommand => {get_sql}",
+            f"{TAB_8}public string ListCommand => {list_sql}",
+            f"{TAB_8}public string CreateCommand => {create_sql}",
+            f"{TAB_8}public string UpdateCommand => {update_sql}",
+            f"{TAB_8}public string DeleteCommand => {delete_sql}",
+            f"{TAB_4}}}",
+            "}"
+        ]
+        return FileData(
+            file_path=self.svc_dir.sql_cmd_dir_path,
+            file_name=self.svc_dir.get_file_name(sql_cmd_class_name),
             file_content=file_content
         )

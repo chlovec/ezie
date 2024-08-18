@@ -9,6 +9,7 @@ from service_gens.csharp_service_gen.db_service_gen import (
     DbServiceGenerator, DbServiceUtil
 )
 from service_gens.service_gen import CSharpTypeMapper
+from sql_generator.sql_generator import PgsqlCommandGenerator
 from utils.utils import FileData
 
 
@@ -167,14 +168,12 @@ ECOMMERCE_FILE_DATA = [
             "{",
             "    public interface IDbService",
             "    {",
-            "        Task<int> ExecuteAsync"
-            "(string sqlCommand, object? param);",
+            "        Task<int> ExecuteAsync(string sqlCommand, object? param);",
             "        Task<T?> GetAsync<T>(string sqlCommand, object? param);",
-            "        Task<IEnumerable<T>> ListAsync<T>"
-            "(string sqlCommand, object? param);",
+            "        Task<IEnumerable<T>> ListAsync<T>(string sqlCommand, object? param);",
             "    }",
-            "}"
-        ]
+            "}",
+        ],
     ),
     FileData(
         file_path="output/path/Ecommerce/src/ProductDal/DbServices",
@@ -188,27 +187,23 @@ ECOMMERCE_FILE_DATA = [
             "{",
             "    public class DbService(IDbConnection conn) : IDbService",
             "    {",
-            "        public async Task<int> ExecuteAsync"
-            "(string sqlCommand, object? param)",
+            "        public async Task<int> ExecuteAsync(string sqlCommand, object? param)",
             "        {",
             "       return await conn.ExecuteAsync(sqlCommand, param);",
             "        }",
             "",
-            "        public async Task<T?> GetAsync<T>"
-            "(string sqlCommand, object? param)",
+            "        public async Task<T?> GetAsync<T>(string sqlCommand, object? param)",
             "        {",
-            "       return await conn.QuerySingleOrDefaultAsync<T>"
-            "(sqlCommand, param);",
+            "       return await conn.QuerySingleOrDefaultAsync<T>(sqlCommand, param);",
             "        }",
             "",
-            "        public async Task<IEnumerable<T>> ListAsync<T>"
-            "(string sqlCommand, object? param)",
+            "        public async Task<IEnumerable<T>> ListAsync<T>(string sqlCommand, object? param)",
             "        {",
             "       return await conn.QueryAsync<T>(sqlCommand, param);",
             "        }",
             "    }",
-            "}"
-        ]
+            "}",
+        ],
     ),
     FileData(
         file_path="output/path/Ecommerce/src/ProductDal/Interfaces",
@@ -224,8 +219,8 @@ ECOMMERCE_FILE_DATA = [
             "        string UpdateCommand { get; }",
             "        string DeleteCommand { get; }",
             "    }",
-            "}"
-        ]
+            "}",
+        ],
     ),
     FileData(
         file_path="output/path/Ecommerce/src/ProductDal/Interfaces",
@@ -238,14 +233,13 @@ ECOMMERCE_FILE_DATA = [
             "    public interface IBrandRepo",
             "    {",
             "        Task<Brand?> GetAsync(BrandGetParam brandGetParam);",
-            "        Task<IEnumerable<Brand>> ListAsync"
-            "(BrandListParam brandListParam);",
+            "        Task<IEnumerable<Brand>> ListAsync(BrandListParam brandListParam);",
             "        Task<int> CreateAsync(Brand brand);",
             "        Task<int> UpdateAsync(Brand brand);",
             "        Task<int> DeleteAsync(BrandGetParam brandGetParam);",
             "    }",
-            "}"
-        ]
+            "}",
+        ],
     ),
     FileData(
         file_path="output/path/Ecommerce/src/ProductDal/Models",
@@ -255,13 +249,12 @@ ECOMMERCE_FILE_DATA = [
             "{",
             "    public class BrandListParam",
             "    {",
-            "        public IEnumerable<string> brand_ids { get; set; } = "
-            "default!;",
+            "        public IEnumerable<string> brand_ids { get; set; } = default!;",
             "        public int Limit { get; set; } = 1000;",
             "        public int OffSet { get; set; } = 0;",
             "    }",
-            "}"
-        ]
+            "}",
+        ],
     ),
     FileData(
         file_path="output/path/Ecommerce/src/ProductDal/Models",
@@ -273,8 +266,8 @@ ECOMMERCE_FILE_DATA = [
             "    {",
             "        public string brand_id { get; set; } = default!;",
             "    }",
-            "}"
-        ]
+            "}",
+        ],
     ),
     FileData(
         file_path="output/path/Ecommerce/src/ProductDal/Models",
@@ -288,8 +281,66 @@ ECOMMERCE_FILE_DATA = [
             "        public string name { get; set; } = default!;",
             "        public string? description { get; set; }",
             "    }",
-            "}"
-        ]
+            "}",
+        ],
+    ),
+    FileData(
+        file_path="output/path/Ecommerce/src/ProductDal/SqlCommands",
+        file_name="BrandSqlCommand.cs",
+        file_content=[
+            "using ProductDal.Interfaces",
+            "",
+            "namespace ProductDal.Interfaces",
+            "{",
+            "public class BrandSqlCommand : ISqlCommand",
+            "    {",
+            '        public string GetCommand => "SELECT brand_id, name, description FROM Brand WHERE brand_id = @brand_id;"',
+            '        public string ListCommand => "SELECT brand_id, name, description FROM Brand WHERE (@brand_ids = {} OR brand_ids = ANY(@brand_ids)) ORDER BY brand_id ASC LIMIT @limit OFFSET @offset;"',
+            '        public string CreateCommand => "INSERT INTO Brand (brand_id, name, description) VALUES(@brand_id, @name, @description);"',
+            '        public string UpdateCommand => "UPDATE Brand  SET name = @name, description = @description WHERE brand_id = @brand_id;"',
+            '        public string DeleteCommand => "DELETE FROM Brand WHERE brand_id = @brand_id;"',
+            "    }",
+            "}",
+        ],
+    ),
+    FileData(
+        file_path="output/path/Ecommerce/src/ProductDal/Repos",
+        file_name="BrandRepo.cs",
+        file_content=[
+            "using ProductDal.Interfaces",
+            "using ProductDal.Models",
+            "",
+            "namespace ProductDal.Repos",
+            "{",
+            "public class BrandRepo(IDbService DbService, ISqlCommand sqlCommand) : IBrand",
+            "    {",
+            "        public async Task<Brand?> GetAsync(BrandGetParam brandGetParam)",
+            "        {",
+            "       return await DbService.GetAsync<Brand>(sqlCommand.GetCommand, brandGetParam);",
+            "        }",
+            "",
+            "         public async Task<IEnumerable<Brand>> ListAsync(BrandListParam brand)",
+            "        {",
+            "       return await dbService.ListAsync<Brand>(sqlCommand.ListCommand, brand);",
+            "        }",
+            "",
+            "        public async Task<int> CreateAsync(Brand brand)",
+            "        {",
+            "       return await dbService.ExecuteAsync(sqlCommand.CreateCommand, brand);",
+            "        }",
+            "",
+            "        public async Task<int> UpdateAsync(Brand brand)",
+            "        {",
+            "       return await dbService.ExecuteAsync(sqlCommand.UpdateCommand, brand);",
+            "        }",
+            "",
+            "        public async Task<int> DeleteAsync(BrandGetParam brandGetParam)",
+            "        {",
+            "       return await dbService.ExecuteAsync(sqlCommand.DeleteCommand, brandGetParam);",
+            "        }",
+            "    }",
+            "}",
+        ],
     ),
     FileData(
         file_path="output/path/Ecommerce/src/ProductDal/Interfaces",
@@ -301,17 +352,14 @@ ECOMMERCE_FILE_DATA = [
             "{",
             "    public interface ICategoryRepo",
             "    {",
-            "        Task<Category?> GetAsync"
-            "(CategoryGetParam categoryGetParam);",
-            "        Task<IEnumerable<Category>> ListAsync"
-            "(CategoryListParam categoryListParam);",
+            "        Task<Category?> GetAsync(CategoryGetParam categoryGetParam);",
+            "        Task<IEnumerable<Category>> ListAsync(CategoryListParam categoryListParam);",
             "        Task<int> CreateAsync(Category category);",
             "        Task<int> UpdateAsync(Category category);",
-            "        Task<int> DeleteAsync"
-            "(CategoryGetParam categoryGetParam);",
+            "        Task<int> DeleteAsync(CategoryGetParam categoryGetParam);",
             "    }",
-            "}"
-        ]
+            "}",
+        ],
     ),
     FileData(
         file_path="output/path/Ecommerce/src/ProductDal/Models",
@@ -325,8 +373,8 @@ ECOMMERCE_FILE_DATA = [
             "        public int Limit { get; set; } = 1000;",
             "        public int OffSet { get; set; } = 0;",
             "    }",
-            "}"
-        ]
+            "}",
+        ],
     ),
     FileData(
         file_path="output/path/Ecommerce/src/ProductDal/Models",
@@ -338,8 +386,8 @@ ECOMMERCE_FILE_DATA = [
             "    {",
             "        public int id { get; set; }",
             "    }",
-            "}"
-        ]
+            "}",
+        ],
     ),
     FileData(
         file_path="output/path/Ecommerce/src/ProductDal/Models",
@@ -353,8 +401,66 @@ ECOMMERCE_FILE_DATA = [
             "        public string name { get; set; } = default!;",
             "        public string? description { get; set; }",
             "    }",
-            "}"
-        ]
+            "}",
+        ],
+    ),
+    FileData(
+        file_path="output/path/Ecommerce/src/ProductDal/SqlCommands",
+        file_name="CategorySqlCommand.cs",
+        file_content=[
+            "using ProductDal.Interfaces",
+            "",
+            "namespace ProductDal.Interfaces",
+            "{",
+            "public class CategorySqlCommand : ISqlCommand",
+            "    {",
+            '        public string GetCommand => "SELECT id, name, description FROM Category WHERE id = @id;"',
+            '        public string ListCommand => "SELECT id, name, description FROM Category WHERE (@ids = {} OR ids = ANY(@ids)) ORDER BY id ASC LIMIT @limit OFFSET @offset;"',
+            '        public string CreateCommand => "INSERT INTO Category (id, name, description) VALUES(@id, @name, @description);"',
+            '        public string UpdateCommand => "UPDATE Category  SET name = @name, description = @description WHERE id = @id;"',
+            '        public string DeleteCommand => "DELETE FROM Category WHERE id = @id;"',
+            "    }",
+            "}",
+        ],
+    ),
+    FileData(
+        file_path="output/path/Ecommerce/src/ProductDal/Repos",
+        file_name="CategoryRepo.cs",
+        file_content=[
+            "using ProductDal.Interfaces",
+            "using ProductDal.Models",
+            "",
+            "namespace ProductDal.Repos",
+            "{",
+            "public class CategoryRepo(IDbService DbService, ISqlCommand sqlCommand) : ICategory",
+            "    {",
+            "        public async Task<Brand?> GetAsync(CategoryGetParam categoryGetParam)",
+            "        {",
+            "       return await DbService.GetAsync<Category>(sqlCommand.GetCommand, categoryGetParam);",
+            "        }",
+            "",
+            "         public async Task<IEnumerable<Category>> ListAsync(CategoryListParam category)",
+            "        {",
+            "       return await dbService.ListAsync<Category>(sqlCommand.ListCommand, category);",
+            "        }",
+            "",
+            "        public async Task<int> CreateAsync(Category category)",
+            "        {",
+            "       return await dbService.ExecuteAsync(sqlCommand.CreateCommand, category);",
+            "        }",
+            "",
+            "        public async Task<int> UpdateAsync(Category category)",
+            "        {",
+            "       return await dbService.ExecuteAsync(sqlCommand.UpdateCommand, category);",
+            "        }",
+            "",
+            "        public async Task<int> DeleteAsync(CategoryGetParam categoryGetParam)",
+            "        {",
+            "       return await dbService.ExecuteAsync(sqlCommand.DeleteCommand, categoryGetParam);",
+            "        }",
+            "    }",
+            "}",
+        ],
     ),
     FileData(
         file_path="output/path/Ecommerce/src/ProductDal/Interfaces",
@@ -366,16 +472,14 @@ ECOMMERCE_FILE_DATA = [
             "{",
             "    public interface IProductRepo",
             "    {",
-            "        Task<Product?> GetAsync"
-            "(ProductGetParam productGetParam);",
-            "        Task<IEnumerable<Product>> ListAsync"
-            "(ProductListParam productListParam);",
+            "        Task<Product?> GetAsync(ProductGetParam productGetParam);",
+            "        Task<IEnumerable<Product>> ListAsync(ProductListParam productListParam);",
             "        Task<int> CreateAsync(Product product);",
             "        Task<int> UpdateAsync(Product product);",
             "        Task<int> DeleteAsync(ProductGetParam productGetParam);",
             "    }",
-            "}"
-        ]
+            "}",
+        ],
     ),
     FileData(
         file_path="output/path/Ecommerce/src/ProductDal/Models",
@@ -389,8 +493,8 @@ ECOMMERCE_FILE_DATA = [
             "        public int Limit { get; set; } = 1000;",
             "        public int OffSet { get; set; } = 0;",
             "    }",
-            "}"
-        ]
+            "}",
+        ],
     ),
     FileData(
         file_path="output/path/Ecommerce/src/ProductDal/Models",
@@ -402,8 +506,8 @@ ECOMMERCE_FILE_DATA = [
             "    {",
             "        public Guid productid { get; set; }",
             "    }",
-            "}"
-        ]
+            "}",
+        ],
     ),
     FileData(
         file_path="output/path/Ecommerce/src/ProductDal/Models",
@@ -421,9 +525,67 @@ ECOMMERCE_FILE_DATA = [
             "        public string brand_id { get; set; } = default!;",
             "        public int category_id { get; set; }",
             "    }",
-            "}"
-        ]
-    )
+            "}",
+        ],
+    ),
+    FileData(
+        file_path="output/path/Ecommerce/src/ProductDal/SqlCommands",
+        file_name="ProductSqlCommand.cs",
+        file_content=[
+            "using ProductDal.Interfaces",
+            "",
+            "namespace ProductDal.Interfaces",
+            "{",
+            "public class ProductSqlCommand : ISqlCommand",
+            "    {",
+            '        public string GetCommand => "SELECT productid, name, description, price, quantity, brand_id, category_id FROM product WHERE productid = @productid;"',
+            '        public string ListCommand => "SELECT productid, name, description, price, quantity, brand_id, category_id FROM product WHERE (@productids = {} OR productids = ANY(@productids)) AND (@brand_ids = {} OR brand_ids = ANY(@brand_ids)) AND (@category_ids = {} OR category_ids = ANY(@category_ids)) ORDER BY productid ASC LIMIT @limit OFFSET @offset;"',
+            '        public string CreateCommand => "INSERT INTO product (productid, name, description, price, quantity, brand_id, category_id) VALUES(@productid, @name, @description, @price, @quantity, @brand_id, @category_id);"',
+            '        public string UpdateCommand => "UPDATE product  SET name = @name, description = @description, price = @price, quantity = @quantity, brand_id = @brand_id, category_id = @category_id WHERE productid = @productid;"',
+            '        public string DeleteCommand => "DELETE FROM product WHERE productid = @productid;"',
+            "    }",
+            "}",
+        ],
+    ),
+    FileData(
+        file_path="output/path/Ecommerce/src/ProductDal/Repos",
+        file_name="ProductRepo.cs",
+        file_content=[
+            "using ProductDal.Interfaces",
+            "using ProductDal.Models",
+            "",
+            "namespace ProductDal.Repos",
+            "{",
+            "public class ProductRepo(IDbService DbService, ISqlCommand sqlCommand) : IProduct",
+            "    {",
+            "        public async Task<Brand?> GetAsync(ProductGetParam productGetParam)",
+            "        {",
+            "       return await DbService.GetAsync<Product>(sqlCommand.GetCommand, productGetParam);",
+            "        }",
+            "",
+            "         public async Task<IEnumerable<Product>> ListAsync(ProductListParam product)",
+            "        {",
+            "       return await dbService.ListAsync<Product>(sqlCommand.ListCommand, product);",
+            "        }",
+            "",
+            "        public async Task<int> CreateAsync(Product product)",
+            "        {",
+            "       return await dbService.ExecuteAsync(sqlCommand.CreateCommand, product);",
+            "        }",
+            "",
+            "        public async Task<int> UpdateAsync(Product product)",
+            "        {",
+            "       return await dbService.ExecuteAsync(sqlCommand.UpdateCommand, product);",
+            "        }",
+            "",
+            "        public async Task<int> DeleteAsync(ProductGetParam productGetParam)",
+            "        {",
+            "       return await dbService.ExecuteAsync(sqlCommand.DeleteCommand, productGetParam);",
+            "        }",
+            "    }",
+            "}",
+        ],
+    ),
 ]
 
 DOT_NET_TYPE_ENTITY = Entity(
@@ -696,8 +858,7 @@ DOTNET_TYPE_ENTITY_FILE_DATA = [
             "    {",
             "        Task<int> ExecuteAsync"
             "(string sqlCommand, object? param);",
-            "        Task<T?> GetAsync<T>"
-            "(string sqlCommand, object? param);",
+            "        Task<T?> GetAsync<T>(string sqlCommand, object? param);",
             "        Task<IEnumerable<T>> ListAsync<T>"
             "(string sqlCommand, object? param);",
             "    }",
@@ -834,6 +995,67 @@ DOTNET_TYPE_ENTITY_FILE_DATA = [
             "}",
         ],
     ),
+    FileData(
+        file_path="output/path/Ecommerce/src/ProductDal/SqlCommands",
+        file_name="DotNetDataTypesSqlCommand.cs",
+        file_content=[
+            "using ProductDal.Interfaces",
+            "",
+            "namespace ProductDal.Interfaces",
+            "{",
+            "public class DotNetDataTypesSqlCommand : ISqlCommand",
+            "    {",
+            '        public string GetCommand => "SELECT BooleanField, '
+            'ByteField, SByteField, CharField, ShortField, UShortField, '
+            'IntField, UIntField, LongField, ULongField, FloatField, '
+            'DoubleField, DecimalField, StringField, DateTimeField, DateTimeOffField, EnumField, GuidField, NullableGuidField FROM DotNetDataTypes;"',
+            '        public string ListCommand => "SELECT BooleanField, ByteField, SByteField, CharField, ShortField, UShortField, IntField, UIntField, LongField, ULongField, FloatField, DoubleField, DecimalField, StringField, DateTimeField, DateTimeOffField, EnumField, GuidField, NullableGuidField FROM DotNetDataTypes;"',
+            '        public string CreateCommand => "INSERT INTO DotNetDataTypes (BooleanField, ByteField, SByteField, CharField, ShortField, UShortField, IntField, UIntField, LongField, ULongField, FloatField, DoubleField, DecimalField, StringField, DateTimeField, DateTimeOffField, EnumField, GuidField, NullableGuidField) VALUES(@BooleanField, @ByteField, @SByteField, @CharField, @ShortField, @UShortField, @IntField, @UIntField, @LongField, @ULongField, @FloatField, @DoubleField, @DecimalField, @StringField, @DateTimeField, @DateTimeOffField, @EnumField, @GuidField, @NullableGuidField);"',
+            '        public string UpdateCommand => "UPDATE DotNetDataTypes  SET BooleanField = @BooleanField, ByteField = @ByteField, SByteField = @SByteField, CharField = @CharField, ShortField = @ShortField, UShortField = @UShortField, IntField = @IntField, UIntField = @UIntField, LongField = @LongField, ULongField = @ULongField, FloatField = @FloatField, DoubleField = @DoubleField, DecimalField = @DecimalField, StringField = @StringField, DateTimeField = @DateTimeField, DateTimeOffField = @DateTimeOffField, EnumField = @EnumField, GuidField = @GuidField, NullableGuidField = @NullableGuidField;"',
+            '        public string DeleteCommand => "DELETE FROM DotNetDataTypes;"',
+            "    }",
+            "}",
+        ],
+    ),
+    FileData(
+        file_path="output/path/Ecommerce/src/ProductDal/Repos",
+        file_name="DotNetDataTypesRepo.cs",
+        file_content=[
+            "using ProductDal.Interfaces",
+            "using ProductDal.Models",
+            "",
+            "namespace ProductDal.Repos",
+            "{",
+            "public class DotNetDataTypesRepo(IDbService DbService, ISqlCommand sqlCommand) : IDotNetDataTypes",
+            "    {",
+            "        public async Task<Brand?> GetAsync(DotNetDataTypesGetParam dotNetDataTypesGetParam)",
+            "        {",
+            "       return await DbService.GetAsync<DotNetDataTypes>(sqlCommand.GetCommand, dotNetDataTypesGetParam);",
+            "        }",
+            "",
+            "         public async Task<IEnumerable<DotNetDataTypes>> ListAsync(DotNetDataTypesListParam dotNetDataTypes)",
+            "        {",
+            "       return await dbService.ListAsync<DotNetDataTypes>(sqlCommand.ListCommand, dotNetDataTypes);",
+            "        }",
+            "",
+            "        public async Task<int> CreateAsync(DotNetDataTypes dotNetDataTypes)",
+            "        {",
+            "       return await dbService.ExecuteAsync(sqlCommand.CreateCommand, dotNetDataTypes);",
+            "        }",
+            "",
+            "        public async Task<int> UpdateAsync(DotNetDataTypes dotNetDataTypes)",
+            "        {",
+            "       return await dbService.ExecuteAsync(sqlCommand.UpdateCommand, dotNetDataTypes);",
+            "        }",
+            "",
+            "        public async Task<int> DeleteAsync(DotNetDataTypesGetParam dotNetDataTypesGetParam)",
+            "        {",
+            "       return await dbService.ExecuteAsync(sqlCommand.DeleteCommand, dotNetDataTypesGetParam);",
+            "        }",
+            "    }",
+            "}",
+        ],
+    ),
 ]
 
 STATE_ENUM_ENTITY = Entity(
@@ -939,7 +1161,8 @@ CUSTOMER_ADDRESS_ENTITY_FILE_DATA = [
             "    {",
             "        Task<int> ExecuteAsync"
             "(string sqlCommand, object? param);",
-            "        Task<T?> GetAsync<T>(string sqlCommand, object? param);",
+            "        Task<T?> GetAsync<T>"
+            "(string sqlCommand, object? param);",
             "        Task<IEnumerable<T>> ListAsync<T>"
             "(string sqlCommand, object? param);",
             "    }",
@@ -1060,6 +1283,79 @@ CUSTOMER_ADDRESS_ENTITY_FILE_DATA = [
         ],
     ),
     FileData(
+        file_path="output/path/Ecommerce/src/ProductDal/SqlCommands",
+        file_name="AddressSqlCommand.cs",
+        file_content=[
+            "using ProductDal.Interfaces",
+            "",
+            "namespace ProductDal.Interfaces",
+            "{",
+            "public class AddressSqlCommand : ISqlCommand",
+            "    {",
+            '        public string GetCommand => '
+            '"SELECT street_address, city, state FROM address;"',
+            '        public string ListCommand => '
+            '"SELECT street_address, city, state FROM address;"',
+            '        public string CreateCommand => '
+            '"INSERT INTO address (street_address, city, state) '
+            'VALUES(@street_address, @city, @state);"',
+            '        public string UpdateCommand => '
+            '"UPDATE address  SET street_address = @street_address, '
+            'city = @city, state = @state;"',
+            '        public string DeleteCommand => "DELETE FROM address;"',
+            "    }",
+            "}",
+        ],
+    ),
+    FileData(
+        file_path="output/path/Ecommerce/src/ProductDal/Repos",
+        file_name="AddressRepo.cs",
+        file_content=[
+            "using ProductDal.Interfaces",
+            "using ProductDal.Models",
+            "",
+            "namespace ProductDal.Repos",
+            "{",
+            "public class AddressRepo"
+            "(IDbService DbService, ISqlCommand sqlCommand) : IAddress",
+            "    {",
+            "        public async Task<Brand?> GetAsync"
+            "(AddressGetParam addressGetParam)",
+            "        {",
+            "       return await DbService.GetAsync<Address>"
+            "(sqlCommand.GetCommand, addressGetParam);",
+            "        }",
+            "",
+            "         public async Task<IEnumerable<Address>> ListAsync"
+            "(AddressListParam address)",
+            "        {",
+            "       return await dbService.ListAsync<Address>"
+            "(sqlCommand.ListCommand, address);",
+            "        }",
+            "",
+            "        public async Task<int> CreateAsync(Address address)",
+            "        {",
+            "       return await dbService.ExecuteAsync"
+            "(sqlCommand.CreateCommand, address);",
+            "        }",
+            "",
+            "        public async Task<int> UpdateAsync(Address address)",
+            "        {",
+            "       return await dbService.ExecuteAsync"
+            "(sqlCommand.UpdateCommand, address);",
+            "        }",
+            "",
+            "        public async Task<int> DeleteAsync"
+            "(AddressGetParam addressGetParam)",
+            "        {",
+            "       return await dbService.ExecuteAsync"
+            "(sqlCommand.DeleteCommand, addressGetParam);",
+            "        }",
+            "    }",
+            "}",
+        ],
+    ),
+    FileData(
         file_path="output/path/Ecommerce/src/ProductDal/Interfaces",
         file_name="ICustomerRepo.cs",
         file_content=[
@@ -1119,8 +1415,8 @@ CUSTOMER_ADDRESS_ENTITY_FILE_DATA = [
             "        public string last_name { get; set; } = default!;",
             "        public string shipping_address_street_address "
             "{ get; set; } = default!;",
-            "        public string shipping_address_city "
-            "{ get; set; } = default!;",
+            "        public string shipping_address_city { get; set; } = "
+            "default!;",
             "        public CSharpDataType.STRING shipping_address_state "
             "{ get; set; }",
             "        public string billing_address_street_address "
@@ -1129,6 +1425,96 @@ CUSTOMER_ADDRESS_ENTITY_FILE_DATA = [
             "default!;",
             "        public CSharpDataType.STRING billing_address_state "
             "{ get; set; }",
+            "    }",
+            "}",
+        ],
+    ),
+    FileData(
+        file_path="output/path/Ecommerce/src/ProductDal/SqlCommands",
+        file_name="CustomerSqlCommand.cs",
+        file_content=[
+            "using ProductDal.Interfaces",
+            "",
+            "namespace ProductDal.Interfaces",
+            "{",
+            "public class CustomerSqlCommand : ISqlCommand",
+            "    {",
+            '        public string GetCommand => "SELECT first_name, '
+            'last_name, shipping_address_street_address, '
+            'shipping_address_city, shipping_address_state, '
+            'billing_address_street_address, billing_address_city, '
+            'billing_address_state FROM customer;"',
+            '        public string ListCommand => "SELECT first_name, '
+            'last_name, shipping_address_street_address, '
+            'shipping_address_city, shipping_address_state, '
+            'billing_address_street_address, billing_address_city, '
+            'billing_address_state FROM customer;"',
+            '        public string CreateCommand => "INSERT INTO customer '
+            '(first_name, last_name, shipping_address_street_address, '
+            'shipping_address_city, shipping_address_state, '
+            'billing_address_street_address, billing_address_city, '
+            'billing_address_state) VALUES(@first_name, @last_name, '
+            '@shipping_address_street_address, @shipping_address_city, '
+            '@shipping_address_state, @billing_address_street_address, '
+            '@billing_address_city, @billing_address_state);"',
+            '        public string UpdateCommand => "UPDATE customer  '
+            'SET first_name = @first_name, last_name = @last_name, '
+            'shipping_address_street_address = '
+            '@shipping_address_street_address, '
+            'shipping_address_city = @shipping_address_city, '
+            'shipping_address_state = @shipping_address_state, '
+            'billing_address_street_address = @billing_address_street_address,'
+            ' billing_address_city = @billing_address_city, '
+            'billing_address_state = @billing_address_state;"',
+            '        public string DeleteCommand => "DELETE FROM customer;"',
+            "    }",
+            "}",
+        ],
+    ),
+    FileData(
+        file_path="output/path/Ecommerce/src/ProductDal/Repos",
+        file_name="CustomerRepo.cs",
+        file_content=[
+            "using ProductDal.Interfaces",
+            "using ProductDal.Models",
+            "",
+            "namespace ProductDal.Repos",
+            "{",
+            "public class CustomerRepo"
+            "(IDbService DbService, ISqlCommand sqlCommand) : ICustomer",
+            "    {",
+            "        public async Task<Brand?> GetAsync"
+            "(CustomerGetParam customerGetParam)",
+            "        {",
+            "       return await DbService.GetAsync<Customer>"
+            "(sqlCommand.GetCommand, customerGetParam);",
+            "        }",
+            "",
+            "         public async Task<IEnumerable<Customer>> ListAsync"
+            "(CustomerListParam customer)",
+            "        {",
+            "       return await dbService.ListAsync<Customer>"
+            "(sqlCommand.ListCommand, customer);",
+            "        }",
+            "",
+            "        public async Task<int> CreateAsync(Customer customer)",
+            "        {",
+            "       return await dbService.ExecuteAsync"
+            "(sqlCommand.CreateCommand, customer);",
+            "        }",
+            "",
+            "        public async Task<int> UpdateAsync(Customer customer)",
+            "        {",
+            "       return await dbService.ExecuteAsync"
+            "(sqlCommand.UpdateCommand, customer);",
+            "        }",
+            "",
+            "        public async Task<int> DeleteAsync"
+            "(CustomerGetParam customerGetParam)",
+            "        {",
+            "       return await dbService.ExecuteAsync"
+            "(sqlCommand.DeleteCommand, customerGetParam);",
+            "        }",
             "    }",
             "}",
         ],
@@ -1174,7 +1560,9 @@ class TestDbServiceGenerator(unittest.TestCase):
             svc_dir=self.svc_dir,
             entities=entities,
             pl_type_mapper=CSharpTypeMapper(),
-            db_type_mapper=None
+            db_type_mapper=None,
+            sql_gen=PgsqlCommandGenerator(entity=None)
         )
         actual_file_data = list(service_gen.gen_service())
+        print(actual_file_data)
         self.assertEqual(expected_file_data, actual_file_data)

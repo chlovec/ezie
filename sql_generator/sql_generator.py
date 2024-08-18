@@ -104,6 +104,9 @@ class SqlCommandGenerator(ABC):
         else:
             return delete_part + END_TOKEN
 
+    def update_entity(self, entity: EntityFieldData) -> None:
+        self.entity_field_data = entity
+
 
 class PgsqlCommandGenerator(SqlCommandGenerator):
     def _get_list_where_clause(self) -> str:
