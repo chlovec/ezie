@@ -1008,11 +1008,38 @@ DOTNET_TYPE_ENTITY_FILE_DATA = [
             '        public string GetCommand => "SELECT BooleanField, '
             'ByteField, SByteField, CharField, ShortField, UShortField, '
             'IntField, UIntField, LongField, ULongField, FloatField, '
-            'DoubleField, DecimalField, StringField, DateTimeField, DateTimeOffField, EnumField, GuidField, NullableGuidField FROM DotNetDataTypes;"',
-            '        public string ListCommand => "SELECT BooleanField, ByteField, SByteField, CharField, ShortField, UShortField, IntField, UIntField, LongField, ULongField, FloatField, DoubleField, DecimalField, StringField, DateTimeField, DateTimeOffField, EnumField, GuidField, NullableGuidField FROM DotNetDataTypes;"',
-            '        public string CreateCommand => "INSERT INTO DotNetDataTypes (BooleanField, ByteField, SByteField, CharField, ShortField, UShortField, IntField, UIntField, LongField, ULongField, FloatField, DoubleField, DecimalField, StringField, DateTimeField, DateTimeOffField, EnumField, GuidField, NullableGuidField) VALUES(@BooleanField, @ByteField, @SByteField, @CharField, @ShortField, @UShortField, @IntField, @UIntField, @LongField, @ULongField, @FloatField, @DoubleField, @DecimalField, @StringField, @DateTimeField, @DateTimeOffField, @EnumField, @GuidField, @NullableGuidField);"',
-            '        public string UpdateCommand => "UPDATE DotNetDataTypes  SET BooleanField = @BooleanField, ByteField = @ByteField, SByteField = @SByteField, CharField = @CharField, ShortField = @ShortField, UShortField = @UShortField, IntField = @IntField, UIntField = @UIntField, LongField = @LongField, ULongField = @ULongField, FloatField = @FloatField, DoubleField = @DoubleField, DecimalField = @DecimalField, StringField = @StringField, DateTimeField = @DateTimeField, DateTimeOffField = @DateTimeOffField, EnumField = @EnumField, GuidField = @GuidField, NullableGuidField = @NullableGuidField;"',
-            '        public string DeleteCommand => "DELETE FROM DotNetDataTypes;"',
+            'DoubleField, DecimalField, StringField, DateTimeField, '
+            'DateTimeOffField, EnumField, GuidField, NullableGuidField '
+            'FROM DotNetDataTypes;"',
+            '        public string ListCommand => "SELECT BooleanField, '
+            'ByteField, SByteField, CharField, ShortField, UShortField, '
+            'IntField, UIntField, LongField, ULongField, FloatField, '
+            'DoubleField, DecimalField, StringField, DateTimeField, '
+            'DateTimeOffField, EnumField, GuidField, NullableGuidField '
+            'FROM DotNetDataTypes;"',
+            '        public string CreateCommand => '
+            '"INSERT INTO DotNetDataTypes (BooleanField, ByteField, '
+            'SByteField, CharField, ShortField, UShortField, IntField, '
+            'UIntField, LongField, ULongField, FloatField, DoubleField, '
+            'DecimalField, StringField, DateTimeField, DateTimeOffField, '
+            'EnumField, GuidField, NullableGuidField) VALUES(@BooleanField, '
+            '@ByteField, @SByteField, @CharField, @ShortField, @UShortField, '
+            '@IntField, @UIntField, @LongField, @ULongField, @FloatField, '
+            '@DoubleField, @DecimalField, @StringField, @DateTimeField, '
+            '@DateTimeOffField, @EnumField, @GuidField, @NullableGuidField);"',
+            '        public string UpdateCommand => '
+            '"UPDATE DotNetDataTypes  SET BooleanField = @BooleanField, '
+            'ByteField = @ByteField, SByteField = @SByteField, '
+            'CharField = @CharField, ShortField = @ShortField, '
+            'UShortField = @UShortField, IntField = @IntField, '
+            'UIntField = @UIntField, LongField = @LongField, '
+            'ULongField = @ULongField, FloatField = @FloatField, '
+            'DoubleField = @DoubleField, DecimalField = @DecimalField, '
+            'StringField = @StringField, DateTimeField = @DateTimeField, '
+            'DateTimeOffField = @DateTimeOffField, EnumField = @EnumField, '
+            'GuidField = @GuidField, NullableGuidField = @NullableGuidField;"',
+            '        public string DeleteCommand '
+            '=> "DELETE FROM DotNetDataTypes;"',
             "    }",
             "}",
         ],
@@ -1026,31 +1053,42 @@ DOTNET_TYPE_ENTITY_FILE_DATA = [
             "",
             "namespace ProductDal.Repos",
             "{",
-            "public class DotNetDataTypesRepo(IDbService DbService, ISqlCommand sqlCommand) : IDotNetDataTypes",
+            "public class DotNetDataTypesRepo(IDbService DbService, "
+            "ISqlCommand sqlCommand) : IDotNetDataTypes",
             "    {",
-            "        public async Task<Brand?> GetAsync(DotNetDataTypesGetParam dotNetDataTypesGetParam)",
+            "        public async Task<Brand?> GetAsync"
+            "(DotNetDataTypesGetParam dotNetDataTypesGetParam)",
             "        {",
-            "       return await DbService.GetAsync<DotNetDataTypes>(sqlCommand.GetCommand, dotNetDataTypesGetParam);",
+            "       return await DbService.GetAsync<DotNetDataTypes>"
+            "(sqlCommand.GetCommand, dotNetDataTypesGetParam);",
             "        }",
             "",
-            "         public async Task<IEnumerable<DotNetDataTypes>> ListAsync(DotNetDataTypesListParam dotNetDataTypes)",
+            "         public async Task<IEnumerable<DotNetDataTypes>> "
+            "ListAsync(DotNetDataTypesListParam dotNetDataTypes)",
             "        {",
-            "       return await dbService.ListAsync<DotNetDataTypes>(sqlCommand.ListCommand, dotNetDataTypes);",
+            "       return await dbService.ListAsync<DotNetDataTypes>"
+            "(sqlCommand.ListCommand, dotNetDataTypes);",
             "        }",
             "",
-            "        public async Task<int> CreateAsync(DotNetDataTypes dotNetDataTypes)",
+            "        public async Task<int> CreateAsync"
+            "(DotNetDataTypes dotNetDataTypes)",
             "        {",
-            "       return await dbService.ExecuteAsync(sqlCommand.CreateCommand, dotNetDataTypes);",
+            "       return await dbService.ExecuteAsync"
+            "(sqlCommand.CreateCommand, dotNetDataTypes);",
             "        }",
             "",
-            "        public async Task<int> UpdateAsync(DotNetDataTypes dotNetDataTypes)",
+            "        public async Task<int> UpdateAsync"
+            "(DotNetDataTypes dotNetDataTypes)",
             "        {",
-            "       return await dbService.ExecuteAsync(sqlCommand.UpdateCommand, dotNetDataTypes);",
+            "       return await dbService.ExecuteAsync"
+            "(sqlCommand.UpdateCommand, dotNetDataTypes);",
             "        }",
             "",
-            "        public async Task<int> DeleteAsync(DotNetDataTypesGetParam dotNetDataTypesGetParam)",
+            "        public async Task<int> DeleteAsync"
+            "(DotNetDataTypesGetParam dotNetDataTypesGetParam)",
             "        {",
-            "       return await dbService.ExecuteAsync(sqlCommand.DeleteCommand, dotNetDataTypesGetParam);",
+            "       return await dbService.ExecuteAsync"
+            "(sqlCommand.DeleteCommand, dotNetDataTypesGetParam);",
             "        }",
             "    }",
             "}",
