@@ -676,7 +676,7 @@ class TestPostgreSqlGenerator(unittest.TestCase):
             "entity_with_no_ref",
             ENTITY_WITH_NO_REF,
             (
-                "INSERT INTO Brand (brand_id, name, description) "
+                "INSERT INTO Brand(brand_id, name, description) "
                 "VALUES(@brand_id, @name, @description);"
             )
         ),
@@ -684,7 +684,7 @@ class TestPostgreSqlGenerator(unittest.TestCase):
             "entity_with_ref",
             ENTITY_WITH_REF,
             (
-                "INSERT INTO product (productid, name, description, price, "
+                "INSERT INTO product(productid, name, description, price, "
                 "quantity, brand_id, category_id) "
                 "VALUES(@productid, @name, @description, @price, @quantity, "
                 "@brand_id, @category_id);"
@@ -694,14 +694,14 @@ class TestPostgreSqlGenerator(unittest.TestCase):
             "entity_with_enum_and_no_pk",
             ADDRESS_ENTITY,
             (
-                "INSERT INTO address (street_address, city, state) "
+                "INSERT INTO address(street_address, city, state) "
                 "VALUES(@street_address, @city, @state);"
             )
         ),
         (
             "entity_with_sub_entity",
             CUSTOMER_ENTITY,
-            "INSERT INTO customer (first_name, last_name, "
+            "INSERT INTO customer(first_name, last_name, "
             "shipping_address_street_address, shipping_address_city, "
             "shipping_address_state, billing_address_street_address, "
             "billing_address_city, billing_address_state) "
@@ -713,7 +713,7 @@ class TestPostgreSqlGenerator(unittest.TestCase):
         (
             "entity_with_composite_pk",
             COMPOSITE_PRIMARY_KEY_ENTITY,
-            "INSERT INTO product_order (order_id, product_id, quantity, price)"
+            "INSERT INTO product_order(order_id, product_id, quantity, price)"
             " VALUES(@order_id, @product_id, @quantity, @price);"
         )
     ])

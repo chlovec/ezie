@@ -78,7 +78,7 @@ class SqlCommandGenerator(ABC):
 
     def gen_create_sql_statement(self) -> str:
         return (
-            f"INSERT INTO {self.entity_field_data.entity_name} "
+            f"INSERT INTO {self.entity_field_data.entity_name}"
             f"({self._get_joined_fields()}) "
             f"VALUES({self._get_joined_fields(self.param_marker)}){END_TOKEN}"
         )

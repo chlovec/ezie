@@ -192,20 +192,20 @@ ECOMMERCE_FILE_DATA = [
             "        public async Task<int> ExecuteAsync"
             "(string sqlCommand, object? param)",
             "        {",
-            "       return await conn.ExecuteAsync(sqlCommand, param);",
+            "           return await conn.ExecuteAsync(sqlCommand, param);",
             "        }",
             "",
             "        public async Task<T?> GetAsync<T>"
             "(string sqlCommand, object? param)",
             "        {",
-            "       return await conn.QuerySingleOrDefaultAsync<T>"
+            "           return await conn.QuerySingleOrDefaultAsync<T>"
             "(sqlCommand, param);",
             "        }",
             "",
             "        public async Task<IEnumerable<T>> ListAsync<T>"
             "(string sqlCommand, object? param)",
             "        {",
-            "       return await conn.QueryAsync<T>(sqlCommand, param);",
+            "           return await conn.QueryAsync<T>(sqlCommand, param);",
             "        }",
             "    }",
             "}",
@@ -308,7 +308,7 @@ ECOMMERCE_FILE_DATA = [
             'description FROM Brand '
             'WHERE (@brand_ids = {} OR brand_ids = ANY(@brand_ids)) '
             'ORDER BY brand_id ASC LIMIT @limit OFFSET @offset;"',
-            '        public string CreateCommand => "INSERT INTO Brand '
+            '        public string CreateCommand => "INSERT INTO Brand'
             '(brand_id, name, description) '
             'VALUES(@brand_id, @name, @description);"',
             '        public string UpdateCommand => "UPDATE Brand  '
@@ -335,33 +335,33 @@ ECOMMERCE_FILE_DATA = [
             "        public async Task<Brand?> GetAsync"
             "(BrandGetParam brandGetParam)",
             "        {",
-            "       return await DbService.GetAsync<Brand>"
+            "           return await DbService.GetAsync<Brand>"
             "(sqlCommand.GetCommand, brandGetParam);",
             "        }",
             "",
             "         public async Task<IEnumerable<Brand>> ListAsync"
             "(BrandListParam brand)",
             "        {",
-            "       return await dbService.ListAsync<Brand>"
+            "           return await dbService.ListAsync<Brand>"
             "(sqlCommand.ListCommand, brand);",
             "        }",
             "",
             "        public async Task<int> CreateAsync(Brand brand)",
             "        {",
-            "       return await dbService.ExecuteAsync"
+            "           return await dbService.ExecuteAsync"
             "(sqlCommand.CreateCommand, brand);",
             "        }",
             "",
             "        public async Task<int> UpdateAsync(Brand brand)",
             "        {",
-            "       return await dbService.ExecuteAsync"
+            "           return await dbService.ExecuteAsync"
             "(sqlCommand.UpdateCommand, brand);",
             "        }",
             "",
             "        public async Task<int> DeleteAsync"
             "(BrandGetParam brandGetParam)",
             "        {",
-            "       return await dbService.ExecuteAsync"
+            "           return await dbService.ExecuteAsync"
             "(sqlCommand.DeleteCommand, brandGetParam);",
             "        }",
             "    }",
@@ -448,7 +448,7 @@ ECOMMERCE_FILE_DATA = [
             '        public string ListCommand => "SELECT id, name, '
             'description FROM Category WHERE (@ids = {} OR ids = ANY(@ids)) '
             'ORDER BY id ASC LIMIT @limit OFFSET @offset;"',
-            '        public string CreateCommand => "INSERT INTO Category '
+            '        public string CreateCommand => "INSERT INTO Category'
             '(id, name, description) VALUES(@id, @name, @description);"',
             '        public string UpdateCommand => "UPDATE Category  '
             'SET name = @name, description = @description WHERE id = @id;"',
@@ -473,33 +473,33 @@ ECOMMERCE_FILE_DATA = [
             "        public async Task<Brand?> GetAsync"
             "(CategoryGetParam categoryGetParam)",
             "        {",
-            "       return await DbService.GetAsync<Category>"
+            "           return await DbService.GetAsync<Category>"
             "(sqlCommand.GetCommand, categoryGetParam);",
             "        }",
             "",
             "         public async Task<IEnumerable<Category>> ListAsync"
             "(CategoryListParam category)",
             "        {",
-            "       return await dbService.ListAsync<Category>"
+            "           return await dbService.ListAsync<Category>"
             "(sqlCommand.ListCommand, category);",
             "        }",
             "",
             "        public async Task<int> CreateAsync(Category category)",
             "        {",
-            "       return await dbService.ExecuteAsync"
+            "           return await dbService.ExecuteAsync"
             "(sqlCommand.CreateCommand, category);",
             "        }",
             "",
             "        public async Task<int> UpdateAsync(Category category)",
             "        {",
-            "       return await dbService.ExecuteAsync"
+            "           return await dbService.ExecuteAsync"
             "(sqlCommand.UpdateCommand, category);",
             "        }",
             "",
             "        public async Task<int> DeleteAsync"
             "(CategoryGetParam categoryGetParam)",
             "        {",
-            "       return await dbService.ExecuteAsync"
+            "           return await dbService.ExecuteAsync"
             "(sqlCommand.DeleteCommand, categoryGetParam);",
             "        }",
             "    }",
@@ -593,7 +593,7 @@ ECOMMERCE_FILE_DATA = [
             '(@brand_ids = {} OR brand_ids = ANY(@brand_ids)) AND '
             '(@category_ids = {} OR category_ids = ANY(@category_ids)) ORDER '
             'BY productid ASC LIMIT @limit OFFSET @offset;"',
-            '        public string CreateCommand => "INSERT INTO product '
+            '        public string CreateCommand => "INSERT INTO product'
             '(productid, name, description, price, quantity, brand_id, '
             'category_id) VALUES(@productid, @name, @description, @price, '
             '@quantity, @brand_id, @category_id);"',
@@ -622,33 +622,33 @@ ECOMMERCE_FILE_DATA = [
             "        public async Task<Brand?> GetAsync"
             "(ProductGetParam productGetParam)",
             "        {",
-            "       return await DbService.GetAsync<Product>"
+            "           return await DbService.GetAsync<Product>"
             "(sqlCommand.GetCommand, productGetParam);",
             "        }",
             "",
             "         public async Task<IEnumerable<Product>> ListAsync"
             "(ProductListParam product)",
             "        {",
-            "       return await dbService.ListAsync<Product>"
+            "           return await dbService.ListAsync<Product>"
             "(sqlCommand.ListCommand, product);",
             "        }",
             "",
             "        public async Task<int> CreateAsync(Product product)",
             "        {",
-            "       return await dbService.ExecuteAsync"
+            "           return await dbService.ExecuteAsync"
             "(sqlCommand.CreateCommand, product);",
             "        }",
             "",
             "        public async Task<int> UpdateAsync(Product product)",
             "        {",
-            "       return await dbService.ExecuteAsync"
+            "           return await dbService.ExecuteAsync"
             "(sqlCommand.UpdateCommand, product);",
             "        }",
             "",
             "        public async Task<int> DeleteAsync"
             "(ProductGetParam productGetParam)",
             "        {",
-            "       return await dbService.ExecuteAsync"
+            "           return await dbService.ExecuteAsync"
             "(sqlCommand.DeleteCommand, productGetParam);",
             "        }",
             "    }",
@@ -949,20 +949,20 @@ DOTNET_TYPE_ENTITY_FILE_DATA = [
             "        public async Task<int> ExecuteAsync"
             "(string sqlCommand, object? param)",
             "        {",
-            "       return await conn.ExecuteAsync(sqlCommand, param);",
+            "           return await conn.ExecuteAsync(sqlCommand, param);",
             "        }",
             "",
             "        public async Task<T?> GetAsync<T>"
             "(string sqlCommand, object? param)",
             "        {",
-            "       return await conn.QuerySingleOrDefaultAsync<T>"
+            "           return await conn.QuerySingleOrDefaultAsync<T>"
             "(sqlCommand, param);",
             "        }",
             "",
             "        public async Task<IEnumerable<T>> ListAsync<T>"
             "(string sqlCommand, object? param)",
             "        {",
-            "       return await conn.QueryAsync<T>(sqlCommand, param);",
+            "           return await conn.QueryAsync<T>(sqlCommand, param);",
             "        }",
             "    }",
             "}",
@@ -1087,7 +1087,7 @@ DOTNET_TYPE_ENTITY_FILE_DATA = [
             'DateTimeOffField, EnumField, GuidField, NullableGuidField '
             'FROM DotNetDataTypes;"',
             '        public string CreateCommand => '
-            '"INSERT INTO DotNetDataTypes (BooleanField, ByteField, '
+            '"INSERT INTO DotNetDataTypes(BooleanField, ByteField, '
             'SByteField, CharField, ShortField, UShortField, IntField, '
             'UIntField, LongField, ULongField, FloatField, DoubleField, '
             'DecimalField, StringField, DateTimeField, DateTimeOffField, '
@@ -1128,35 +1128,35 @@ DOTNET_TYPE_ENTITY_FILE_DATA = [
             "        public async Task<Brand?> GetAsync"
             "(DotNetDataTypesGetParam dotNetDataTypesGetParam)",
             "        {",
-            "       return await DbService.GetAsync<DotNetDataTypes>"
+            "           return await DbService.GetAsync<DotNetDataTypes>"
             "(sqlCommand.GetCommand, dotNetDataTypesGetParam);",
             "        }",
             "",
             "         public async Task<IEnumerable<DotNetDataTypes>> "
             "ListAsync(DotNetDataTypesListParam dotNetDataTypes)",
             "        {",
-            "       return await dbService.ListAsync<DotNetDataTypes>"
+            "           return await dbService.ListAsync<DotNetDataTypes>"
             "(sqlCommand.ListCommand, dotNetDataTypes);",
             "        }",
             "",
             "        public async Task<int> CreateAsync"
             "(DotNetDataTypes dotNetDataTypes)",
             "        {",
-            "       return await dbService.ExecuteAsync"
+            "           return await dbService.ExecuteAsync"
             "(sqlCommand.CreateCommand, dotNetDataTypes);",
             "        }",
             "",
             "        public async Task<int> UpdateAsync"
             "(DotNetDataTypes dotNetDataTypes)",
             "        {",
-            "       return await dbService.ExecuteAsync"
+            "           return await dbService.ExecuteAsync"
             "(sqlCommand.UpdateCommand, dotNetDataTypes);",
             "        }",
             "",
             "        public async Task<int> DeleteAsync"
             "(DotNetDataTypesGetParam dotNetDataTypesGetParam)",
             "        {",
-            "       return await dbService.ExecuteAsync"
+            "           return await dbService.ExecuteAsync"
             "(sqlCommand.DeleteCommand, dotNetDataTypesGetParam);",
             "        }",
             "    }",
@@ -1291,20 +1291,20 @@ CUSTOMER_ADDRESS_ENTITY_FILE_DATA = [
             "        public async Task<int> ExecuteAsync"
             "(string sqlCommand, object? param)",
             "        {",
-            "       return await conn.ExecuteAsync(sqlCommand, param);",
+            "           return await conn.ExecuteAsync(sqlCommand, param);",
             "        }",
             "",
             "        public async Task<T?> GetAsync<T>"
             "(string sqlCommand, object? param)",
             "        {",
-            "       return await conn.QuerySingleOrDefaultAsync<T>"
+            "           return await conn.QuerySingleOrDefaultAsync<T>"
             "(sqlCommand, param);",
             "        }",
             "",
             "        public async Task<IEnumerable<T>> ListAsync<T>"
             "(string sqlCommand, object? param)",
             "        {",
-            "       return await conn.QueryAsync<T>(sqlCommand, param);",
+            "           return await conn.QueryAsync<T>(sqlCommand, param);",
             "        }",
             "    }",
             "}",
@@ -1404,7 +1404,7 @@ CUSTOMER_ADDRESS_ENTITY_FILE_DATA = [
             '        public string ListCommand => '
             '"SELECT street_address, city, state FROM address;"',
             '        public string CreateCommand => '
-            '"INSERT INTO address (street_address, city, state) '
+            '"INSERT INTO address(street_address, city, state) '
             'VALUES(@street_address, @city, @state);"',
             '        public string UpdateCommand => '
             '"UPDATE address  SET street_address = @street_address, '
@@ -1429,33 +1429,33 @@ CUSTOMER_ADDRESS_ENTITY_FILE_DATA = [
             "        public async Task<Brand?> GetAsync"
             "(AddressGetParam addressGetParam)",
             "        {",
-            "       return await DbService.GetAsync<Address>"
+            "           return await DbService.GetAsync<Address>"
             "(sqlCommand.GetCommand, addressGetParam);",
             "        }",
             "",
             "         public async Task<IEnumerable<Address>> ListAsync"
             "(AddressListParam address)",
             "        {",
-            "       return await dbService.ListAsync<Address>"
+            "           return await dbService.ListAsync<Address>"
             "(sqlCommand.ListCommand, address);",
             "        }",
             "",
             "        public async Task<int> CreateAsync(Address address)",
             "        {",
-            "       return await dbService.ExecuteAsync"
+            "           return await dbService.ExecuteAsync"
             "(sqlCommand.CreateCommand, address);",
             "        }",
             "",
             "        public async Task<int> UpdateAsync(Address address)",
             "        {",
-            "       return await dbService.ExecuteAsync"
+            "           return await dbService.ExecuteAsync"
             "(sqlCommand.UpdateCommand, address);",
             "        }",
             "",
             "        public async Task<int> DeleteAsync"
             "(AddressGetParam addressGetParam)",
             "        {",
-            "       return await dbService.ExecuteAsync"
+            "           return await dbService.ExecuteAsync"
             "(sqlCommand.DeleteCommand, addressGetParam);",
             "        }",
             "    }",
@@ -1556,7 +1556,7 @@ CUSTOMER_ADDRESS_ENTITY_FILE_DATA = [
             'shipping_address_city, shipping_address_state, '
             'billing_address_street_address, billing_address_city, '
             'billing_address_state FROM customer;"',
-            '        public string CreateCommand => "INSERT INTO customer '
+            '        public string CreateCommand => "INSERT INTO customer'
             '(first_name, last_name, shipping_address_street_address, '
             'shipping_address_city, shipping_address_state, '
             'billing_address_street_address, billing_address_city, '
@@ -1593,33 +1593,33 @@ CUSTOMER_ADDRESS_ENTITY_FILE_DATA = [
             "        public async Task<Brand?> GetAsync"
             "(CustomerGetParam customerGetParam)",
             "        {",
-            "       return await DbService.GetAsync<Customer>"
+            "           return await DbService.GetAsync<Customer>"
             "(sqlCommand.GetCommand, customerGetParam);",
             "        }",
             "",
             "         public async Task<IEnumerable<Customer>> ListAsync"
             "(CustomerListParam customer)",
             "        {",
-            "       return await dbService.ListAsync<Customer>"
+            "           return await dbService.ListAsync<Customer>"
             "(sqlCommand.ListCommand, customer);",
             "        }",
             "",
             "        public async Task<int> CreateAsync(Customer customer)",
             "        {",
-            "       return await dbService.ExecuteAsync"
+            "           return await dbService.ExecuteAsync"
             "(sqlCommand.CreateCommand, customer);",
             "        }",
             "",
             "        public async Task<int> UpdateAsync(Customer customer)",
             "        {",
-            "       return await dbService.ExecuteAsync"
+            "           return await dbService.ExecuteAsync"
             "(sqlCommand.UpdateCommand, customer);",
             "        }",
             "",
             "        public async Task<int> DeleteAsync"
             "(CustomerGetParam customerGetParam)",
             "        {",
-            "       return await dbService.ExecuteAsync"
+            "           return await dbService.ExecuteAsync"
             "(sqlCommand.DeleteCommand, customerGetParam);",
             "        }",
             "    }",
