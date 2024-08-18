@@ -136,10 +136,10 @@ class ServiceUtil(ABC):
     def __init__(
         self, output_path: str, sln_name: str, service_name: str, src: str
     ):
-        self.service_path = path.join(
-            output_path, sln_name, src, service_name
-        )
+        self.sln_name = sln_name
         self.service_name = service_name
+        self.sln_path = path.join(output_path, sln_name)
+        self.service_path = path.join(self.sln_path, src, service_name)
 
     @abstractmethod
     def get_file_name(self, cls_name: str) -> str:
