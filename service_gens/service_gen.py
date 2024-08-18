@@ -4,9 +4,19 @@ from os import path
 from typing import Generator, List
 
 from data_type_mapper.data_type_mapper import (
-    LOWER_LIMIT_SBYTE, NEG_BIGINT, NEG_INTEGER, NEG_SMALLINT, POS_BIGINT,
-    POS_INTEGER, POS_SMALLINT, UPPER_LIMIT_BYTE, UPPER_LIMIT_SBYTE,
-    UPPER_LIMIT_UINT, UPPER_LIMIT_ULONG, UPPER_LIMIT_USHORT, TypeMapper
+    LOWER_LIMIT_SBYTE,
+    NEG_BIGINT,
+    NEG_INTEGER,
+    NEG_SMALLINT,
+    POS_BIGINT,
+    POS_INTEGER,
+    POS_SMALLINT,
+    UPPER_LIMIT_BYTE,
+    UPPER_LIMIT_SBYTE,
+    UPPER_LIMIT_UINT,
+    UPPER_LIMIT_ULONG,
+    UPPER_LIMIT_USHORT,
+    TypeMapper,
 )
 from entity_parser.entity import Entity, EntityField, FieldFormat, FieldType
 from utils.utils import FileData
@@ -126,7 +136,7 @@ class ServiceUtil(ABC):
     def __init__(
         self, output_path: str, sln_name: str, service_name: str, src: str
     ):
-        self.output_path = path.join(
+        self.service_path = path.join(
             output_path, sln_name, src, service_name
         )
         self.service_name = service_name

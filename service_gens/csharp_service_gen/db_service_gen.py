@@ -5,7 +5,7 @@ from data_type_mapper.data_type_mapper import TypeMapper
 from entity_parser.entity import Entity, FieldData, FieldType
 from service_gens.service_gen import ServiceGenerator, ServiceUtil
 from sql_generator.sql_generator import SqlCommandGenerator
-from utils.constants import TAB_12, TAB_4, TAB_8
+from utils.constants import TAB_4, TAB_8, TAB_12
 from utils.utils import EntityFieldData, FileData
 
 ZERO: int = 0
@@ -94,7 +94,7 @@ class DbServiceUtil(ServiceUtil):
         return f"{self.service_name}.{dir}"
 
     def get_path(self, dir: str) -> str:
-        return path.join(self.output_path, dir)
+        return path.join(self.service_path, dir)
 
     def get_repo_interface_name(self, cls_name: str) -> str:
         return f"I{cls_name}Repo"
