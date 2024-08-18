@@ -836,6 +836,305 @@ DOTNET_TYPE_ENTITY_FILE_DATA = [
     ),
 ]
 
+STATE_ENUM_ENTITY = Entity(
+    name=STATE,
+    non_ref_fields=[],
+    ref_fields=[],
+    pk_fields=[],
+    is_enum=True,
+    enum_values=["CA", "NY", "... etc ..."]
+)
+
+ADDRESS_ENTITY = Entity(
+    name=ADDRESS,
+    non_ref_fields=[
+        EntityField(
+            name="street_address",
+            field_type=FieldType.STRING,
+            max_length=None,
+            is_required=True,
+            is_primary_key=False,
+            type_ref=None,
+            format=None,
+            is_enum=False,
+            enum_values=[]
+        ),
+        EntityField(
+            name=CITY,
+            field_type=FieldType.STRING,
+            max_length=None,
+            is_required=True,
+            is_primary_key=False,
+            type_ref=None,
+            format=None,
+            is_enum=False,
+            enum_values=[]
+        )
+    ],
+    ref_fields=[
+        RefEntityField(
+            name=STATE,
+            ref_entity=STATE_ENUM_ENTITY,
+            is_required=True
+        )
+    ],
+    pk_fields=[],
+    is_enum=False,
+    enum_values=None,
+    is_sub_def=True
+)
+
+CUSTOMER_ENTITY = Entity(
+    name="customer",
+    non_ref_fields=[
+        EntityField(
+            name="first_name",
+            field_type=FieldType.STRING,
+            max_length=None,
+            is_required=True,
+            is_primary_key=False,
+            type_ref=None,
+            format=None,
+            is_enum=False,
+            enum_values=[]
+        ),
+        EntityField(
+            name="last_name",
+            field_type=FieldType.STRING,
+            max_length=None,
+            is_required=True,
+            is_primary_key=False,
+            type_ref=None,
+            format=None,
+            is_enum=False,
+            enum_values=[]
+        )
+    ],
+    ref_fields=[
+        RefEntityField(
+            name="shipping_address",
+            ref_entity=ADDRESS_ENTITY,
+            is_required=True
+        ),
+        RefEntityField(
+            name="billing_address",
+            ref_entity=ADDRESS_ENTITY,
+            is_required=True
+        )
+    ],
+    pk_fields=[],
+    is_enum=False,
+    enum_values=None
+)
+
+CUSTOMER_ADDRESS_ENTITY_FILE_DATA = [
+    FileData(
+        file_path="output/path/Ecommerce/src/ProductDal/Interfaces",
+        file_name="IDbService.cs",
+        file_content=[
+            "namespace ProductDal.Interfaces",
+            "",
+            "{",
+            "    public interface IDbService",
+            "    {",
+            "        Task<int> ExecuteAsync"
+            "(string sqlCommand, object? param);",
+            "        Task<T?> GetAsync<T>(string sqlCommand, object? param);",
+            "        Task<IEnumerable<T>> ListAsync<T>"
+            "(string sqlCommand, object? param);",
+            "    }",
+            "}",
+        ],
+    ),
+    FileData(
+        file_path="output/path/Ecommerce/src/ProductDal/DbServices",
+        file_name="DbService.cs",
+        file_content=[
+            "using System.Data;",
+            "using Dapper;",
+            "using ProductDal.Interfaces;",
+            "",
+            "namespace ProductDal.DbServices",
+            "{",
+            "    public class DbService(IDbConnection conn) : IDbService",
+            "    {",
+            "        public async Task<int> ExecuteAsync"
+            "(string sqlCommand, object? param)",
+            "        {",
+            "       return await conn.ExecuteAsync(sqlCommand, param);",
+            "        }",
+            "",
+            "        public async Task<T?> GetAsync<T>"
+            "(string sqlCommand, object? param)",
+            "        {",
+            "       return await conn.QuerySingleOrDefaultAsync<T>"
+            "(sqlCommand, param);",
+            "        }",
+            "",
+            "        public async Task<IEnumerable<T>> ListAsync<T>"
+            "(string sqlCommand, object? param)",
+            "        {",
+            "       return await conn.QueryAsync<T>(sqlCommand, param);",
+            "        }",
+            "    }",
+            "}",
+        ],
+    ),
+    FileData(
+        file_path="output/path/Ecommerce/src/ProductDal/Interfaces",
+        file_name="ISqlCommand.cs",
+        file_content=[
+            "namespace ProductDal.Interfaces",
+            "{",
+            "    public interface ISqlCommand",
+            "    {",
+            "        string GetCommand { get; }",
+            "        string ListCommand { get; }",
+            "        string CreateCommand { get; }",
+            "        string UpdateCommand { get; }",
+            "        string DeleteCommand { get; }",
+            "    }",
+            "}",
+        ],
+    ),
+    FileData(
+        file_path="output/path/Ecommerce/src/ProductDal/Interfaces",
+        file_name="IAddressRepo.cs",
+        file_content=[
+            "using ProductDal.Models;",
+            "",
+            "namespace ProductDal.Interfaces",
+            "{",
+            "    public interface IAddressRepo",
+            "    {",
+            "        Task<Address?> GetAsync"
+            "(AddressGetParam addressGetParam);",
+            "        Task<IEnumerable<Address>> ListAsync"
+            "(AddressListParam addressListParam);",
+            "        Task<int> CreateAsync(Address address);",
+            "        Task<int> UpdateAsync(Address address);",
+            "        Task<int> DeleteAsync(AddressGetParam addressGetParam);",
+            "    }",
+            "}",
+        ],
+    ),
+    FileData(
+        file_path="output/path/Ecommerce/src/ProductDal/Models",
+        file_name="AddressListParam.cs",
+        file_content=[
+            "namespace ProductDal.Models",
+            "{",
+            "    public class AddressListParam",
+            "    {",
+            "        public int Limit { get; set; } = 1000;",
+            "        public int OffSet { get; set; } = 0;",
+            "    }",
+            "}",
+        ],
+    ),
+    FileData(
+        file_path="output/path/Ecommerce/src/ProductDal/Models",
+        file_name="AddressGetParam.cs",
+        file_content=[
+            "namespace ProductDal.Models",
+            "{",
+            "    public class AddressGetParam",
+            "    {",
+            "    }",
+            "}",
+        ],
+    ),
+    FileData(
+        file_path="output/path/Ecommerce/src/ProductDal/Models",
+        file_name="Address.cs",
+        file_content=[
+            "namespace ProductDal.Models",
+            "{",
+            "    public class Address",
+            "    {",
+            "        public string street_address { get; set; } = default!;",
+            "        public string city { get; set; } = default!;",
+            "        public CSharpDataType.STRING state { get; set; }",
+            "    }",
+            "}",
+        ],
+    ),
+    FileData(
+        file_path="output/path/Ecommerce/src/ProductDal/Interfaces",
+        file_name="ICustomerRepo.cs",
+        file_content=[
+            "using ProductDal.Models;",
+            "",
+            "namespace ProductDal.Interfaces",
+            "{",
+            "    public interface ICustomerRepo",
+            "    {",
+            "        Task<Customer?> GetAsync"
+            "(CustomerGetParam customerGetParam);",
+            "        Task<IEnumerable<Customer>> ListAsync"
+            "(CustomerListParam customerListParam);",
+            "        Task<int> CreateAsync(Customer customer);",
+            "        Task<int> UpdateAsync(Customer customer);",
+            "        Task<int> DeleteAsync"
+            "(CustomerGetParam customerGetParam);",
+            "    }",
+            "}",
+        ],
+    ),
+    FileData(
+        file_path="output/path/Ecommerce/src/ProductDal/Models",
+        file_name="CustomerListParam.cs",
+        file_content=[
+            "namespace ProductDal.Models",
+            "{",
+            "    public class CustomerListParam",
+            "    {",
+            "        public int Limit { get; set; } = 1000;",
+            "        public int OffSet { get; set; } = 0;",
+            "    }",
+            "}",
+        ],
+    ),
+    FileData(
+        file_path="output/path/Ecommerce/src/ProductDal/Models",
+        file_name="CustomerGetParam.cs",
+        file_content=[
+            "namespace ProductDal.Models",
+            "{",
+            "    public class CustomerGetParam",
+            "    {",
+            "    }",
+            "}",
+        ],
+    ),
+    FileData(
+        file_path="output/path/Ecommerce/src/ProductDal/Models",
+        file_name="Customer.cs",
+        file_content=[
+            "namespace ProductDal.Models",
+            "{",
+            "    public class Customer",
+            "    {",
+            "        public string first_name { get; set; } = default!;",
+            "        public string last_name { get; set; } = default!;",
+            "        public string shipping_address_street_address "
+            "{ get; set; } = default!;",
+            "        public string shipping_address_city "
+            "{ get; set; } = default!;",
+            "        public CSharpDataType.STRING shipping_address_state "
+            "{ get; set; }",
+            "        public string billing_address_street_address "
+            "{ get; set; } = default!;",
+            "        public string billing_address_city { get; set; } = "
+            "default!;",
+            "        public CSharpDataType.STRING billing_address_state "
+            "{ get; set; }",
+            "    }",
+            "}",
+        ],
+    ),
+]
+
 
 class TestDbServiceGenerator(unittest.TestCase):
     def setUp(self) -> None:
@@ -857,6 +1156,11 @@ class TestDbServiceGenerator(unittest.TestCase):
             "dotnet_types_entity",
             [DOT_NET_TYPE_ENTITY],
             DOTNET_TYPE_ENTITY_FILE_DATA,
+        ),
+        (
+            "customer_address_entity",
+            [ADDRESS_ENTITY, CUSTOMER_ENTITY],
+            CUSTOMER_ADDRESS_ENTITY_FILE_DATA
         )
     ])
     def test_gen_service(
@@ -873,4 +1177,5 @@ class TestDbServiceGenerator(unittest.TestCase):
             db_type_mapper=None
         )
         actual_file_data = list(service_gen.gen_service())
+        print(actual_file_data)
         self.assertEqual(expected_file_data, actual_file_data)
