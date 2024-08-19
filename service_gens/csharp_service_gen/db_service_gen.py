@@ -328,7 +328,7 @@ class DbServiceGenerator(ServiceGenerator):
         update_sql: str = f'"{self.sql_gen.gen_update_sql_statement()}";'
         delete_sql: str = f'"{self.sql_gen.gen_delete_sql_statement()}";'
         file_content = [
-            f"using {self.svc_dir.interfaces_ns}",
+            f"using {self.svc_dir.interfaces_ns};",
             "",
             f"namespace {self.svc_dir.sql_cmd_ns}",
             "{",

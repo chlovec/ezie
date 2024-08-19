@@ -72,7 +72,7 @@ class CsharpServiceUtil(ServiceUtil):
 
     @property
     def sql_cmd_ns(self) -> str:
-        return self.get_name_space(INTERFACES)
+        return self.get_name_space(SQL_COMMANDS)
 
     # interfaces
     @property
