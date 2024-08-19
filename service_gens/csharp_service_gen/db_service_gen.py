@@ -104,7 +104,7 @@ class DbServiceGenerator(ServiceGenerator):
             null_type = "" if fld.is_required else "?"
             default_clause = self._get_default_clause(fld)
             prop_type = fld.data_type
-            fld_name = fld.name
+            fld_name = self.svc_dir.normalize_name(fld.name)
 
             # handle list properties
             if is_list:
