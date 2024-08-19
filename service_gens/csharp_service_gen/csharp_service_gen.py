@@ -1,5 +1,6 @@
 import os
 import subprocess
+from data_type_mapper.data_type_mapper import TypeMapper
 from entity_parser.entity_parser import JsonSchemaParser
 from service_gens.csharp_service_gen.db_service_gen import (
     DbServiceGenerator
@@ -8,8 +9,8 @@ from service_gens.csharp_service_gen.utils import (
     SECRET_MANAGER, CsharpServiceUtil
 )
 from service_gens.service_gen import CSharpTypeMapper
-from sql_generator.sql_generator import PgsqlCommandGenerator
-from utils.utils import FileData
+from sql_generator.sql_generator import SqlCommandGenerator, TableSqlGenerator
+from utils.utils import write_file_data
 
 
 class DotnetProcessRunner:
@@ -107,7 +108,10 @@ class CsharpRestServiceGenerator:
         output_path: str,
         sln_name: str,
         service_name: str,
-        file_content: str
+        file_content: str,
+        sql_gen: SqlCommandGenerator,
+        db_type_mapper: TypeMapper,
+        db_script_gen: TableSqlGenerator
     ) -> None:
         # Setup project
         svc_util = CsharpServiceUtil(
@@ -135,15 +139,17 @@ class CsharpRestServiceGenerator:
             entities=entities,
             pl_type_mapper=CSharpTypeMapper(),
             db_type_mapper=None,
-            sql_gen=PgsqlCommandGenerator(entity=None)
+            sql_gen=sql_gen
         )
 
         for file_data in service_gen.gen_service():
-            CsharpRestServiceGenerator.write_file_data(file_data)
+            write_file_data(file_data)
 
-    @staticmethod
-    def write_file_data(file_data: FileData) -> None:
-        file_path = os.path.join(file_data.file_path, file_data.file_name)
-        with open(file_path, "w") as file:
-            for line in file_data.file_content:
-                file.write(line + "\n")
+        # Write db scripts
+        db_scripts_data = db_script_gen.gen_db_scripts_file_data(
+            entities=entities,
+            type_mapper=db_type_mapper,
+            file_path=svc_dir.db_scripts_dir_path,
+            file_name=svc_dir.db_scripts_file_name
+        )
+        write_file_data(db_scripts_data)

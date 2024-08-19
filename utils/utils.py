@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import os
 from typing import List, NamedTuple
 
 from data_type_mapper.data_type_mapper import TypeMapper
@@ -27,6 +28,13 @@ def get_field_data(
         )
         for fld in non_ref_fields
     ]
+
+
+def write_file_data(file_data: "FileData") -> None:
+    file_path = os.path.join(file_data.file_path, file_data.file_name)
+    with open(file_path, "w") as file:
+        for line in file_data.file_content:
+            file.write(line + "\n")
 
 
 def get_ref_field_data(

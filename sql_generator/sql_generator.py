@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
 from typing import List, Tuple
 
-from entity_parser.entity import FieldData
+from data_type_mapper.data_type_mapper import TypeMapper
+from entity_parser.entity import Entity, FieldData
 from utils.constants import TAB_4
-from utils.utils import EntityFieldData, remove_last_comma
+from utils.utils import EntityFieldData, FileData, remove_last_comma
 
 
 END_TOKEN: str = ";"
@@ -130,6 +131,15 @@ class TableSqlGenerator(ABC):
     def gen_table_sql(self, entity: EntityFieldData) -> List[str]:
         pass
 
+    @abstractmethod
+    def gen_db_scripts_file_data(
+        self, entities: List[Entity],
+        type_mapper: TypeMapper,
+        file_path: str,
+        file_name: str
+    ) -> FileData:
+        pass
+
 
 class PgsqlTableSqlGenerator(TableSqlGenerator):
     def _get_nullable_part(self, field: FieldData) -> str:
@@ -215,3 +225,21 @@ class PgsqlTableSqlGenerator(TableSqlGenerator):
         # Close and return create table statement
         sql_strs.append(");")
         return sql_strs
+
+    def gen_db_scripts_file_data(
+        self, entities: List[Entity],
+        type_mapper: TypeMapper,
+        file_path: str,
+        file_name: str
+    ) -> FileData:
+        file_content: List[str] = []
+        for entity in entities:
+            entity_data = EntityFieldData.from_entity(entity, type_mapper)
+            file_content += self.gen_table_sql(entity_data)
+            file_content += []
+
+        return FileData(
+            file_path=file_path,
+            file_name=file_name,
+            file_content=file_content
+        )

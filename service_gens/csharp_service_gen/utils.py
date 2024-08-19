@@ -7,6 +7,7 @@ ONE: int = 1
 
 CLASS_1_CS: str = "Class1.cs"
 CS_EXT: str = ".cs"
+DB_SCRIPT_FILE: str = "init.sql"
 DB_SCRIPTS: str = "DbScripts"
 DB_SERVICE = "DbService"
 DB_SERVICES: str = "DbServices"
@@ -106,6 +107,10 @@ class CsharpServiceUtil(ServiceUtil):
     @property
     def sln_full_name(self) -> str:
         return path.join(self.sln_path, self.sln_name + ".sln")
+
+    @property
+    def db_scripts_file_name(self) -> str:
+        return DB_SCRIPT_FILE
 
     # utility methods
     def get_file_name(self, cls_name: str) -> str:
