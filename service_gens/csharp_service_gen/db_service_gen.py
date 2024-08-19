@@ -1,122 +1,19 @@
-from os import path
 from typing import Generator, List
 
 from data_type_mapper.data_type_mapper import TypeMapper
 from entity_parser.entity import Entity, FieldData, FieldType
-from service_gens.service_gen import ServiceGenerator, ServiceUtil
+from service_gens.csharp_service_gen.utils import CsharpServiceUtil
+from service_gens.service_gen import ServiceGenerator
 from sql_generator.sql_generator import SqlCommandGenerator
 from utils.constants import TAB_4, TAB_8, TAB_12
 from utils.utils import EntityFieldData, FileData
-
-ZERO: int = 0
-ONE: int = 1
-
-CS_EXT: str = ".cs"
-DB_SERVICE = "DbService"
-DB_SERVICES: str = "DbServices"
-INTERFACES: str = "Interfaces"
-MODELS: str = "Models"
-REPOS: str = "Repos"
-SQL_COMMANDS: str = "SqlCommands"
-
-
-class DbServiceUtil(ServiceUtil):
-    # file paths
-    @property
-    def interfaces_dir_path(self) -> str:
-        return self.get_path(INTERFACES)
-
-    @property
-    def models_dir_path(self) -> str:
-        return self.get_path(MODELS)
-
-    @property
-    def repos_dir_path(self) -> str:
-        return self.get_path(REPOS)
-
-    @property
-    def db_services_dir_path(self) -> str:
-        return self.get_path(DB_SERVICES)
-
-    @property
-    def sql_cmd_dir_path(self) -> str:
-        return self.get_path(SQL_COMMANDS)
-
-    # namespaces
-    @property
-    def db_service_ns(self) -> str:
-        return self.get_name_space(DB_SERVICES)
-
-    @property
-    def model_ns(self) -> str:
-        return self.get_name_space(MODELS)
-
-    @property
-    def repos_ns(self) -> str:
-        return self.get_name_space(REPOS)
-
-    @property
-    def interfaces_ns(self) -> str:
-        return self.get_name_space(INTERFACES)
-
-    @property
-    def sql_cmd_ns(self) -> str:
-        return self.get_name_space(INTERFACES)
-
-    # interfaces
-    @property
-    def db_service_interface_name(self) -> str:
-        return "IDbService"
-
-    @property
-    def sql_cmd_interface_name(self) -> str:
-        return "ISqlCommand"
-
-    # class names
-    @property
-    def db_service_class_name(self) -> str:
-        return DB_SERVICE
-
-    # utility methods
-    def get_file_name(self, cls_name: str) -> str:
-        return f"{cls_name}{CS_EXT}"
-
-    def get_get_param_name(self, cls_name: str) -> str:
-        return f"{cls_name}GetParam"
-
-    def get_list_param_name(self, cls_name: str) -> str:
-        return f"{cls_name}ListParam"
-
-    def get_interface_name(self, cls_name: str) -> str:
-        return f"I{cls_name}"
-
-    def get_name_space(self, dir: str) -> str:
-        return f"{self.service_name}.{dir}"
-
-    def get_path(self, dir: str) -> str:
-        return path.join(self.service_path, dir)
-
-    def get_repo_interface_name(self, cls_name: str) -> str:
-        return f"I{cls_name}Repo"
-
-    def get_repo_name(self, cls_name: str) -> str:
-        return f"{cls_name}Repo"
-
-    def get_var_name(self, cls_name: str) -> str:
-        return cls_name[ZERO].lower() + cls_name[ONE:]
-
-    def normalize_name(self, cls_name: str) -> str:
-        return cls_name[ZERO].upper() + cls_name[ONE:]
-
-    def get_sql_cmd_name(self, cls_name: str) -> str:
-        return f"{cls_name}SqlCommand"
 
 
 class DbServiceGenerator(ServiceGenerator):
     def __init__(
         self,
         service_name: str,
-        svc_dir: DbServiceUtil,
+        svc_dir: CsharpServiceUtil,
         entities: List[Entity],
         pl_type_mapper: TypeMapper,
         db_type_mapper: TypeMapper = None,
@@ -228,7 +125,7 @@ class DbServiceGenerator(ServiceGenerator):
 
         return FileData(
             file_path=file_path,
-            file_name=f"{class_name}{CS_EXT}",
+            file_name=self.svc_dir.get_file_name(class_name),
             file_content=file_content
         )
 

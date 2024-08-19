@@ -6,8 +6,9 @@ from entity_parser.entity import (
     Entity, EntityField, FieldFormat, FieldType, RefEntityField
 )
 from service_gens.csharp_service_gen.db_service_gen import (
-    DbServiceGenerator, DbServiceUtil
+    DbServiceGenerator
 )
+from service_gens.csharp_service_gen.utils import CsharpServiceUtil
 from service_gens.service_gen import CSharpTypeMapper
 from sql_generator.sql_generator import PgsqlCommandGenerator
 from utils.utils import FileData
@@ -1632,7 +1633,7 @@ CUSTOMER_ADDRESS_ENTITY_FILE_DATA = [
 class TestDbServiceGenerator(unittest.TestCase):
     def setUp(self) -> None:
         self.maxDiff = None
-        self.svc_dir = DbServiceUtil(
+        self.svc_dir = CsharpServiceUtil(
             output_path=OUTPUT_PATH,
             sln_name=ECOMMERCE,
             service_name=PRODUCT_DAL,
