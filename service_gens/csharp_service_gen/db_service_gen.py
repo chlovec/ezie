@@ -1,9 +1,9 @@
 from typing import Generator, List
 
 from data_type_mapper.data_type_mapper import TypeMapper
-from entity_parser.entity import Entity, FieldData, FieldType
+from entity_parser.entity import Entity, FieldData
 from service_gens.csharp_service_gen.utils import CsharpServiceUtil
-from service_gens.service_gen import ServiceGenerator
+from service_gens.service_gen import CSharpDataType, ServiceGenerator
 from sql_generator.sql_generator import SqlCommandGenerator
 from utils.constants import TAB_4, TAB_8, TAB_12
 from utils.utils import EntityFieldData, FileData
@@ -136,7 +136,11 @@ class DbServiceGenerator(ServiceGenerator):
         ]
 
     def _get_default_clause(self, field: FieldData) -> str:
-        if field.is_required and field.data_type == FieldType.STRING.value:
+        default_filed_types: List[str] = [
+            CSharpDataType.STRING.value,
+            CSharpDataType.GUID.value
+        ]
+        if field.is_required and field.data_type in default_filed_types:
             return " = default!;"
         return ""
 
