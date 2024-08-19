@@ -1,7 +1,13 @@
 from os import path
 import os
 import subprocess
-from service_gens.service_gen import ServiceUtil
+from entity_parser.entity_parser import JsonSchemaParser
+from service_gens.csharp_service_gen.db_service_gen import (
+    DbServiceGenerator, DbServiceUtil
+)
+from service_gens.service_gen import CSharpTypeMapper, ServiceUtil
+from sql_generator.sql_generator import PgsqlCommandGenerator
+from utils.utils import FileData
 
 ZERO: int = 0
 ONE: int = 0
@@ -230,3 +236,51 @@ class DotnetProcessRunner:
             check=True,
             text=True
         )
+
+
+class CsharpRestServiceGenerator:
+    @staticmethod
+    def gen_services_from_file_content(
+        output_path: str,
+        sln_name: str,
+        service_name: str,
+        file_content: str
+    ) -> None:
+        # Setup project
+        svc_util = CsharpServiceUtil(
+            output_path=output_path,
+            sln_name=sln_name,
+            service_name=service_name + "Dal",
+            src="src"
+        )
+        DotnetProcessRunner.setup_project(svc_util)
+
+        # Parse Json Schema
+        parser = JsonSchemaParser()
+        entities = parser.parse(file_content=file_content)
+
+        # Generate and write db service files
+        svc_dir = DbServiceUtil(
+            output_path=output_path,
+            sln_name=sln_name,
+            service_name=service_name + "Dal",
+            src="src"
+        )
+        service_gen = DbServiceGenerator(
+            service_name=service_name,
+            svc_dir=svc_dir,
+            entities=entities,
+            pl_type_mapper=CSharpTypeMapper(),
+            db_type_mapper=None,
+            sql_gen=PgsqlCommandGenerator(entity=None)
+        )
+
+        for file_data in service_gen.gen_service():
+            CsharpRestServiceGenerator.write_file_data(file_data)
+
+    @staticmethod
+    def write_file_data(file_data: FileData) -> None:
+        file_path = os.path.join(file_data.file_path, file_data.file_name)
+        with open(file_path, "w") as file:
+            for line in file_data.file_content:
+                file.write(line + "\n")
