@@ -6,6 +6,7 @@ from service_gens.service_gen import ServiceUtil
 ZERO: int = 0
 ONE: int = 0
 
+CLASS_1_CS: str = "Class1.cs"
 CS_EXT: str = ".cs"
 DB_SCRIPTS: str = "DbScripts"
 DB_SERVICE = "DbService"
@@ -87,6 +88,26 @@ class CsharpServiceUtil(ServiceUtil):
     def db_service_class_name(self) -> str:
         return DB_SERVICE
 
+    @property
+    def proj_full_name(self) -> str:
+        return path.join(self.service_path, self.service_name + ".csproj")
+
+    @property
+    def secret_mgr_full_name(self) -> str:
+        return path.join(self.secret_mgr_dir_path, SECRET_MANAGER + ".csproj")
+
+    @property
+    def secret_mgr_class1_cs(self) -> str:
+        return path.join(self.secret_mgr_dir_path, CLASS_1_CS)
+
+    @property
+    def service_class1_cs(self) -> str:
+        return path.join(self.service_path, CLASS_1_CS)
+
+    @property
+    def sln_full_name(self) -> str:
+        return path.join(self.sln_path, self.sln_name + ".sln")
+
     # utility methods
     def get_file_name(self, cls_name: str) -> str:
         return f"{cls_name}{CS_EXT}"
@@ -121,18 +142,6 @@ class CsharpServiceUtil(ServiceUtil):
     def get_sql_cmd_name(self, cls_name: str) -> str:
         return f"{cls_name}SqlCommand"
 
-    @property
-    def proj_full_name(self) -> str:
-        return path.join(self.service_path, self.service_name + ".csproj")
-
-    @property
-    def secret_mgr_full_name(self) -> str:
-        return path.join(self.secret_mgr_dir_path, SECRET_MANAGER + ".csproj")
-
-    @property
-    def sln_full_name(self) -> str:
-        return path.join(self.sln_path, self.sln_name + ".sln")
-
 
 class DotnetProcessRunner:
     @staticmethod
@@ -159,8 +168,9 @@ class DotnetProcessRunner:
         for dir_path in dir_paths:
             os.mkdir(dir_path)
 
-        # TO-DOS:
-        # delete Class1.cs file in both db service and secret manager
+        # Delete Class1.cs files
+        os.remove(svc_util.service_class1_cs)
+        os.remove(svc_util.secret_mgr_class1_cs)
 
     @staticmethod
     def create_sln(svc_util: CsharpServiceUtil) -> None:
