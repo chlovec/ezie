@@ -236,7 +236,7 @@ class PgsqlTableSqlGenerator(TableSqlGenerator):
         for entity in entities:
             entity_data = EntityFieldData.from_entity(entity, type_mapper)
             file_content += self.gen_table_sql(entity_data)
-            file_content += []
+            file_content.append("")
 
         return FileData(
             file_path=file_path,
