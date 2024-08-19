@@ -138,6 +138,7 @@ class ServiceUtil(ABC):
     ):
         self.sln_name = sln_name
         self.service_name = service_name
+        self.src = src
         self.sln_path = path.join(output_path, sln_name)
         self.service_path = path.join(self.sln_path, src, service_name)
 
