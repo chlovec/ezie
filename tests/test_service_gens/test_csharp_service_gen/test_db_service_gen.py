@@ -1128,31 +1128,42 @@ DOTNET_TYPE_ENTITY_FILE_DATA = [
             "",
             "namespace ProductDal.Repos",
             "{",
-            "    public class DotNetDataTypesRepo(IDbService dbService, ISqlCommand sqlCommand) : IDotNetDataTypesRepo",
+            "    public class DotNetDataTypesRepo(IDbService dbService, "
+            "ISqlCommand sqlCommand) : IDotNetDataTypesRepo",
             "    {",
-            "        public async Task<DotNetDataTypes?> GetAsync(DotNetDataTypesGetParam dotNetDataTypesGetParam)",
+            "        public async Task<DotNetDataTypes?> GetAsync"
+            "(DotNetDataTypesGetParam dotNetDataTypesGetParam)",
             "        {",
-            "           return await dbService.GetAsync<DotNetDataTypes>(sqlCommand.GetCommand, dotNetDataTypesGetParam);",
+            "           return await dbService.GetAsync<DotNetDataTypes>"
+            "(sqlCommand.GetCommand, dotNetDataTypesGetParam);",
             "        }",
             "",
-            "         public async Task<IEnumerable<DotNetDataTypes>> ListAsync(DotNetDataTypesListParam dotNetDataTypes)",
+            "         public async Task<IEnumerable<DotNetDataTypes>> "
+            "ListAsync(DotNetDataTypesListParam dotNetDataTypes)",
             "        {",
-            "           return await dbService.ListAsync<DotNetDataTypes>(sqlCommand.ListCommand, dotNetDataTypes);",
+            "           return await dbService.ListAsync<DotNetDataTypes>"
+            "(sqlCommand.ListCommand, dotNetDataTypes);",
             "        }",
             "",
-            "        public async Task<int> CreateAsync(DotNetDataTypes dotNetDataTypes)",
+            "        public async Task<int> CreateAsync"
+            "(DotNetDataTypes dotNetDataTypes)",
             "        {",
-            "           return await dbService.ExecuteAsync(sqlCommand.CreateCommand, dotNetDataTypes);",
+            "           return await dbService.ExecuteAsync"
+            "(sqlCommand.CreateCommand, dotNetDataTypes);",
             "        }",
             "",
-            "        public async Task<int> UpdateAsync(DotNetDataTypes dotNetDataTypes)",
+            "        public async Task<int> UpdateAsync"
+            "(DotNetDataTypes dotNetDataTypes)",
             "        {",
-            "           return await dbService.ExecuteAsync(sqlCommand.UpdateCommand, dotNetDataTypes);",
+            "           return await dbService.ExecuteAsync"
+            "(sqlCommand.UpdateCommand, dotNetDataTypes);",
             "        }",
             "",
-            "        public async Task<int> DeleteAsync(DotNetDataTypesGetParam dotNetDataTypesGetParam)",
+            "        public async Task<int> DeleteAsync"
+            "(DotNetDataTypesGetParam dotNetDataTypesGetParam)",
             "        {",
-            "           return await dbService.ExecuteAsync(sqlCommand.DeleteCommand, dotNetDataTypesGetParam);",
+            "           return await dbService.ExecuteAsync"
+            "(sqlCommand.DeleteCommand, dotNetDataTypesGetParam);",
             "        }",
             "    }",
             "}",
@@ -1261,9 +1272,11 @@ CUSTOMER_ADDRESS_ENTITY_FILE_DATA = [
             "{",
             "    public interface IDbService",
             "    {",
-            "        Task<int> ExecuteAsync(string sqlCommand, object? param);",
+            "        Task<int> ExecuteAsync"
+            "(string sqlCommand, object? param);",
             "        Task<T?> GetAsync<T>(string sqlCommand, object? param);",
-            "        Task<IEnumerable<T>> ListAsync<T>(string sqlCommand, object? param);",
+            "        Task<IEnumerable<T>> ListAsync<T>"
+            "(string sqlCommand, object? param);",
             "    }",
             "}",
         ],
@@ -1280,17 +1293,21 @@ CUSTOMER_ADDRESS_ENTITY_FILE_DATA = [
             "{",
             "    public class DbService(IDbConnection conn) : IDbService",
             "    {",
-            "        public async Task<int> ExecuteAsync(string sqlCommand, object? param)",
+            "        public async Task<int> ExecuteAsync"
+            "(string sqlCommand, object? param)",
             "        {",
             "           return await conn.ExecuteAsync(sqlCommand, param);",
             "        }",
             "",
-            "        public async Task<T?> GetAsync<T>(string sqlCommand, object? param)",
+            "        public async Task<T?> GetAsync<T>"
+            "(string sqlCommand, object? param)",
             "        {",
-            "           return await conn.QuerySingleOrDefaultAsync<T>(sqlCommand, param);",
+            "           return await conn.QuerySingleOrDefaultAsync<T>"
+            "(sqlCommand, param);",
             "        }",
             "",
-            "        public async Task<IEnumerable<T>> ListAsync<T>(string sqlCommand, object? param)",
+            "        public async Task<IEnumerable<T>> ListAsync<T>"
+            "(string sqlCommand, object? param)",
             "        {",
             "           return await conn.QueryAsync<T>(sqlCommand, param);",
             "        }",
@@ -1325,8 +1342,10 @@ CUSTOMER_ADDRESS_ENTITY_FILE_DATA = [
             "{",
             "    public interface IAddressRepo",
             "    {",
-            "        Task<Address?> GetAsync(AddressGetParam addressGetParam);",
-            "        Task<IEnumerable<Address>> ListAsync(AddressListParam addressListParam);",
+            "        Task<Address?> GetAsync"
+            "(AddressGetParam addressGetParam);",
+            "        Task<IEnumerable<Address>> ListAsync"
+            "(AddressListParam addressListParam);",
             "        Task<int> CreateAsync(Address address);",
             "        Task<int> UpdateAsync(Address address);",
             "        Task<int> DeleteAsync(AddressGetParam addressGetParam);",
@@ -1385,10 +1404,16 @@ CUSTOMER_ADDRESS_ENTITY_FILE_DATA = [
             "{",
             "    public class AddressSqlCommand : ISqlCommand",
             "    {",
-            '        public string GetCommand => "SELECT street_address, city, state FROM address;";',
-            '        public string ListCommand => "SELECT street_address, city, state FROM address;";',
-            '        public string CreateCommand => "INSERT INTO address(street_address, city, state) VALUES(@street_address, @city, @state);";',
-            '        public string UpdateCommand => "UPDATE address  SET street_address = @street_address, city = @city, state = @state;";',
+            '        public string GetCommand => "'
+            'SELECT street_address, city, state FROM address;";',
+            '        public string ListCommand => "'
+            'SELECT street_address, city, state FROM address;";',
+            '        public string CreateCommand => "'
+            'INSERT INTO address(street_address, city, state) '
+            'VALUES(@street_address, @city, @state);";',
+            '        public string UpdateCommand => "'
+            'UPDATE address  SET street_address = @street_address, '
+            'city = @city, state = @state;";',
             '        public string DeleteCommand => "DELETE FROM address;";',
             "    }",
             "}",
@@ -1403,31 +1428,40 @@ CUSTOMER_ADDRESS_ENTITY_FILE_DATA = [
             "",
             "namespace ProductDal.Repos",
             "{",
-            "    public class AddressRepo(IDbService dbService, ISqlCommand sqlCommand) : IAddressRepo",
+            "    public class AddressRepo"
+            "(IDbService dbService, ISqlCommand sqlCommand) : IAddressRepo",
             "    {",
-            "        public async Task<Address?> GetAsync(AddressGetParam addressGetParam)",
+            "        public async Task<Address?> GetAsync"
+            "(AddressGetParam addressGetParam)",
             "        {",
-            "           return await dbService.GetAsync<Address>(sqlCommand.GetCommand, addressGetParam);",
+            "           return await dbService.GetAsync<Address>"
+            "(sqlCommand.GetCommand, addressGetParam);",
             "        }",
             "",
-            "         public async Task<IEnumerable<Address>> ListAsync(AddressListParam address)",
+            "         public async Task<IEnumerable<Address>> ListAsync"
+            "(AddressListParam address)",
             "        {",
-            "           return await dbService.ListAsync<Address>(sqlCommand.ListCommand, address);",
+            "           return await dbService.ListAsync<Address>"
+            "(sqlCommand.ListCommand, address);",
             "        }",
             "",
             "        public async Task<int> CreateAsync(Address address)",
             "        {",
-            "           return await dbService.ExecuteAsync(sqlCommand.CreateCommand, address);",
+            "           return await dbService.ExecuteAsync"
+            "(sqlCommand.CreateCommand, address);",
             "        }",
             "",
             "        public async Task<int> UpdateAsync(Address address)",
             "        {",
-            "           return await dbService.ExecuteAsync(sqlCommand.UpdateCommand, address);",
+            "           return await dbService.ExecuteAsync"
+            "(sqlCommand.UpdateCommand, address);",
             "        }",
             "",
-            "        public async Task<int> DeleteAsync(AddressGetParam addressGetParam)",
+            "        public async Task<int> DeleteAsync"
+            "(AddressGetParam addressGetParam)",
             "        {",
-            "           return await dbService.ExecuteAsync(sqlCommand.DeleteCommand, addressGetParam);",
+            "           return await dbService.ExecuteAsync"
+            "(sqlCommand.DeleteCommand, addressGetParam);",
             "        }",
             "    }",
             "}",
@@ -1443,11 +1477,14 @@ CUSTOMER_ADDRESS_ENTITY_FILE_DATA = [
             "{",
             "    public interface ICustomerRepo",
             "    {",
-            "        Task<Customer?> GetAsync(CustomerGetParam customerGetParam);",
-            "        Task<IEnumerable<Customer>> ListAsync(CustomerListParam customerListParam);",
+            "        Task<Customer?> GetAsync"
+            "(CustomerGetParam customerGetParam);",
+            "        Task<IEnumerable<Customer>> ListAsync"
+            "(CustomerListParam customerListParam);",
             "        Task<int> CreateAsync(Customer customer);",
             "        Task<int> UpdateAsync(Customer customer);",
-            "        Task<int> DeleteAsync(CustomerGetParam customerGetParam);",
+            "        Task<int> DeleteAsync"
+            "(CustomerGetParam customerGetParam);",
             "    }",
             "}",
         ],
@@ -1488,12 +1525,18 @@ CUSTOMER_ADDRESS_ENTITY_FILE_DATA = [
             "    {",
             "        public string First_name { get; set; } = default!;",
             "        public string Last_name { get; set; } = default!;",
-            "        public string Shipping_address_street_address { get; set; } = default!;",
-            "        public string Shipping_address_city { get; set; } = default!;",
-            "        public CSharpDataType.STRING Shipping_address_state { get; set; }",
-            "        public string Billing_address_street_address { get; set; } = default!;",
-            "        public string Billing_address_city { get; set; } = default!;",
-            "        public CSharpDataType.STRING Billing_address_state { get; set; }",
+            "        public string Shipping_address_street_address "
+            "{ get; set; } = default!;",
+            "        public string Shipping_address_city { get; set; } = "
+            "default!;",
+            "        public CSharpDataType.STRING Shipping_address_state "
+            "{ get; set; }",
+            "        public string Billing_address_street_address "
+            "{ get; set; } = default!;",
+            "        public string Billing_address_city { get; set; } "
+            "= default!;",
+            "        public CSharpDataType.STRING Billing_address_state "
+            "{ get; set; }",
             "    }",
             "}",
         ],
@@ -1508,10 +1551,34 @@ CUSTOMER_ADDRESS_ENTITY_FILE_DATA = [
             "{",
             "    public class CustomerSqlCommand : ISqlCommand",
             "    {",
-            '        public string GetCommand => "SELECT first_name, last_name, shipping_address_street_address, shipping_address_city, shipping_address_state, billing_address_street_address, billing_address_city, billing_address_state FROM customer;";',
-            '        public string ListCommand => "SELECT first_name, last_name, shipping_address_street_address, shipping_address_city, shipping_address_state, billing_address_street_address, billing_address_city, billing_address_state FROM customer;";',
-            '        public string CreateCommand => "INSERT INTO customer(first_name, last_name, shipping_address_street_address, shipping_address_city, shipping_address_state, billing_address_street_address, billing_address_city, billing_address_state) VALUES(@first_name, @last_name, @shipping_address_street_address, @shipping_address_city, @shipping_address_state, @billing_address_street_address, @billing_address_city, @billing_address_state);";',
-            '        public string UpdateCommand => "UPDATE customer  SET first_name = @first_name, last_name = @last_name, shipping_address_street_address = @shipping_address_street_address, shipping_address_city = @shipping_address_city, shipping_address_state = @shipping_address_state, billing_address_street_address = @billing_address_street_address, billing_address_city = @billing_address_city, billing_address_state = @billing_address_state;";',
+            '        public string GetCommand => "'
+            'SELECT first_name, last_name, shipping_address_street_address, '
+            'shipping_address_city, shipping_address_state, '
+            'billing_address_street_address, billing_address_city, '
+            'billing_address_state FROM customer;";',
+            '        public string ListCommand => "SELECT first_name, '
+            'last_name, shipping_address_street_address, '
+            'shipping_address_city, shipping_address_state, '
+            'billing_address_street_address, billing_address_city, '
+            'billing_address_state FROM customer;";',
+            '        public string CreateCommand => "'
+            'INSERT INTO customer(first_name, last_name, '
+            'shipping_address_street_address, shipping_address_city, '
+            'shipping_address_state, billing_address_street_address, '
+            'billing_address_city, billing_address_state) '
+            'VALUES(@first_name, @last_name, @shipping_address_street_address,'
+            ' @shipping_address_city, @shipping_address_state, '
+            '@billing_address_street_address, @billing_address_city, '
+            '@billing_address_state);";',
+            '        public string UpdateCommand => "'
+            'UPDATE customer  SET first_name = @first_name, '
+            'last_name = @last_name, shipping_address_street_address = '
+            '@shipping_address_street_address, shipping_address_city = '
+            '@shipping_address_city, shipping_address_state = '
+            '@shipping_address_state, billing_address_street_address = '
+            '@billing_address_street_address, billing_address_city = '
+            '@billing_address_city, '
+            'billing_address_state = @billing_address_state;";',
             '        public string DeleteCommand => "DELETE FROM customer;";',
             "    }",
             "}",
@@ -1526,31 +1593,40 @@ CUSTOMER_ADDRESS_ENTITY_FILE_DATA = [
             "",
             "namespace ProductDal.Repos",
             "{",
-            "    public class CustomerRepo(IDbService dbService, ISqlCommand sqlCommand) : ICustomerRepo",
+            "    public class CustomerRepo"
+            "(IDbService dbService, ISqlCommand sqlCommand) : ICustomerRepo",
             "    {",
-            "        public async Task<Customer?> GetAsync(CustomerGetParam customerGetParam)",
+            "        public async Task<Customer?> GetAsync"
+            "(CustomerGetParam customerGetParam)",
             "        {",
-            "           return await dbService.GetAsync<Customer>(sqlCommand.GetCommand, customerGetParam);",
+            "           return await dbService.GetAsync<Customer>"
+            "(sqlCommand.GetCommand, customerGetParam);",
             "        }",
             "",
-            "         public async Task<IEnumerable<Customer>> ListAsync(CustomerListParam customer)",
+            "         public async Task<IEnumerable<Customer>> ListAsync"
+            "(CustomerListParam customer)",
             "        {",
-            "           return await dbService.ListAsync<Customer>(sqlCommand.ListCommand, customer);",
+            "           return await dbService.ListAsync<Customer>"
+            "(sqlCommand.ListCommand, customer);",
             "        }",
             "",
             "        public async Task<int> CreateAsync(Customer customer)",
             "        {",
-            "           return await dbService.ExecuteAsync(sqlCommand.CreateCommand, customer);",
+            "           return await dbService.ExecuteAsync"
+            "(sqlCommand.CreateCommand, customer);",
             "        }",
             "",
             "        public async Task<int> UpdateAsync(Customer customer)",
             "        {",
-            "           return await dbService.ExecuteAsync(sqlCommand.UpdateCommand, customer);",
+            "           return await dbService.ExecuteAsync"
+            "(sqlCommand.UpdateCommand, customer);",
             "        }",
             "",
-            "        public async Task<int> DeleteAsync(CustomerGetParam customerGetParam)",
+            "        public async Task<int> DeleteAsync"
+            "(CustomerGetParam customerGetParam)",
             "        {",
-            "           return await dbService.ExecuteAsync(sqlCommand.DeleteCommand, customerGetParam);",
+            "           return await dbService.ExecuteAsync"
+            "(sqlCommand.DeleteCommand, customerGetParam);",
             "        }",
             "    }",
             "}",
