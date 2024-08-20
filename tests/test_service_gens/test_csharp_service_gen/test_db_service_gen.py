@@ -169,9 +169,11 @@ ECOMMERCE_FILE_DATA = [
             "{",
             "    public interface IDbService",
             "    {",
-            "        Task<int> ExecuteAsync(string sqlCommand, object? param);",
+            "        Task<int> ExecuteAsync"
+            "(string sqlCommand, object? param);",
             "        Task<T?> GetAsync<T>(string sqlCommand, object? param);",
-            "        Task<IEnumerable<T>> ListAsync<T>(string sqlCommand, object? param);",
+            "        Task<IEnumerable<T>> ListAsync<T>"
+            "(string sqlCommand, object? param);",
             "    }",
             "}",
         ],
@@ -188,17 +190,21 @@ ECOMMERCE_FILE_DATA = [
             "{",
             "    public class DbService(IDbConnection conn) : IDbService",
             "    {",
-            "        public async Task<int> ExecuteAsync(string sqlCommand, object? param)",
+            "        public async Task<int> ExecuteAsync"
+            "(string sqlCommand, object? param)",
             "        {",
             "           return await conn.ExecuteAsync(sqlCommand, param);",
             "        }",
             "",
-            "        public async Task<T?> GetAsync<T>(string sqlCommand, object? param)",
+            "        public async Task<T?> GetAsync<T>"
+            "(string sqlCommand, object? param)",
             "        {",
-            "           return await conn.QuerySingleOrDefaultAsync<T>(sqlCommand, param);",
+            "           return await conn.QuerySingleOrDefaultAsync<T>"
+            "(sqlCommand, param);",
             "        }",
             "",
-            "        public async Task<IEnumerable<T>> ListAsync<T>(string sqlCommand, object? param)",
+            "        public async Task<IEnumerable<T>> ListAsync<T>"
+            "(string sqlCommand, object? param)",
             "        {",
             "           return await conn.QueryAsync<T>(sqlCommand, param);",
             "        }",
@@ -234,7 +240,8 @@ ECOMMERCE_FILE_DATA = [
             "    public interface IBrandRepo",
             "    {",
             "        Task<Brand?> GetAsync(BrandGetParam brandGetParam);",
-            "        Task<IEnumerable<Brand>> ListAsync(BrandListParam brandListParam);",
+            "        Task<IEnumerable<Brand>> ListAsync"
+            "(BrandListParam brandListParam);",
             "        Task<int> CreateAsync(Brand brand);",
             "        Task<int> UpdateAsync(Brand brand);",
             "        Task<int> DeleteAsync(BrandGetParam brandGetParam);",
@@ -250,7 +257,8 @@ ECOMMERCE_FILE_DATA = [
             "{",
             "    public class BrandListParam",
             "    {",
-            "        public IEnumerable<string> Brand_ids { get; set; } = default!;",
+            "        public IEnumerable<string> Brand_ids "
+            "{ get; set; } = default!;",
             "        public int Limit { get; set; } = 1000;",
             "        public int OffSet { get; set; } = 0;",
             "    }",
@@ -295,11 +303,20 @@ ECOMMERCE_FILE_DATA = [
             "{",
             "    public class BrandSqlCommand : ISqlCommand",
             "    {",
-            '        public string GetCommand => "SELECT brand_id, name, description FROM Brand WHERE brand_id = @brand_id;";',
-            '        public string ListCommand => "SELECT brand_id, name, description FROM Brand WHERE (@brand_ids = {} OR brand_ids = ANY(@brand_ids)) ORDER BY brand_id ASC LIMIT @limit OFFSET @offset;";',
-            '        public string CreateCommand => "INSERT INTO Brand(brand_id, name, description) VALUES(@brand_id, @name, @description);";',
-            '        public string UpdateCommand => "UPDATE Brand  SET name = @name, description = @description WHERE brand_id = @brand_id;";',
-            '        public string DeleteCommand => "DELETE FROM Brand WHERE brand_id = @brand_id;";',
+            '        public string GetCommand => "SELECT brand_id, name, '
+            'description FROM Brand WHERE brand_id = @brand_id;";',
+            '        public string ListCommand => '
+            '"SELECT brand_id, name, description FROM Brand '
+            'WHERE (@brand_ids = {} OR brand_ids = ANY(@brand_ids)) '
+            'ORDER BY brand_id ASC LIMIT @limit OFFSET @offset;";',
+            '        public string CreateCommand => '
+            '"INSERT INTO Brand(brand_id, name, description) '
+            'VALUES(@brand_id, @name, @description);";',
+            '        public string UpdateCommand => "UPDATE Brand  '
+            'SET name = @name, description = @description '
+            'WHERE brand_id = @brand_id;";',
+            '        public string DeleteCommand => "DELETE FROM Brand '
+            'WHERE brand_id = @brand_id;";',
             "    }",
             "}",
         ],
@@ -313,31 +330,40 @@ ECOMMERCE_FILE_DATA = [
             "",
             "namespace ProductDal.Repos",
             "{",
-            "    public class BrandRepo(IDbService dbService, ISqlCommand sqlCommand) : IBrandRepo",
+            "    public class BrandRepo"
+            "(IDbService dbService, ISqlCommand sqlCommand) : IBrandRepo",
             "    {",
-            "        public async Task<Brand?> GetAsync(BrandGetParam brandGetParam)",
+            "        public async Task<Brand?> GetAsync"
+            "(BrandGetParam brandGetParam)",
             "        {",
-            "           return await dbService.GetAsync<Brand>(sqlCommand.GetCommand, brandGetParam);",
+            "           return await dbService.GetAsync<Brand>"
+            "(sqlCommand.GetCommand, brandGetParam);",
             "        }",
             "",
-            "         public async Task<IEnumerable<Brand>> ListAsync(BrandListParam brand)",
+            "         public async Task<IEnumerable<Brand>> "
+            "ListAsync(BrandListParam brand)",
             "        {",
-            "           return await dbService.ListAsync<Brand>(sqlCommand.ListCommand, brand);",
+            "           return await dbService.ListAsync<Brand>"
+            "(sqlCommand.ListCommand, brand);",
             "        }",
             "",
             "        public async Task<int> CreateAsync(Brand brand)",
             "        {",
-            "           return await dbService.ExecuteAsync(sqlCommand.CreateCommand, brand);",
+            "           return await dbService.ExecuteAsync"
+            "(sqlCommand.CreateCommand, brand);",
             "        }",
             "",
             "        public async Task<int> UpdateAsync(Brand brand)",
             "        {",
-            "           return await dbService.ExecuteAsync(sqlCommand.UpdateCommand, brand);",
+            "           return await dbService.ExecuteAsync"
+            "(sqlCommand.UpdateCommand, brand);",
             "        }",
             "",
-            "        public async Task<int> DeleteAsync(BrandGetParam brandGetParam)",
+            "        public async Task<int> DeleteAsync"
+            "(BrandGetParam brandGetParam)",
             "        {",
-            "           return await dbService.ExecuteAsync(sqlCommand.DeleteCommand, brandGetParam);",
+            "           return await dbService.ExecuteAsync"
+            "(sqlCommand.DeleteCommand, brandGetParam);",
             "        }",
             "    }",
             "}",
@@ -353,11 +379,14 @@ ECOMMERCE_FILE_DATA = [
             "{",
             "    public interface ICategoryRepo",
             "    {",
-            "        Task<Category?> GetAsync(CategoryGetParam categoryGetParam);",
-            "        Task<IEnumerable<Category>> ListAsync(CategoryListParam categoryListParam);",
+            "        Task<Category?> GetAsync"
+            "(CategoryGetParam categoryGetParam);",
+            "        Task<IEnumerable<Category>> ListAsync"
+            "(CategoryListParam categoryListParam);",
             "        Task<int> CreateAsync(Category category);",
             "        Task<int> UpdateAsync(Category category);",
-            "        Task<int> DeleteAsync(CategoryGetParam categoryGetParam);",
+            "        Task<int> DeleteAsync"
+            "(CategoryGetParam categoryGetParam);",
             "    }",
             "}",
         ],
@@ -415,11 +444,18 @@ ECOMMERCE_FILE_DATA = [
             "{",
             "    public class CategorySqlCommand : ISqlCommand",
             "    {",
-            '        public string GetCommand => "SELECT id, name, description FROM Category WHERE id = @id;";',
-            '        public string ListCommand => "SELECT id, name, description FROM Category WHERE (@ids = {} OR ids = ANY(@ids)) ORDER BY id ASC LIMIT @limit OFFSET @offset;";',
-            '        public string CreateCommand => "INSERT INTO Category(id, name, description) VALUES(@id, @name, @description);";',
-            '        public string UpdateCommand => "UPDATE Category  SET name = @name, description = @description WHERE id = @id;";',
-            '        public string DeleteCommand => "DELETE FROM Category WHERE id = @id;";',
+            '        public string GetCommand => '
+            '"SELECT id, name, description FROM Category WHERE id = @id;";',
+            '        public string ListCommand => '
+            '"SELECT id, name, description FROM Category '
+            'WHERE (@ids = {} OR ids = ANY(@ids)) '
+            'ORDER BY id ASC LIMIT @limit OFFSET @offset;";',
+            '        public string CreateCommand => "INSERT INTO Category'
+            '(id, name, description) VALUES(@id, @name, @description);";',
+            '        public string UpdateCommand => "UPDATE Category  '
+            'SET name = @name, description = @description WHERE id = @id;";',
+            '        public string DeleteCommand => "DELETE FROM Category '
+            'WHERE id = @id;";',
             "    }",
             "}",
         ],
@@ -433,31 +469,40 @@ ECOMMERCE_FILE_DATA = [
             "",
             "namespace ProductDal.Repos",
             "{",
-            "    public class CategoryRepo(IDbService dbService, ISqlCommand sqlCommand) : ICategoryRepo",
+            "    public class CategoryRepo"
+            "(IDbService dbService, ISqlCommand sqlCommand) : ICategoryRepo",
             "    {",
-            "        public async Task<Category?> GetAsync(CategoryGetParam categoryGetParam)",
+            "        public async Task<Category?> GetAsync"
+            "(CategoryGetParam categoryGetParam)",
             "        {",
-            "           return await dbService.GetAsync<Category>(sqlCommand.GetCommand, categoryGetParam);",
+            "           return await dbService.GetAsync<Category>"
+            "(sqlCommand.GetCommand, categoryGetParam);",
             "        }",
             "",
-            "         public async Task<IEnumerable<Category>> ListAsync(CategoryListParam category)",
+            "         public async Task<IEnumerable<Category>> ListAsync"
+            "(CategoryListParam category)",
             "        {",
-            "           return await dbService.ListAsync<Category>(sqlCommand.ListCommand, category);",
+            "           return await dbService.ListAsync<Category>"
+            "(sqlCommand.ListCommand, category);",
             "        }",
             "",
             "        public async Task<int> CreateAsync(Category category)",
             "        {",
-            "           return await dbService.ExecuteAsync(sqlCommand.CreateCommand, category);",
+            "           return await dbService.ExecuteAsync"
+            "(sqlCommand.CreateCommand, category);",
             "        }",
             "",
             "        public async Task<int> UpdateAsync(Category category)",
             "        {",
-            "           return await dbService.ExecuteAsync(sqlCommand.UpdateCommand, category);",
+            "           return await dbService.ExecuteAsync"
+            "(sqlCommand.UpdateCommand, category);",
             "        }",
             "",
-            "        public async Task<int> DeleteAsync(CategoryGetParam categoryGetParam)",
+            "        public async Task<int> DeleteAsync"
+            "(CategoryGetParam categoryGetParam)",
             "        {",
-            "           return await dbService.ExecuteAsync(sqlCommand.DeleteCommand, categoryGetParam);",
+            "           return await dbService.ExecuteAsync"
+            "(sqlCommand.DeleteCommand, categoryGetParam);",
             "        }",
             "    }",
             "}",
@@ -473,8 +518,10 @@ ECOMMERCE_FILE_DATA = [
             "{",
             "    public interface IProductRepo",
             "    {",
-            "        Task<Product?> GetAsync(ProductGetParam productGetParam);",
-            "        Task<IEnumerable<Product>> ListAsync(ProductListParam productListParam);",
+            "        Task<Product?> GetAsync"
+            "(ProductGetParam productGetParam);",
+            "        Task<IEnumerable<Product>> ListAsync"
+            "(ProductListParam productListParam);",
             "        Task<int> CreateAsync(Product product);",
             "        Task<int> UpdateAsync(Product product);",
             "        Task<int> DeleteAsync(ProductGetParam productGetParam);",
@@ -490,7 +537,8 @@ ECOMMERCE_FILE_DATA = [
             "{",
             "    public class ProductListParam",
             "    {",
-            "        public IEnumerable<Guid> Productids { get; set; } = default!;",
+            "        public IEnumerable<Guid> Productids "
+            "{ get; set; } = default!;",
             "        public int Limit { get; set; } = 1000;",
             "        public int OffSet { get; set; } = 0;",
             "    }",
@@ -539,11 +587,26 @@ ECOMMERCE_FILE_DATA = [
             "{",
             "    public class ProductSqlCommand : ISqlCommand",
             "    {",
-            '        public string GetCommand => "SELECT productid, name, description, price, quantity, brand_id, category_id FROM product WHERE productid = @productid;";',
-            '        public string ListCommand => "SELECT productid, name, description, price, quantity, brand_id, category_id FROM product WHERE (@productids = {} OR productids = ANY(@productids)) AND (@brand_ids = {} OR brand_ids = ANY(@brand_ids)) AND (@category_ids = {} OR category_ids = ANY(@category_ids)) ORDER BY productid ASC LIMIT @limit OFFSET @offset;";',
-            '        public string CreateCommand => "INSERT INTO product(productid, name, description, price, quantity, brand_id, category_id) VALUES(@productid, @name, @description, @price, @quantity, @brand_id, @category_id);";',
-            '        public string UpdateCommand => "UPDATE product  SET name = @name, description = @description, price = @price, quantity = @quantity, brand_id = @brand_id, category_id = @category_id WHERE productid = @productid;";',
-            '        public string DeleteCommand => "DELETE FROM product WHERE productid = @productid;";',
+            '        public string GetCommand => "SELECT productid, '
+            'name, description, price, quantity, brand_id, category_id '
+            'FROM product WHERE productid = @productid;";',
+            '        public string ListCommand => "SELECT productid, '
+            'name, description, price, quantity, brand_id, category_id '
+            'FROM product WHERE '
+            '(@productids = {} OR productids = ANY(@productids)) '
+            'AND (@brand_ids = {} OR brand_ids = ANY(@brand_ids)) AND '
+            '(@category_ids = {} OR category_ids = ANY(@category_ids)) '
+            'ORDER BY productid ASC LIMIT @limit OFFSET @offset;";',
+            '        public string CreateCommand => "INSERT INTO product'
+            '(productid, name, description, price, quantity, brand_id, '
+            'category_id) VALUES(@productid, @name, @description, @price, '
+            '@quantity, @brand_id, @category_id);";',
+            '        public string UpdateCommand => "UPDATE product  '
+            'SET name = @name, description = @description, price = @price, '
+            'quantity = @quantity, brand_id = @brand_id, category_id = '
+            '@category_id WHERE productid = @productid;";',
+            '        public string DeleteCommand => "DELETE FROM product '
+            'WHERE productid = @productid;";',
             "    }",
             "}",
         ],
@@ -557,31 +620,40 @@ ECOMMERCE_FILE_DATA = [
             "",
             "namespace ProductDal.Repos",
             "{",
-            "    public class ProductRepo(IDbService dbService, ISqlCommand sqlCommand) : IProductRepo",
+            "    public class ProductRepo"
+            "(IDbService dbService, ISqlCommand sqlCommand) : IProductRepo",
             "    {",
-            "        public async Task<Product?> GetAsync(ProductGetParam productGetParam)",
+            "        public async Task<Product?> "
+            "GetAsync(ProductGetParam productGetParam)",
             "        {",
-            "           return await dbService.GetAsync<Product>(sqlCommand.GetCommand, productGetParam);",
+            "           return await dbService.GetAsync<Product>"
+            "(sqlCommand.GetCommand, productGetParam);",
             "        }",
             "",
-            "         public async Task<IEnumerable<Product>> ListAsync(ProductListParam product)",
+            "         public async Task<IEnumerable<Product>> ListAsync"
+            "(ProductListParam product)",
             "        {",
-            "           return await dbService.ListAsync<Product>(sqlCommand.ListCommand, product);",
+            "           return await dbService.ListAsync<Product>"
+            "(sqlCommand.ListCommand, product);",
             "        }",
             "",
             "        public async Task<int> CreateAsync(Product product)",
             "        {",
-            "           return await dbService.ExecuteAsync(sqlCommand.CreateCommand, product);",
+            "           return await dbService.ExecuteAsync"
+            "(sqlCommand.CreateCommand, product);",
             "        }",
             "",
             "        public async Task<int> UpdateAsync(Product product)",
             "        {",
-            "           return await dbService.ExecuteAsync(sqlCommand.UpdateCommand, product);",
+            "           return await dbService.ExecuteAsync"
+            "(sqlCommand.UpdateCommand, product);",
             "        }",
             "",
-            "        public async Task<int> DeleteAsync(ProductGetParam productGetParam)",
+            "        public async Task<int> DeleteAsync"
+            "(ProductGetParam productGetParam)",
             "        {",
-            "           return await dbService.ExecuteAsync(sqlCommand.DeleteCommand, productGetParam);",
+            "           return await dbService.ExecuteAsync"
+            "(sqlCommand.DeleteCommand, productGetParam);",
             "        }",
             "    }",
             "}",
@@ -857,9 +929,12 @@ DOTNET_TYPE_ENTITY_FILE_DATA = [
             "{",
             "    public interface IDbService",
             "    {",
-            "        Task<int> ExecuteAsync(string sqlCommand, object? param);",
-            "        Task<T?> GetAsync<T>(string sqlCommand, object? param);",
-            "        Task<IEnumerable<T>> ListAsync<T>(string sqlCommand, object? param);",
+            "        Task<int> ExecuteAsync"
+            "(string sqlCommand, object? param);",
+            "        Task<T?> GetAsync<T>"
+            "(string sqlCommand, object? param);",
+            "        Task<IEnumerable<T>> ListAsync<T>"
+            "(string sqlCommand, object? param);",
             "    }",
             "}",
         ],
@@ -876,17 +951,21 @@ DOTNET_TYPE_ENTITY_FILE_DATA = [
             "{",
             "    public class DbService(IDbConnection conn) : IDbService",
             "    {",
-            "        public async Task<int> ExecuteAsync(string sqlCommand, object? param)",
+            "        public async Task<int> ExecuteAsync"
+            "(string sqlCommand, object? param)",
             "        {",
             "           return await conn.ExecuteAsync(sqlCommand, param);",
             "        }",
             "",
-            "        public async Task<T?> GetAsync<T>(string sqlCommand, object? param)",
+            "        public async Task<T?> GetAsync<T>"
+            "(string sqlCommand, object? param)",
             "        {",
-            "           return await conn.QuerySingleOrDefaultAsync<T>(sqlCommand, param);",
+            "           return await conn.QuerySingleOrDefaultAsync<T>"
+            "(sqlCommand, param);",
             "        }",
             "",
-            "        public async Task<IEnumerable<T>> ListAsync<T>(string sqlCommand, object? param)",
+            "        public async Task<IEnumerable<T>> ListAsync<T>"
+            "(string sqlCommand, object? param)",
             "        {",
             "           return await conn.QueryAsync<T>(sqlCommand, param);",
             "        }",
@@ -921,11 +1000,14 @@ DOTNET_TYPE_ENTITY_FILE_DATA = [
             "{",
             "    public interface IDotNetDataTypesRepo",
             "    {",
-            "        Task<DotNetDataTypes?> GetAsync(DotNetDataTypesGetParam dotNetDataTypesGetParam);",
-            "        Task<IEnumerable<DotNetDataTypes>> ListAsync(DotNetDataTypesListParam dotNetDataTypesListParam);",
+            "        Task<DotNetDataTypes?> GetAsync"
+            "(DotNetDataTypesGetParam dotNetDataTypesGetParam);",
+            "        Task<IEnumerable<DotNetDataTypes>> ListAsync"
+            "(DotNetDataTypesListParam dotNetDataTypesListParam);",
             "        Task<int> CreateAsync(DotNetDataTypes dotNetDataTypes);",
             "        Task<int> UpdateAsync(DotNetDataTypes dotNetDataTypes);",
-            "        Task<int> DeleteAsync(DotNetDataTypesGetParam dotNetDataTypesGetParam);",
+            "        Task<int> DeleteAsync"
+            "(DotNetDataTypesGetParam dotNetDataTypesGetParam);",
             "    }",
             "}",
         ],
@@ -997,11 +1079,42 @@ DOTNET_TYPE_ENTITY_FILE_DATA = [
             "{",
             "    public class DotNetDataTypesSqlCommand : ISqlCommand",
             "    {",
-            '        public string GetCommand => "SELECT BooleanField, ByteField, SByteField, CharField, ShortField, UShortField, IntField, UIntField, LongField, ULongField, FloatField, DoubleField, DecimalField, StringField, DateTimeField, DateTimeOffField, EnumField, GuidField, NullableGuidField FROM DotNetDataTypes;";',
-            '        public string ListCommand => "SELECT BooleanField, ByteField, SByteField, CharField, ShortField, UShortField, IntField, UIntField, LongField, ULongField, FloatField, DoubleField, DecimalField, StringField, DateTimeField, DateTimeOffField, EnumField, GuidField, NullableGuidField FROM DotNetDataTypes;";',
-            '        public string CreateCommand => "INSERT INTO DotNetDataTypes(BooleanField, ByteField, SByteField, CharField, ShortField, UShortField, IntField, UIntField, LongField, ULongField, FloatField, DoubleField, DecimalField, StringField, DateTimeField, DateTimeOffField, EnumField, GuidField, NullableGuidField) VALUES(@BooleanField, @ByteField, @SByteField, @CharField, @ShortField, @UShortField, @IntField, @UIntField, @LongField, @ULongField, @FloatField, @DoubleField, @DecimalField, @StringField, @DateTimeField, @DateTimeOffField, @EnumField, @GuidField, @NullableGuidField);";',
-            '        public string UpdateCommand => "UPDATE DotNetDataTypes  SET BooleanField = @BooleanField, ByteField = @ByteField, SByteField = @SByteField, CharField = @CharField, ShortField = @ShortField, UShortField = @UShortField, IntField = @IntField, UIntField = @UIntField, LongField = @LongField, ULongField = @ULongField, FloatField = @FloatField, DoubleField = @DoubleField, DecimalField = @DecimalField, StringField = @StringField, DateTimeField = @DateTimeField, DateTimeOffField = @DateTimeOffField, EnumField = @EnumField, GuidField = @GuidField, NullableGuidField = @NullableGuidField;";',
-            '        public string DeleteCommand => "DELETE FROM DotNetDataTypes;";',
+            '        public string GetCommand => '
+            '"SELECT BooleanField, ByteField, SByteField, CharField, '
+            'ShortField, UShortField, IntField, UIntField, LongField, '
+            'ULongField, FloatField, DoubleField, DecimalField, StringField, '
+            'DateTimeField, DateTimeOffField, EnumField, GuidField, '
+            'NullableGuidField FROM DotNetDataTypes;";',
+            '        public string ListCommand => '
+            '"SELECT BooleanField, ByteField, SByteField, CharField, '
+            'ShortField, UShortField, IntField, UIntField, LongField, '
+            'ULongField, FloatField, DoubleField, DecimalField, StringField, '
+            'DateTimeField, DateTimeOffField, EnumField, GuidField, '
+            'NullableGuidField FROM DotNetDataTypes;";',
+            '        public string CreateCommand => '
+            '"INSERT INTO DotNetDataTypes(BooleanField, ByteField, '
+            'SByteField, CharField, ShortField, UShortField, IntField, '
+            'UIntField, LongField, ULongField, FloatField, DoubleField, '
+            'DecimalField, StringField, DateTimeField, DateTimeOffField, '
+            'EnumField, GuidField, NullableGuidField) VALUES(@BooleanField, '
+            '@ByteField, @SByteField, @CharField, @ShortField, @UShortField, '
+            '@IntField, @UIntField, @LongField, @ULongField, @FloatField, '
+            '@DoubleField, @DecimalField, @StringField, @DateTimeField, '
+            '@DateTimeOffField, @EnumField, @GuidField, '
+            '@NullableGuidField);";',
+            '        public string UpdateCommand => "UPDATE DotNetDataTypes  '
+            'SET BooleanField = @BooleanField, ByteField = @ByteField, '
+            'SByteField = @SByteField, CharField = @CharField, '
+            'ShortField = @ShortField, UShortField = @UShortField, '
+            'IntField = @IntField, UIntField = @UIntField, '
+            'LongField = @LongField, ULongField = @ULongField, '
+            'FloatField = @FloatField, DoubleField = @DoubleField, '
+            'DecimalField = @DecimalField, StringField = @StringField, '
+            'DateTimeField = @DateTimeField, DateTimeOffField = '
+            '@DateTimeOffField, EnumField = @EnumField, GuidField = '
+            '@GuidField, NullableGuidField = @NullableGuidField;";',
+            '        public string DeleteCommand => "DELETE '
+            'FROM DotNetDataTypes;";',
             "    }",
             "}",
         ],
