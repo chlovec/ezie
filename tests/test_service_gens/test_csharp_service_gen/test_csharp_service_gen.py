@@ -1,4 +1,5 @@
 from os import path
+from pathlib import Path
 import unittest
 
 import send2trash
@@ -11,9 +12,10 @@ from sql_generator.sql_generator import (
     PgsqlCommandGenerator, PgsqlTableSqlGenerator
 )
 
-
+OUTPUT_PATH: str = "test_file_output/"
 ECOMMERCE: str = "Ecommerce"
-OUTPUT_PATH: str = ""
+PRODUCT_API: str = "ProductApi"
+
 SELF_REF_AND_ENTITY_REF_SCHEMA: str = '''
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -113,21 +115,26 @@ SELF_REF_AND_ENTITY_REF_SCHEMA: str = '''
 
 class TestDotnetProcessRunner(unittest.TestCase):
     def setUp(self) -> None:
+        self.output_path = str(Path(OUTPUT_PATH).resolve())
         self._delete_output_folder(ECOMMERCE)
 
     def _delete_output_folder(self, folder: str):
-        folder_path: str = path.join(OUTPUT_PATH, folder)
+        folder_path: str = str(path.join(self.output_path, folder))
         if path.exists(folder_path):
             send2trash.send2trash(folder_path)
 
     def test_gen_rest_service(self):
         CsharpRestServiceGenerator.gen_services_from_file_content(
-            output_path=OUTPUT_PATH,
+            output_path=self.output_path,
             sln_name=ECOMMERCE,
-            service_name="ProductApi",
+            service_name=PRODUCT_API,
             file_content=SELF_REF_AND_ENTITY_REF_SCHEMA,
             sql_gen=PgsqlCommandGenerator(entity=None),
             db_type_mapper=PgsqlTypeMapper(),
             db_script_gen=PgsqlTableSqlGenerator()
         )
         self.assertTrue(True)
+
+
+if __name__ == '__main__':
+    unittest.main()
