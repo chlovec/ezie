@@ -1,10 +1,10 @@
 import os
 import subprocess
+
 from data_type_mapper.data_type_mapper import TypeMapper
 from entity_parser.entity_parser import JsonSchemaParser
-from service_gens.csharp_service_gen.db_service_gen import (
-    DbServiceGenerator
-)
+from service_gens.csharp_service_gen.db_service_gen import DbServiceGenerator
+from service_gens.csharp_service_gen.secret_manager_gen import SecretManagerGen
 from service_gens.csharp_service_gen.utils import (
     SECRET_MANAGER, CsharpServiceUtil
 )
@@ -24,7 +24,7 @@ class DotnetProcessRunner:
 
         # Create directories
         dir_paths = [
-            svc_util.env_mgr_dir_path,
+            svc_util.secret_mgr_env_mgr_dir_path,
             svc_util.models_dir_path,
             svc_util.repos_dir_path,
             svc_util.interfaces_dir_path,
@@ -141,7 +141,6 @@ class CsharpRestServiceGenerator:
             db_type_mapper=None,
             sql_gen=sql_gen
         )
-
         for file_data in service_gen.gen_service():
             write_file_data(file_data)
 
@@ -153,3 +152,11 @@ class CsharpRestServiceGenerator:
             file_name=svc_dir.db_scripts_file_name
         )
         write_file_data(db_scripts_data)
+
+        # Generate and write secret manager files
+        secret_mgr_gen = SecretManagerGen(
+            service_name="SecretManager",
+            svc_dir=svc_dir
+        )
+        for file_data in secret_mgr_gen.gen_service():
+            write_file_data(file_data)

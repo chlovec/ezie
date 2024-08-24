@@ -1,6 +1,6 @@
 from os import path
-from service_gens.service_gen import ServiceUtil
 
+from service_gens.service_gen import ServiceUtil
 
 ZERO: int = 0
 ONE: int = 1
@@ -24,10 +24,6 @@ class CsharpServiceUtil(ServiceUtil):
     @property
     def db_scripts_dir_path(self) -> str:
         return path.join(self.sln_path, DB_SCRIPTS)
-
-    @property
-    def env_mgr_dir_path(self) -> str:
-        return path.join(self.secret_mgr_dir_path, ENV_MANAGER)
 
     @property
     def interfaces_dir_path(self) -> str:
@@ -87,6 +83,39 @@ class CsharpServiceUtil(ServiceUtil):
     @property
     def db_service_class_name(self) -> str:
         return DB_SERVICE
+
+    # Secret Manager
+    @property
+    def secret_mgr_env_mgr_dir_path(self) -> str:
+        return path.join(self.secret_mgr_dir_path, ENV_MANAGER)
+
+    @property
+    def secret_mgr_class_name(self) -> str:
+        return "DbSecretManager"
+
+    @property
+    def secret_mgr_db_user_name(self) -> str:
+        return '"DB_USERNAME"'
+
+    @property
+    def secret_mgr_db_password(self) -> str:
+        return '"DB_PASSWORD"'
+
+    @property
+    def secret_mgr_db_name(self) -> str:
+        return '"DB_NAME"'
+
+    @property
+    def secret_mgr_db_port(self) -> str:
+        return '"DB_PORT"'
+
+    @property
+    def secret_mgr_db_host(self) -> str:
+        return '"DB_HOST"'
+
+    @property
+    def secret_mgr_ns(self) -> str:
+        return f"{SECRET_MANAGER}.{ENV_MANAGER}"
 
     @property
     def proj_full_name(self) -> str:
