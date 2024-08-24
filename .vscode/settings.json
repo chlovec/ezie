@@ -24,6 +24,7 @@
         "lseg",
         "macaddr",
         "numrange",
+        "pytest",
         "sqls",
         "TIMESPAN",
         "timestamptz",

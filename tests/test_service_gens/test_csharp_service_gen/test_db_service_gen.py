@@ -1677,5 +1677,4 @@ class TestDbServiceGenerator(unittest.TestCase):
             sql_gen=PgsqlCommandGenerator(entity=None)
         )
         actual_file_data = list(service_gen.gen_service())
-        print(actual_file_data)
         self.assertEqual(expected_file_data, actual_file_data)

@@ -1,4 +1,7 @@
+from os import path
 import unittest
+
+import send2trash
 
 from data_type_mapper.sql_type_mapper import PgsqlTypeMapper
 from service_gens.csharp_service_gen.csharp_service_gen import (
@@ -9,8 +12,8 @@ from sql_generator.sql_generator import (
 )
 
 
+ECOMMERCE: str = "Ecommerce"
 OUTPUT_PATH: str = ""
-
 SELF_REF_AND_ENTITY_REF_SCHEMA: str = '''
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -109,10 +112,18 @@ SELF_REF_AND_ENTITY_REF_SCHEMA: str = '''
 
 
 class TestDotnetProcessRunner(unittest.TestCase):
+    def setUp(self) -> None:
+        self._delete_output_folder(ECOMMERCE)
+
+    def _delete_output_folder(self, folder: str):
+        folder_path: str = path.join(OUTPUT_PATH, folder)
+        if path.exists(folder_path):
+            send2trash.send2trash(folder_path)
+
     def test_gen_rest_service(self):
         CsharpRestServiceGenerator.gen_services_from_file_content(
             output_path=OUTPUT_PATH,
-            sln_name="Ecommerce",
+            sln_name=ECOMMERCE,
             service_name="ProductApi",
             file_content=SELF_REF_AND_ENTITY_REF_SCHEMA,
             sql_gen=PgsqlCommandGenerator(entity=None),

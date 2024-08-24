@@ -10,7 +10,7 @@ from service_gens.csharp_service_gen.utils import (
 )
 from service_gens.service_gen import CSharpTypeMapper
 from sql_generator.sql_generator import SqlCommandGenerator, TableSqlGenerator
-from utils.utils import write_file_data
+from utils.utils import read_file_content, write_file_data
 
 
 class DotnetProcessRunner:
@@ -36,7 +36,7 @@ class DotnetProcessRunner:
             dir_paths.append(svc_util.db_scripts_dir_path)
 
         for dir_path in dir_paths:
-            os.mkdir(dir_path)
+            os.makedirs(dir_path)
 
         # Delete Class1.cs files
         os.remove(svc_util.service_class1_cs)
@@ -103,6 +103,27 @@ class DotnetProcessRunner:
 
 
 class CsharpRestServiceGenerator:
+    @staticmethod
+    def gen_services_from_file_path(
+        output_path: str,
+        sln_name: str,
+        service_name: str,
+        file_path: str,
+        sql_gen: SqlCommandGenerator,
+        db_type_mapper: TypeMapper,
+        db_script_gen: TableSqlGenerator
+    ) -> None:
+        file_content: str = read_file_content(file_path)
+        CsharpRestServiceGenerator.gen_services_from_file_content(
+            output_path=output_path,
+            sln_name=sln_name,
+            service_name=service_name,
+            file_content=file_content,
+            sql_gen=SqlCommandGenerator,
+            db_type_mapper=db_type_mapper,
+            db_script_gen=db_script_gen
+        )
+
     @staticmethod
     def gen_services_from_file_content(
         output_path: str,

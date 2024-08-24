@@ -6,6 +6,11 @@ from data_type_mapper.data_type_mapper import TypeMapper
 from entity_parser.entity import Entity, EntityField, FieldData, RefEntityField
 
 
+def read_file_content(file_path: str) -> None:
+    with open(file_path) as file:
+        return file.read()
+
+
 def remove_last_comma(s: str) -> str:
     if s.endswith(","):
         return s[:-1]
