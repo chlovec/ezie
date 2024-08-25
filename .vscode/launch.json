@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Module",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "pytest",  // Or use "pytest" if you are running tests
+            "args": ["--maxfail=1", "--disable-warnings"],
+            "justMyCode": false,
+            "env": { "PYTHONPATH": "${workspaceFolder}" },  // Add this line
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal"
+        }
+    ]
+}

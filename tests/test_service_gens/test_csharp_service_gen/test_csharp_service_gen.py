@@ -1,7 +1,9 @@
 from os import path
 from pathlib import Path
+from typing import List
 import unittest
 
+from parameterized import parameterized
 import send2trash
 
 from data_type_mapper.sql_type_mapper import PgsqlTypeMapper
@@ -15,7 +17,11 @@ from sql_generator.sql_generator import (
 OUTPUT_PATH: str = "test_file_output/"
 ECOMMERCE: str = "Ecommerce"
 PRODUCT_API: str = "ProductApi"
-
+ECOMMERCE_PROJECT_FILES: List[str] = [
+    "Ecommerce/Ecommerce.sln",
+    "Ecommerce/src/ProductApiDal/ProductApiDal.csproj",
+    "Ecommerce/src/SecretManager/SecretManager.csproj",
+]
 SELF_REF_AND_ENTITY_REF_SCHEMA: str = '''
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -119,11 +125,17 @@ class TestDotnetProcessRunner(unittest.TestCase):
         self._delete_output_folder(ECOMMERCE)
 
     def _delete_output_folder(self, folder: str):
-        folder_path: str = str(path.join(self.output_path, folder))
+        folder_path: str = path.join(self.output_path, folder)
         if path.exists(folder_path):
             send2trash.send2trash(folder_path)
 
-    def test_gen_rest_service(self):
+    @parameterized.expand([
+        (
+            "ecommerce_product_api",
+            ECOMMERCE_PROJECT_FILES
+        ),
+    ])
+    def test_gen_rest_service(self, name: str, project_files: List[str]):
         CsharpRestServiceGenerator.gen_services_from_file_content(
             output_path=self.output_path,
             sln_name=ECOMMERCE,
@@ -133,8 +145,9 @@ class TestDotnetProcessRunner(unittest.TestCase):
             db_type_mapper=PgsqlTypeMapper(),
             db_script_gen=PgsqlTableSqlGenerator()
         )
-        self.assertTrue(True)
 
-
-if __name__ == '__main__':
-    unittest.main()
+        # Verify project files exist
+        for file_path in project_files:
+            full_file_name: str = path.join(self.output_path, file_path)
+            file_exist = path.exists(full_file_name)
+            self.assertTrue(file_exist)
