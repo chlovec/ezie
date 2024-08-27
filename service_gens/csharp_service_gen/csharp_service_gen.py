@@ -119,7 +119,7 @@ class CsharpRestServiceGenerator:
             sln_name=sln_name,
             service_name=service_name,
             file_content=file_content,
-            sql_gen=SqlCommandGenerator,
+            sql_gen=sql_gen,
             db_type_mapper=db_type_mapper,
             db_script_gen=db_script_gen
         )
